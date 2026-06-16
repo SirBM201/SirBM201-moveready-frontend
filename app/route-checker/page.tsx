@@ -1,3 +1,5 @@
+import RouteReadinessForm from "@/components/RouteReadinessForm";
+
 const routeOptions = [
   { title: "Study", fit: "Admission, scholarship, tuition, proof of funds, insurance", risk: "Medium" },
   { title: "Startup", fit: "Founder role, innovation, traction, funds, relocation intent", risk: "Medium" },
@@ -12,28 +14,24 @@ export default function RouteCheckerPage() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="/"><strong>Project MoveReady</strong><span>Route checker</span></a>
-        <nav className="nav"><a href="/">Home</a><a href="/document-checklist">Documents</a><a href="/report-preview">Report</a></nav>
+        <nav className="nav"><a href="/">Home</a><a href="/document-checklist">Documents</a><a href="/budget-calculator">Budget</a><a href="/report-preview">Report</a></nav>
       </header>
-      <section className="hero-band">
+
+      <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">MVP workflow</span>
+          <span className="eyebrow">Live MVP workflow</span>
           <h1>Find the most realistic pathway before spending money.</h1>
-          <p className="lede">The checker starts with the user's goal, current country, target country, family size, funds, and timeline. It then points them toward route categories that deserve deeper review.</p>
+          <p className="lede">Enter a basic profile and generate a starter checklist, budget estimate, and readiness report from the backend.</p>
         </div>
-        <aside className="workflow-panel">
-          <h2>Profile inputs</h2>
-          <div className="form-grid">
-            <div className="field"><label>Main goal</label><select defaultValue="startup"><option>Study</option><option>Startup</option><option>Work</option><option>Family</option><option>Visit</option></select></div>
-            <div className="field"><label>Current country</label><input placeholder="Example: Kuwait" /></div>
-            <div className="field"><label>Target country</label><input placeholder="Example: Estonia" /></div>
-            <div className="field"><label>Available funds</label><input placeholder="Example: 12000 EUR" /></div>
-            <a className="btn primary" href="/report-preview">Preview result</a>
-          </div>
-        </aside>
       </section>
+
+      <section className="section no-top-pad">
+        <RouteReadinessForm />
+      </section>
+
       <section className="section">
         <h2>Route categories</h2>
-        <p className="section-intro">These are starter categories. Later, each category will be connected to approved country-specific route versions and source snapshots.</p>
+        <p className="section-intro">These starter categories will be connected to approved country-specific route versions and source snapshots as the admin review system grows.</p>
         <div className="grid">
           {routeOptions.map((route) => (
             <article className="card" key={route.title}>
