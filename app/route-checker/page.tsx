@@ -6,7 +6,7 @@ export default function RouteCheckerPage() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="/"><strong>Project MoveReady</strong><span>Route checker</span></a>
-        <nav className="nav"><a href="/">Home</a><a href="/document-checklist">Documents</a><a href="/budget-calculator">Budget</a><a href="/report-preview">Report</a></nav>
+        <nav className="nav"><a href="/">Home</a><a href="/routes/estonia-startup">Estonia Route</a><a href="/document-checklist">Documents</a><a href="/budget-calculator">Budget</a><a href="/report-preview">Report</a></nav>
       </header>
 
       <section className="hero-band compact-hero">
@@ -14,6 +14,9 @@ export default function RouteCheckerPage() {
           <span className="eyebrow">Live MVP workflow</span>
           <h1>Find the most realistic pathway before spending money.</h1>
           <p className="lede">Enter a basic profile and generate a starter checklist, budget estimate, and readiness report from the backend.</p>
+          <div className="actions">
+            <a className="btn" href="/routes/estonia-startup">Open Estonia startup route</a>
+          </div>
         </div>
       </section>
 
