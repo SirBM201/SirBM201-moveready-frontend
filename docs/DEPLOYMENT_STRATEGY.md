@@ -1,10 +1,22 @@
 # MoveReady Frontend Deployment Strategy
 
-Status: staging plan
+Status: frontend staging ready
 
-## Decision
+## Backend URL
 
-Deploy the MoveReady frontend separately from the backend. The frontend can safely use Vercel or Netlify while the backend runs on a staging provider.
+Use the active Railway backend:
+
+```text
+https://moveready-mvp-production.up.railway.app
+```
+
+Verified backend endpoints:
+
+```text
+/health
+/api/health
+/api/relocation/countries
+```
 
 ## Recommended Frontend Provider
 
@@ -12,11 +24,11 @@ Vercel is the preferred staging host because this is a Next.js frontend.
 
 Alternative: Netlify Free.
 
-## Required Environment Variables
+## Required Vercel Environment Variables
 
 ```text
 NEXT_PUBLIC_APP_NAME=Project MoveReady
-NEXT_PUBLIC_BACKEND_URL=https://your-backend-staging-domain
+NEXT_PUBLIC_BACKEND_URL=https://moveready-mvp-production.up.railway.app
 NEXT_PUBLIC_API_BASE=
 ```
 
@@ -28,14 +40,14 @@ Example:
 
 ```text
 Frontend request: /api/relocation/countries
-Backend target:   https://your-backend-staging-domain/api/relocation/countries
+Backend target:   https://moveready-mvp-production.up.railway.app/api/relocation/countries
 ```
 
 ## Temporary Architecture
 
 ```text
 MoveReady frontend -> Vercel
-MoveReady backend  -> Railway or PythonAnywhere
+MoveReady backend  -> Railway
 Database           -> Supabase
 ```
 
