@@ -1,3 +1,5 @@
+import LiveScholarshipList from "@/components/LiveScholarshipList";
+
 const scholarshipFilters = [
   "Target country",
   "Education level",
@@ -15,12 +17,17 @@ export default function ScholarshipsPage() {
         <div className="hero-copy">
           <span className="eyebrow">Student pathway module</span>
           <h1>Scholarships should support the route, not become the whole app.</h1>
-          <p className="lede">MoveReady will help users find relevant funding options while still checking visa route, documents, insurance, proof of funds, and arrival readiness.</p>
+          <p className="lede">MoveReady will help users find relevant funding options while still checking visa route, documents, funds, and arrival readiness.</p>
         </div>
         <aside className="workflow-panel">
           <h2>Scholarship filters</h2>
           <div className="badge-row">{scholarshipFilters.map((item) => <span className="badge" key={item}>{item}</span>)}</div>
         </aside>
+      </section>
+      <section className="section">
+        <h2>Live scholarship records</h2>
+        <p className="section-intro">This list loads through the API. New records can be added later from the admin workflow.</p>
+        <LiveScholarshipList />
       </section>
     </main>
   );
