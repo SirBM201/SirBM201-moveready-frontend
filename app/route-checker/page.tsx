@@ -1,13 +1,5 @@
+import LiveRouteGrid from "@/components/LiveRouteGrid";
 import RouteReadinessForm from "@/components/RouteReadinessForm";
-
-const routeOptions = [
-  { title: "Study", fit: "Admission, scholarship, tuition, proof of funds, insurance", risk: "Medium" },
-  { title: "Startup", fit: "Founder role, innovation, traction, funds, relocation intent", risk: "Medium" },
-  { title: "Work", fit: "Job offer, employer sponsorship, qualifications, salary threshold", risk: "High" },
-  { title: "Family", fit: "Relationship evidence, sponsor status, income, housing", risk: "High" },
-  { title: "Visit", fit: "Purpose, ties to residence country, travel funds, return plan", risk: "Medium" },
-  { title: "Digital nomad", fit: "Remote income, clients, insurance, accommodation, tax exposure", risk: "Medium" },
-];
 
 export default function RouteCheckerPage() {
   return (
@@ -30,17 +22,9 @@ export default function RouteCheckerPage() {
       </section>
 
       <section className="section">
-        <h2>Route categories</h2>
-        <p className="section-intro">These starter categories will be connected to approved country-specific route versions and source snapshots as the admin review system grows.</p>
-        <div className="grid">
-          {routeOptions.map((route) => (
-            <article className="card" key={route.title}>
-              <h3>{route.title}</h3>
-              <p>{route.fit}</p>
-              <div className="badge-row"><span className="badge">Risk: {route.risk}</span><span className="badge">Needs source review</span></div>
-            </article>
-          ))}
-        </div>
+        <h2>Live route records</h2>
+        <p className="section-intro">These records come through the API. Each route should eventually have an active reviewed version, risk level, confidence status, and review due date.</p>
+        <LiveRouteGrid />
       </section>
     </main>
   );
