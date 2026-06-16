@@ -1,5 +1,10 @@
 const routes = [
   {
+    title: "Estonia startup route",
+    href: "/routes/estonia-startup",
+    text: "Review Startup Committee, D visa, document, funds, insurance, and budget readiness for Estonia startup founders.",
+  },
+  {
     title: "Route checker",
     href: "/route-checker",
     text: "Compare study, work, startup, family, scholarship, visitor, and digital-nomad pathways before spending money.",
@@ -47,6 +52,7 @@ export default function Home() {
           <span>Global relocation readiness platform</span>
         </a>
         <nav className="nav" aria-label="Main navigation">
+          <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/document-checklist">Documents</a>
           <a href="/budget-calculator">Budget</a>
@@ -65,7 +71,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
-            <a className="btn" href="/report-preview">Preview readiness report</a>
+            <a className="btn" href="/routes/estonia-startup">View Estonia startup route</a>
           </div>
         </div>
 
@@ -90,7 +96,7 @@ export default function Home() {
               <label htmlFor="target">Target country</label>
               <input id="target" placeholder="Example: Estonia, Portugal, Finland" />
             </div>
-            <a className="btn primary" href="/report-preview">Generate starter plan</a>
+            <a className="btn primary" href="/route-checker">Generate starter plan</a>
           </div>
         </aside>
       </section>
