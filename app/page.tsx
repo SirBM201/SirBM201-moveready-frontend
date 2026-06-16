@@ -1,26 +1,32 @@
 const routes = [
   {
     title: "Route checker",
+    href: "/route-checker",
     text: "Compare study, work, startup, family, scholarship, visitor, and digital-nomad pathways before spending money.",
   },
   {
     title: "Document checklist",
+    href: "/document-checklist",
     text: "Turn a route into a practical document list with required, conditional, and recommended items.",
   },
   {
     title: "Funds and budget readiness",
+    href: "/budget-calculator",
     text: "Estimate application costs, proof-of-funds pressure, insurance, travel, accommodation, and first-arrival costs.",
   },
   {
     title: "Scholarship matching",
+    href: "/scholarships",
     text: "Help students find funding routes without making scholarship research the whole product.",
   },
   {
     title: "Insurance guidance",
+    href: "/insurance-guide",
     text: "Show when travel, student, health, family, or work insurance may be needed for a route.",
   },
   {
     title: "Readiness reports",
+    href: "/report-preview",
     text: "Generate a route-specific action plan with risk notes, source status, and next steps.",
   },
 ];
@@ -41,10 +47,12 @@ export default function Home() {
           <span>Global relocation readiness platform</span>
         </a>
         <nav className="nav" aria-label="Main navigation">
-          <a href="#checker">Route Checker</a>
-          <a href="#modules">Modules</a>
-          <a href="#trust">Trust System</a>
-          <a href="#report">Report</a>
+          <a href="/route-checker">Route Checker</a>
+          <a href="/document-checklist">Documents</a>
+          <a href="/budget-calculator">Budget</a>
+          <a href="/scholarships">Scholarships</a>
+          <a href="/insurance-guide">Insurance</a>
+          <a href="/report-preview">Report</a>
         </nav>
       </header>
 
@@ -56,8 +64,8 @@ export default function Home() {
             MoveReady helps users compare realistic visa, study, work, business, family, scholarship, and relocation pathways, then prepare documents, funds, budget, insurance, and next steps from source-backed data.
           </p>
           <div className="actions">
-            <a className="btn primary" href="#report">Preview readiness report</a>
-            <a className="btn" href="#modules">See MVP modules</a>
+            <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/report-preview">Preview readiness report</a>
           </div>
         </div>
 
@@ -82,7 +90,7 @@ export default function Home() {
               <label htmlFor="target">Target country</label>
               <input id="target" placeholder="Example: Estonia, Portugal, Finland" />
             </div>
-            <a className="btn primary" href="#report">Generate starter plan</a>
+            <a className="btn primary" href="/report-preview">Generate starter plan</a>
           </div>
         </aside>
       </section>
@@ -103,10 +111,10 @@ export default function Home() {
         </p>
         <div className="grid">
           {routes.map((route) => (
-            <article className="card" key={route.title}>
+            <a className="card" href={route.href} key={route.title}>
               <h3>{route.title}</h3>
               <p>{route.text}</p>
-            </article>
+            </a>
           ))}
         </div>
       </section>
