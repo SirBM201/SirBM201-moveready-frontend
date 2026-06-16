@@ -166,7 +166,7 @@ export default function LiveRouteDetail({ countryCode, routeCode }: Props) {
               {(route.documents || []).map((item) => (
                 <div key={`${item.document_name}-${item.display_order}`}>
                   <strong>{item.document_name || "Document"}</strong>
-                  <span>{item.requirement_level || "review"} · {item.details || "Details pending review."}</span>
+                  <span>{item.requirement_level || "review"} - {item.details || "Details pending review."}</span>
                 </div>
               ))}
             </div>
