@@ -2,26 +2,19 @@
 
 Working frontend repository for Project MoveReady, a global visa, travel, and relocation readiness platform.
 
-Final brand name and domain will be decided later. For now, this frontend should use neutral MoveReady/relocation naming.
+Final brand name and domain will be decided later. For now, this frontend uses neutral MoveReady/relocation naming.
 
-## Direction
+## Current Status
 
-This frontend should reuse proven patterns from the existing Naija Tax Guide / TaxBridge frontend, especially:
+Starter Next.js frontend scaffold is in place, adapted from the proven Naija Tax Guide / TaxBridge structure but cleaned of tax-specific content.
 
-- Next.js app router structure
-- API helper pattern
-- Public checker/report flow
-- Admin page structure
-- Report preview/export ideas
-- Clean public landing and tool pages
+The current pages are mostly static/mock-backed until the Supabase schema is run and backend environment variables are connected.
 
-It should not carry over tax-specific content, tax calculators, quiz logic, plan text, or old brand language.
-
-## MVP Pages
+## Implemented Pages
 
 - `/`
-- `/route-checker`
 - `/country-checker`
+- `/route-checker`
 - `/document-checklist`
 - `/proof-of-funds`
 - `/budget-calculator`
@@ -36,6 +29,23 @@ It should not carry over tax-specific content, tax calculators, quiz logic, plan
 - `/admin/reviews`
 - `/admin/reports`
 
+## Reused Foundation
+
+- Next.js app router structure
+- TypeScript setup
+- API helper pattern
+- Backend rewrite pattern
+- Public checker/report flow direction
+- Admin-page structure direction
+
+## Not Reused
+
+- Tax calculators
+- Tax quiz
+- Naija Tax Guide pricing
+- WhatsApp/Telegram tax menu patching
+- Tax-specific prompts or copy
+
 ## Product Rule
 
 The frontend should show trust clearly:
@@ -48,3 +58,11 @@ The frontend should show trust clearly:
 - Whether a report needs refresh
 
 AI output should feel helpful, but source freshness should carry the trust.
+
+## Next Frontend Work
+
+- Connect route checker form to `/api/relocation/reports`
+- Connect countries/routes pages to backend data
+- Add loading, empty, and error states
+- Add report export/download later
+- Add login and saved-report ownership after backend auth is added
