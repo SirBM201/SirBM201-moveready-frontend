@@ -67,6 +67,32 @@ export default function RouteReadinessForm() {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  function downloadReport() {
+    if (!result?.report) return;
+    const payload = {
+      exported_at: new Date().toISOString(),
+      input: form,
+      checklist: result.checklist || [],
+      budget: result.budget || null,
+      report: result.report,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${result.report.report_ref || "moveready-report"}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function printReport() {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -209,6 +235,10 @@ export default function RouteReadinessForm() {
                   <span className="badge">Risk: {result.report.risk_level}</span>
                   <span className="badge">Stored: {result.report.stored ? "yes" : "not yet"}</span>
                   <span className="badge">{result.report.source_status}</span>
+                </div>
+                <div className="actions report-actions">
+                  <button className="btn" type="button" onClick={downloadReport}>Download JSON</button>
+                  <button className="btn" type="button" onClick={printReport}>Print report</button>
                 </div>
                 {result.report.storage_note ? <p className="note">{result.report.storage_note}</p> : null}
                 <div className="mini-list">
