@@ -30,7 +30,8 @@ export default async function PlatformModulePage({ params }: { params: Promise<{
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
-          <a href="/platform">Platform</a>
+          <a href="/platform">Services</a>
+          <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
@@ -44,6 +45,7 @@ export default async function PlatformModulePage({ params }: { params: Promise<{
           <p className="lede">{module.summary}</p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Use live route checker</a>
+            <a className="btn" href="/watchlist">Create watchlist alert</a>
             <a className="btn" href="/platform">Back to services</a>
           </div>
         </div>
