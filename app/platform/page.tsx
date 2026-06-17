@@ -17,6 +17,7 @@ export default function PlatformPage() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/opportunities">Opportunities</a>
+          <a href="/readiness">Readiness</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/country-checker">Countries</a>
@@ -32,8 +33,8 @@ export default function PlatformPage() {
             MoveReady brings route intelligence, official opportunity monitoring, documents, funds, alerts, courier, legalization, insurance, appointments, family planning, and post-arrival support into one source-backed platform.
           </p>
           <div className="actions">
-            <a className="btn primary" href="/opportunities">View official opportunities</a>
-            <a className="btn" href="/route-checker">Use route checker</a>
+            <a className="btn primary" href="/readiness">Use readiness tools</a>
+            <a className="btn" href="/opportunities">View official opportunities</a>
           </div>
         </div>
       </section>
