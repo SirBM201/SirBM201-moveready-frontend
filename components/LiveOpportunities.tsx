@@ -98,6 +98,25 @@ export default function LiveOpportunities() {
 
   return (
     <div className="opportunity-workspace">
+      <style>{`
+        .opportunity-workspace { display: grid; gap: 16px; }
+        .opportunity-filter { grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.34fr) minmax(180px, 0.34fr); }
+        .opportunity-list { display: grid; gap: 16px; }
+        .opportunity-card { display: grid; gap: 18px; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: var(--shadow); }
+        .opportunity-card-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: start; }
+        .opportunity-card h3 { margin: 10px 0 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.05; }
+        .opportunity-card p { margin: 0; max-width: 900px; color: var(--muted); line-height: 1.6; }
+        .compact-badges { justify-content: flex-end; margin-top: 0; }
+        .opportunity-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .opportunity-detail-grid div { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fbfdff; }
+        .opportunity-detail-grid strong { font-size: 13px; }
+        .opportunity-detail-grid span { color: var(--muted); line-height: 1.5; }
+        .small-actions { margin-top: 0; }
+        .opportunity-status.open, .opportunity-status.results_open { color: var(--brand-strong); background: #e7f4f2; border-color: #b9d7d3; }
+        .opportunity-status.closed, .opportunity-status.paused { color: var(--warning); background: #fff7ed; border-color: #fed7aa; }
+        @media (max-width: 980px) { .opportunity-filter, .opportunity-card-head, .opportunity-detail-grid { grid-template-columns: 1fr; } .compact-badges { justify-content: flex-start; } }
+      `}</style>
+
       <div className="admin-toolbar opportunity-filter">
         <div className="field">
           <label htmlFor="opportunity_query">Search</label>
