@@ -555,18 +555,18 @@ h1 {
   gap: 8px;
 }
 
-.module-status.live {
+.module-status.available {
   color: var(--brand-strong);
   background: #e7f4f2;
   border-color: #b9d7d3;
 }
 
-.module-status.planned {
+.module-status.coming_soon {
   color: #374151;
   background: #f3f4f6;
 }
 
-.module-status.partner_pending {
+.module-status.partner_approval {
   color: var(--warning);
   background: #fff7ed;
   border-color: #fed7aa;
