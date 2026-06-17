@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import ServiceInterestForm from "@/components/ServiceInterestForm";
 import { getPlatformModule, platformModules } from "@/lib/platformModules";
 
 const availabilityLabel = {
@@ -67,6 +68,10 @@ export default async function PlatformModulePage({ params }: { params: Promise<{
             </p>
           </article>
         </div>
+      </section>
+
+      <section className="section no-top-pad">
+        <ServiceInterestForm serviceSlug={module.slug} serviceTitle={module.title} />
       </section>
     </main>
   );
