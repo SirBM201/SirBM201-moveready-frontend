@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { apiJson } from "@/lib/api";
 
@@ -75,7 +75,7 @@ export default function ReadinessTools() {
     setRefusalResult(data);
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>, runner: (formData: FormData) => Promise<void>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>, runner: (formData: FormData) => Promise<void>) {
     event.preventDefault();
     setStatus("Running check...");
     try {
