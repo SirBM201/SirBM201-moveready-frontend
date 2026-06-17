@@ -19,10 +19,10 @@ export default function WatchlistPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Coming soon: notification sending</span>
+          <span className="eyebrow">Available now: watchlist saving</span>
           <h1>Save routes and opportunities you want MoveReady to monitor.</h1>
           <p className="lede">
-            Users can opt in for alerts about application openings, closing dates, result windows, eligibility changes, document changes, fee changes, and source-review updates.
+            Users can opt in for alerts about application openings, closing dates, result windows, eligibility changes, document changes, fee changes, and source-review updates. Message delivery is activated only after the selected notification provider is approved.
           </p>
         </div>
       </section>
