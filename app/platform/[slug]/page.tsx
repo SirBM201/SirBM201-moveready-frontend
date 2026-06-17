@@ -5,7 +5,7 @@ import { getPlatformModule, platformModules } from "@/lib/platformModules";
 const availabilityLabel = {
   available: "Available",
   coming_soon: "Coming soon",
-  partner_approval: "Partner approval pending",
+  partner_approval_pending: "Partner approval pending",
 };
 
 export function generateStaticParams() {
