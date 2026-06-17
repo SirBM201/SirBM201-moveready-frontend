@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { apiJson } from "@/lib/api";
 
@@ -14,6 +14,16 @@ type SubmitState = "idle" | "submitting" | "success" | "error";
 export default function ServiceInterestForm({ serviceSlug, serviceTitle }: ServiceInterestFormProps) {
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
+  const [routeHint, setRouteHint] = useState("");
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      setRouteHint(params.get("route") || params.get("service") || "");
+    } catch {
+      setRouteHint("");
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,7 +42,7 @@ export default function ServiceInterestForm({ serviceSlug, serviceTitle }: Servi
       route_or_goal: String(data.get("route_or_goal") || "").trim(),
       message: String(data.get("message") || "").trim(),
       consent_to_contact: data.get("consent_to_contact") === "on",
-      source_page: typeof window !== "undefined" ? window.location.pathname : "",
+      source_page: typeof window !== "undefined" ? `${window.location.pathname}${window.location.search}` : "",
     };
 
     if (!payload.email && !payload.phone) {
@@ -60,6 +70,7 @@ export default function ServiceInterestForm({ serviceSlug, serviceTitle }: Servi
       setState("success");
       setMessage(response.stored === false ? "Request received. Storage will activate after setup is completed." : "Request received. We will contact you when this service is ready.");
       form.reset();
+      setRouteHint("");
     } catch {
       setState("error");
       setMessage("Unable to send this request right now. Please try again later.");
@@ -108,7 +119,7 @@ export default function ServiceInterestForm({ serviceSlug, serviceTitle }: Servi
 
       <div className="field">
         <label htmlFor="route_or_goal">Route or goal</label>
-        <input id="route_or_goal" name="route_or_goal" placeholder="Example: Estonia startup, DV lottery, document courier" />
+        <input id="route_or_goal" name="route_or_goal" value={routeHint} onChange={(event) => setRouteHint(event.target.value)} placeholder="Example: Estonia startup, DV lottery, document courier" />
       </div>
 
       <div className="field">
