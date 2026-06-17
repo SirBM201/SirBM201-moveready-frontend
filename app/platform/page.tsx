@@ -1,9 +1,9 @@
 import { platformModules } from "@/lib/platformModules";
 
-const statusLabel = {
-  live: "Live now",
-  planned: "Planned",
-  partner_pending: "Partner pending",
+const availabilityLabel = {
+  available: "Available",
+  coming_soon: "Coming soon",
+  partner_approval: "Partner approval pending",
 };
 
 export default function PlatformPage() {
@@ -12,7 +12,7 @@ export default function PlatformPage() {
       <header className="topbar">
         <a className="brand" href="/">
           <strong>Project MoveReady</strong>
-          <span>Platform architecture</span>
+          <span>Platform services</span>
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
@@ -25,10 +25,10 @@ export default function PlatformPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Full platform map</span>
-          <h1>Build the full structure now. Activate modules only when ready.</h1>
+          <span className="eyebrow">MoveReady services</span>
+          <h1>Visa, relocation, documents, alerts, and trusted services in one place.</h1>
           <p className="lede">
-            MoveReady is structured for route intelligence, official opportunity monitoring, documents, funds, alerts, courier, legalization, insurance, appointments, family planning, and post-arrival support.
+            MoveReady brings route intelligence, official opportunity monitoring, documents, funds, alerts, courier, legalization, insurance, appointments, family planning, and post-arrival support into one source-backed platform.
           </p>
         </div>
       </section>
@@ -43,8 +43,7 @@ export default function PlatformPage() {
                 <p>{module.summary}</p>
               </div>
               <div className="module-row-meta">
-                <span className="badge">{module.phase}</span>
-                <span className={`badge module-status ${module.status}`}>{statusLabel[module.status]}</span>
+                <span className={`badge module-status ${module.availability}`}>{availabilityLabel[module.availability]}</span>
               </div>
             </a>
           ))}
