@@ -2,6 +2,11 @@ import { platformModules } from "@/lib/platformModules";
 
 const liveRoutes = [
   {
+    title: "Official ballots and quota opportunities",
+    href: "/opportunities",
+    text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
+  },
+  {
     title: "Estonia startup route",
     href: "/routes/estonia-startup",
     text: "Review Startup Committee, D visa, document, funds, insurance, and budget readiness for Estonia startup founders.",
@@ -57,6 +62,7 @@ export default function Home() {
           <span>Global relocation readiness platform</span>
         </a>
         <nav className="nav" aria-label="Main navigation">
+          <a href="/opportunities">Opportunities</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/country-checker">Countries</a>
@@ -74,7 +80,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
-            <a className="btn" href="/routes/estonia-startup">View Estonia startup route</a>
+            <a className="btn" href="/opportunities">View official opportunities</a>
           </div>
         </div>
 
@@ -117,7 +123,7 @@ export default function Home() {
       <section className="section" id="modules">
         <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          The current tools focus on route intelligence, official opportunities, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
