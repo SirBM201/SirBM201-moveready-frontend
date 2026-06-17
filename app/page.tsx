@@ -1,4 +1,6 @@
-const routes = [
+import { platformModules } from "@/lib/platformModules";
+
+const liveRoutes = [
   {
     title: "Estonia startup route",
     href: "/routes/estonia-startup",
@@ -25,11 +27,6 @@ const routes = [
     text: "Help students find funding routes without making scholarship research the whole product.",
   },
   {
-    title: "Insurance guidance",
-    href: "/insurance-guide",
-    text: "Show when travel, student, health, family, or work insurance may be needed for a route.",
-  },
-  {
     title: "Readiness reports",
     href: "/report-preview",
     text: "Generate a route-specific action plan with risk notes, source status, and next steps.",
@@ -40,10 +37,12 @@ const trustItems = [
   { value: "Source-first", label: "AI explains approved route data" },
   { value: "Versioned", label: "Old route facts are kept for audit" },
   { value: "Reviewed", label: "Admin tasks track source changes" },
-  { value: "Practical", label: "Documents, funds, budget, and insurance" },
+  { value: "Expandable", label: "Future services stay feature-flagged" },
 ];
 
 export default function Home() {
+  const previewModules = platformModules.slice(0, 6);
+
   return (
     <main className="page-shell">
       <header className="topbar">
@@ -54,10 +53,8 @@ export default function Home() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
-          <a href="/document-checklist">Documents</a>
-          <a href="/budget-calculator">Budget</a>
-          <a href="/scholarships">Scholarships</a>
-          <a href="/insurance-guide">Insurance</a>
+          <a href="/country-checker">Countries</a>
+          <a href="/platform">Platform</a>
           <a href="/report-preview">Report</a>
         </nav>
       </header>
@@ -67,7 +64,7 @@ export default function Home() {
           <span className="eyebrow">Working MVP name - final brand later</span>
           <h1>Choose the route, then get ready properly.</h1>
           <p className="lede">
-            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, and relocation pathways, then prepare documents, funds, budget, insurance, and next steps from source-backed data.
+            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, and next steps from source-backed data.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
@@ -86,6 +83,7 @@ export default function Home() {
                 <option value="business">Startup or business</option>
                 <option value="family">Family relocation</option>
                 <option value="visit">Visitor route</option>
+                <option value="ballot">Ballot or quota opportunity</option>
               </select>
             </div>
             <div className="field">
@@ -111,15 +109,37 @@ export default function Home() {
       </section>
 
       <section className="section" id="modules">
-        <h2>MVP modules</h2>
+        <h2>Live MVP modules</h2>
         <p className="section-intro">
-          The first version should focus on intelligence, readiness, and reports. Courier, notary, flight, hotel, taxi, and consultant marketplaces can come after the trusted route foundation is working.
+          The current version focuses on intelligence, readiness, and source-backed reports. Execution services stay planned until their workflows are safe to activate.
         </p>
         <div className="grid">
-          {routes.map((route) => (
+          {liveRoutes.map((route) => (
             <a className="card" href={route.href} key={route.title}>
               <h3>{route.title}</h3>
               <p>{route.text}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="section" id="platform-map">
+        <div className="section-heading-row">
+          <div>
+            <h2>Planned platform expansion</h2>
+            <p className="section-intro">
+              These modules are designed into the platform now so future APIs, alerts, partners, courier, legalization, and settlement features have a clear place to plug in.
+            </p>
+          </div>
+          <a className="btn" href="/platform">View full map</a>
+        </div>
+        <div className="module-preview-grid">
+          {previewModules.map((module) => (
+            <a className="module-tile" href={module.href} key={module.slug}>
+              <span className="overline">{module.phase}</span>
+              <h3>{module.title}</h3>
+              <p>{module.summary}</p>
+              <span className="badge">{module.status === "partner_pending" ? "Partner pending" : "Planned"}</span>
             </a>
           ))}
         </div>
@@ -140,7 +160,7 @@ export default function Home() {
             <span className="badge">Budget estimate</span>
             <span className="badge">Insurance notes</span>
             <span className="badge">Scholarship options</span>
-            <span className="badge">Next steps</span>
+            <span className="badge">Opportunity alerts</span>
             <span className="badge">Source freshness</span>
           </div>
         </article>
