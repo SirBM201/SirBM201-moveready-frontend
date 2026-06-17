@@ -179,7 +179,7 @@ export default function LiveOpportunities() {
             <div className="actions small-actions">
               <a className="btn primary" href={item.official_url} target="_blank" rel="noreferrer">Official source</a>
               {item.result_check_url ? <a className="btn" href={item.result_check_url} target="_blank" rel="noreferrer">Result check</a> : null}
-              <a className="btn" href={`/platform/opportunities?route=${encodeURIComponent(item.opportunity_code)}`}>Request alert</a>
+              <a className="btn" href={`/platform/watchlist?route=${encodeURIComponent(item.opportunity_code)}`}>Request alert</a>
             </div>
           </article>
         ))}
