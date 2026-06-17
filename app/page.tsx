@@ -67,7 +67,7 @@ export default function Home() {
 
       <section className="hero-band" id="checker">
         <div className="hero-copy">
-          <span className="eyebrow">Working MVP name - final brand later</span>
+          <span className="eyebrow">Source-backed relocation readiness</span>
           <h1>Choose the route, then get ready properly.</h1>
           <p className="lede">
             MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, and next steps from source-backed data.
