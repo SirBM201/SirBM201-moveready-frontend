@@ -566,7 +566,7 @@ h1 {
   background: #f3f4f6;
 }
 
-.module-status.partner_approval {
+.module-status.partner_approval_pending {
   color: var(--warning);
   background: #fff7ed;
   border-color: #fed7aa;
