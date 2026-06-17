@@ -31,6 +31,7 @@ export default async function PlatformModulePage({ params }: { params: Promise<{
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/platform">Platform</a>
+          <a href="/readiness">Readiness</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
         </nav>
@@ -51,20 +52,20 @@ export default async function PlatformModulePage({ params }: { params: Promise<{
       <section className="section no-top-pad">
         <div className="platform-detail-grid">
           <article className="detail-section">
-            <span className="overline">Launch readiness</span>
+            <span className="overline">Service status</span>
             <h3>Current support</h3>
             <p>{module.readiness}</p>
           </article>
           <article className="detail-section">
-            <span className="overline">Service scope</span>
-            <h3>What this will support</h3>
+            <span className="overline">Coverage</span>
+            <h3>What this supports</h3>
             <p>{module.launchScope}</p>
           </article>
           <article className="detail-section">
             <span className="overline">Trust standard</span>
-            <h3>Source-backed before activation</h3>
+            <h3>Source-backed and consent-based</h3>
             <p>
-              This service will only be switched on publicly when the official-source rules, provider checks, user consent, and audit trail are ready.
+              Services that depend on official rules, external providers, or user notifications are activated only after source checks, provider approval, user consent, and audit logging are in place.
             </p>
           </article>
         </div>
