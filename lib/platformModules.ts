@@ -2,7 +2,7 @@ export type PlatformModule = {
   slug: string;
   title: string;
   category: string;
-  availability: "available" | "coming_soon" | "partner_approval";
+  availability: "available" | "coming_soon" | "partner_approval_pending";
   summary: string;
   readiness: string;
   launchScope: string;
@@ -74,7 +74,7 @@ export const platformModules: PlatformModule[] = [
     slug: "courier",
     title: "Passport and document courier",
     category: "Execution services",
-    availability: "partner_approval",
+    availability: "partner_approval_pending",
     summary: "Coordinate trusted handling for passports, certificates, embassy submissions, and notarization/legalization pickups.",
     readiness: "The service slot is prepared for trusted provider onboarding.",
     launchScope: "Courier partners, tracking, insurance options, destination handling rules, special instructions, and pricing.",
@@ -106,7 +106,7 @@ export const platformModules: PlatformModule[] = [
     category: "Readiness",
     availability: "coming_soon",
     summary: "Plan spouse, children, dependent documents, extra funds, accommodation, school, insurance, and arrival tasks.",
-    readiness: "Family count already affects starter budget estimates.",
+    readiness: "Family count affects starter budget estimate.",
     launchScope: "Per-family-member documents, dependent proof, funds adjustment, insurance, school planning, and arrival checklist.",
     href: "/platform/family-relocation",
   },
@@ -124,7 +124,7 @@ export const platformModules: PlatformModule[] = [
     slug: "partners",
     title: "Partner and expert review network",
     category: "Marketplace",
-    availability: "partner_approval",
+    availability: "partner_approval_pending",
     summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, and settlement providers.",
     readiness: "The app is structured for provider onboarding and service requests.",
     launchScope: "Provider vetting, expert review, service requests, commission tracking, handoff notes, and user support workflow.",
