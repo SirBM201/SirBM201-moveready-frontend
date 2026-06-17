@@ -8,12 +8,13 @@ Final brand name and domain will be decided later. For now, this frontend uses n
 
 Next.js frontend scaffold is in place and connected to the deployed backend through `NEXT_PUBLIC_BACKEND_URL` / `NEXT_PUBLIC_API_BASE`.
 
-The public app now includes live route checks, official opportunities, Estonia startup route detail, readiness tools, service request capture, and admin review surfaces.
+The public app now includes live route checks, official opportunities, watchlist subscription capture, Estonia startup route detail, readiness tools, service request capture, and admin review surfaces.
 
 ## Implemented Pages
 
 - `/`
 - `/opportunities`
+- `/watchlist`
 - `/readiness`
 - `/platform`
 - `/platform/[slug]`
@@ -40,12 +41,14 @@ The public app now includes live route checks, official opportunities, Estonia s
 - Estonia startup founder route workspace
 - Readiness report generation
 - Official ballots and quota opportunity listing
+- Watchlist subscription capture for routes, opportunities, scholarships, countries, and services
 - Name consistency checker
 - Document readiness checker
 - Proof-of-funds planner
 - Refusal-risk screener
 - Service request forms for coming-soon and partner-dependent services
 - Admin service request dashboard
+- Admin watchlist subscription dashboard after migration `007_watchlist_alert_subscriptions.sql`
 - Admin readiness check dashboard after migration `006_readiness_check_runs.sql`
 
 ## Reused Foundation
@@ -84,4 +87,4 @@ AI output should feel helpful, but source freshness should carry the trust.
 - Add report export/download
 - Add provider onboarding screens
 - Add paid report flow
-- Add richer admin CRUD for routes, sources, opportunities, and partner services
+- Add richer admin CRUD for routes, sources, opportunities, watchlists, and partner services
