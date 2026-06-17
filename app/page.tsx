@@ -7,6 +7,11 @@ const liveRoutes = [
     text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
   },
   {
+    title: "Readiness tools",
+    href: "/readiness",
+    text: "Check name consistency, documents, proof-of-funds gaps, and refusal-risk indicators before submitting evidence.",
+  },
+  {
     title: "Estonia startup route",
     href: "/routes/estonia-startup",
     text: "Review Startup Committee, D visa, document, funds, insurance, and budget readiness for Estonia startup founders.",
@@ -63,6 +68,7 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/opportunities">Opportunities</a>
+          <a href="/readiness">Readiness</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/country-checker">Countries</a>
@@ -80,7 +86,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
-            <a className="btn" href="/opportunities">View official opportunities</a>
+            <a className="btn" href="/readiness">Use readiness tools</a>
           </div>
         </div>
 
@@ -160,7 +166,7 @@ export default function Home() {
       <section className="section" id="report">
         <h2>Readiness report foundation</h2>
         <p className="section-intro">
-          Every sensitive report should keep the route version, source snapshots, risk level, last verified date, review due date, and refresh status used when the report was generated.
+          Every sensitive report keeps the route version, source snapshots, risk level, last verified date, review due date, and refresh status used when the report was generated.
         </p>
         <article className="card">
           <h3>Example report sections</h3>
