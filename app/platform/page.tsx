@@ -17,6 +17,7 @@ export default function PlatformPage() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/opportunities">Opportunities</a>
+          <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
@@ -34,6 +35,7 @@ export default function PlatformPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/readiness">Use readiness tools</a>
+            <a className="btn" href="/watchlist">Create watchlist alert</a>
             <a className="btn" href="/opportunities">View official opportunities</a>
           </div>
         </div>
