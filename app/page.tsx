@@ -35,10 +35,16 @@ const liveRoutes = [
 
 const trustItems = [
   { value: "Source-first", label: "AI explains approved route data" },
-  { value: "Versioned", label: "Old route facts are kept for audit" },
-  { value: "Reviewed", label: "Admin tasks track source changes" },
-  { value: "Expandable", label: "Future services stay feature-flagged" },
+  { value: "Versioned", label: "Route facts keep an audit trail" },
+  { value: "Reviewed", label: "Admin checks track source changes" },
+  { value: "Expandable", label: "New services plug in cleanly" },
 ];
+
+const availabilityLabel = {
+  available: "Available",
+  coming_soon: "Coming soon",
+  partner_approval: "Partner approval pending",
+};
 
 export default function Home() {
   const previewModules = platformModules.slice(0, 6);
@@ -54,7 +60,7 @@ export default function Home() {
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/country-checker">Countries</a>
-          <a href="/platform">Platform</a>
+          <a href="/platform">Services</a>
           <a href="/report-preview">Report</a>
         </nav>
       </header>
@@ -109,9 +115,9 @@ export default function Home() {
       </section>
 
       <section className="section" id="modules">
-        <h2>Live MVP modules</h2>
+        <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current version focuses on intelligence, readiness, and source-backed reports. Execution services stay planned until their workflows are safe to activate.
+          The current tools focus on route intelligence, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
@@ -126,20 +132,20 @@ export default function Home() {
       <section className="section" id="platform-map">
         <div className="section-heading-row">
           <div>
-            <h2>Planned platform expansion</h2>
+            <h2>MoveReady services</h2>
             <p className="section-intro">
-              These modules are designed into the platform now so future APIs, alerts, partners, courier, legalization, and settlement features have a clear place to plug in.
+              Additional services are being prepared so users can move from route choice to alerts, documents, funds, trusted services, and settlement support inside one platform.
             </p>
           </div>
-          <a className="btn" href="/platform">View full map</a>
+          <a className="btn" href="/platform">View services</a>
         </div>
         <div className="module-preview-grid">
           {previewModules.map((module) => (
             <a className="module-tile" href={module.href} key={module.slug}>
-              <span className="overline">{module.phase}</span>
+              <span className="overline">{module.category}</span>
               <h3>{module.title}</h3>
               <p>{module.summary}</p>
-              <span className="badge">{module.status === "partner_pending" ? "Partner pending" : "Planned"}</span>
+              <span className={`badge module-status ${module.availability}`}>{availabilityLabel[module.availability]}</span>
             </a>
           ))}
         </div>
