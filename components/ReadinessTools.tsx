@@ -6,6 +6,14 @@ import { apiJson } from "@/lib/api";
 
 type Result = Record<string, any> | null;
 
+function sourcePage() {
+  try {
+    return typeof window !== "undefined" ? `${window.location.pathname}${window.location.search}` : "/readiness";
+  } catch {
+    return "/readiness";
+  }
+}
+
 function ResultPanel({ title, result }: { title: string; result: Result }) {
   return (
     <article className="result-block">
@@ -28,7 +36,7 @@ export default function ReadinessTools() {
       { label: "Certificate", name: String(formData.get("certificate_name") || "") },
       { label: "Bank statement", name: String(formData.get("bank_name") || "") },
     ];
-    const data = await apiJson("readiness/name-consistency", { method: "POST", body: { records }, useAuthToken: false });
+    const data = await apiJson("readiness/name-consistency", { method: "POST", body: { records, source_page: sourcePage() }, useAuthToken: false });
     setNameResult(data);
   }
 
@@ -39,7 +47,7 @@ export default function ReadinessTools() {
       .filter(Boolean);
     const data = await apiJson("readiness/document-readiness", {
       method: "POST",
-      body: { route_category: String(formData.get("route_category") || "startup"), documents },
+      body: { route_category: String(formData.get("route_category") || "startup"), documents, source_page: sourcePage() },
       useAuthToken: false,
     });
     setDocumentResult(data);
@@ -55,6 +63,7 @@ export default function ReadinessTools() {
         family_members_count: Number(formData.get("family_members_count") || 0),
         currency: String(formData.get("currency") || "EUR"),
         recent_large_deposits: formData.get("recent_large_deposits") === "on",
+        source_page: sourcePage(),
       },
       useAuthToken: false,
     });
@@ -71,7 +80,7 @@ export default function ReadinessTools() {
       unexplained_deposits: formData.get("unexplained_deposits") === "on",
       weak_business_plan: formData.get("weak_business_plan") === "on",
     };
-    const data = await apiJson("readiness/refusal-risk", { method: "POST", body: { indicators }, useAuthToken: false });
+    const data = await apiJson("readiness/refusal-risk", { method: "POST", body: { indicators, source_page: sourcePage() }, useAuthToken: false });
     setRefusalResult(data);
   }
 
