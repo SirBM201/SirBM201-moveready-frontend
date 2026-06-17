@@ -6,13 +6,18 @@ Final brand name and domain will be decided later. For now, this frontend uses n
 
 ## Current Status
 
-Starter Next.js frontend scaffold is in place, adapted from the proven Naija Tax Guide / TaxBridge structure but cleaned of tax-specific content.
+Next.js frontend scaffold is in place and connected to the deployed backend through `NEXT_PUBLIC_BACKEND_URL` / `NEXT_PUBLIC_API_BASE`.
 
-The current pages are mostly static/mock-backed until the Supabase schema is run and backend environment variables are connected.
+The public app now includes live route checks, official opportunities, Estonia startup route detail, readiness tools, service request capture, and admin review surfaces.
 
 ## Implemented Pages
 
 - `/`
+- `/opportunities`
+- `/readiness`
+- `/platform`
+- `/platform/[slug]`
+- `/routes/estonia-startup`
 - `/country-checker`
 - `/route-checker`
 - `/document-checklist`
@@ -28,6 +33,20 @@ The current pages are mostly static/mock-backed until the Supabase schema is run
 - `/admin/routes`
 - `/admin/reviews`
 - `/admin/reports`
+
+## Current Live Features
+
+- Country and route data loading from backend/Supabase
+- Estonia startup founder route workspace
+- Readiness report generation
+- Official ballots and quota opportunity listing
+- Name consistency checker
+- Document readiness checker
+- Proof-of-funds planner
+- Refusal-risk screener
+- Service request forms for coming-soon and partner-dependent services
+- Admin service request dashboard
+- Admin readiness check dashboard after migration `006_readiness_check_runs.sql`
 
 ## Reused Foundation
 
@@ -61,8 +80,8 @@ AI output should feel helpful, but source freshness should carry the trust.
 
 ## Next Frontend Work
 
-- Connect route checker form to `/api/relocation/reports`
-- Connect countries/routes pages to backend data
-- Add loading, empty, and error states
-- Add report export/download later
-- Add login and saved-report ownership after backend auth is added
+- Add auth and saved user profiles
+- Add report export/download
+- Add provider onboarding screens
+- Add paid report flow
+- Add richer admin CRUD for routes, sources, opportunities, and partner services
