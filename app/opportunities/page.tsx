@@ -10,6 +10,7 @@ export default function OpportunitiesPage() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
+          <a href="/watchlist">Watchlist</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/country-checker">Countries</a>
           <a href="/platform">Services</a>
@@ -25,7 +26,7 @@ export default function OpportunitiesPage() {
             MoveReady lists limited opportunity routes with official links, source confidence, application-window notes, and scam-safe reminders. Use this as a monitoring guide, not a promise of selection or approval.
           </p>
           <div className="actions">
-            <a className="btn primary" href="/platform/opportunities">Request opportunity alerts</a>
+            <a className="btn primary" href="/watchlist?type=opportunity">Create opportunity alert</a>
             <a className="btn" href="/route-checker">Check your route</a>
           </div>
         </div>
