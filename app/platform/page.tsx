@@ -17,16 +17,15 @@ export default function PlatformPage() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/services">Services</a>
+          <a href="/providers">Providers</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
-          <a href="/partners/apply">Provider Apply</a>
+          <a href="/sources">Sources</a>
+          <a href="/launch-readiness">Launch</a>
           <a href="/route-checker">Route Checker</a>
-          <a href="/routes/estonia-startup">Estonia Route</a>
-          <a href="/country-checker">Countries</a>
-          <a href="/report-preview">Report</a>
         </nav>
       </header>
 
