@@ -9,7 +9,7 @@ const launchChecks = [
     area: "Readiness",
     status: "Active",
     title: "Document and funds tools",
-    text: "Name consistency, document readiness, proof-of-funds planning, and refusal-risk checks are available and can store runs after the SQL migration is active.",
+    text: "Name consistency, document readiness, proof-of-funds planning, and refusal-risk checks are available with backend storage support.",
   },
   {
     area: "Monitoring",
@@ -50,7 +50,7 @@ const launchChecks = [
 ];
 
 const deploymentChecks = [
-  "Run all required Supabase migrations in order, including the corrected Finland D visa migration.",
+  "Confirm backend database setup is complete, including corrected Finland D visa route records.",
   "Confirm Railway backend health and route endpoints after deployment completes.",
   "Confirm Vercel frontend has the latest production deployment.",
   "Set frontend API base to the active backend URL.",
