@@ -126,9 +126,9 @@ export const platformModules: PlatformModule[] = [
     category: "Marketplace",
     availability: "partner_approval_pending",
     summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, and settlement providers.",
-    readiness: "Provider application capture and admin screening are available. Public handoff should only use approved providers.",
+    readiness: "Provider application capture and admin screening are available. Public listings stay hidden until approval.",
     launchScope: "Provider vetting, expert review, service requests, commission tracking, handoff notes, and user support workflow.",
-    href: "/partners/apply",
+    href: "/providers",
   },
 ];
 
