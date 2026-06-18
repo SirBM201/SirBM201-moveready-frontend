@@ -8,7 +8,7 @@ Final brand name and domain will be decided later. For now, this frontend uses n
 
 Next.js frontend scaffold is in place and connected to the deployed backend through `NEXT_PUBLIC_BACKEND_URL` / `NEXT_PUBLIC_API_BASE`.
 
-The public app now includes live route checks, official opportunities, watchlist subscription capture, Estonia startup route detail, readiness tools, readiness report export actions, service request capture, and admin review surfaces.
+The public app now includes live route checks, official opportunities, watchlist subscription capture, Estonia startup route detail, readiness tools, readiness report export actions, user profile saving, service request capture, and admin review surfaces.
 
 ## Implemented Pages
 
@@ -43,11 +43,13 @@ The public app now includes live route checks, official opportunities, watchlist
 - Readiness report JSON download and print action from the route checker result
 - Official ballots and quota opportunity listing
 - Watchlist subscription capture for routes, opportunities, scholarships, countries, and services
+- User relocation profile saving and lookup from `/dashboard` after migration `008_user_relocation_profiles.sql`
 - Name consistency checker
 - Document readiness checker
 - Proof-of-funds planner
 - Refusal-risk screener
 - Service request forms for coming-soon and partner-dependent services
+- Admin user profile review dashboard after migration `008_user_relocation_profiles.sql`
 - Admin service request dashboard
 - Admin watchlist subscription dashboard after migration `007_watchlist_alert_subscriptions.sql`
 - Admin readiness check dashboard after migration `006_readiness_check_runs.sql`
@@ -84,8 +86,8 @@ AI output should feel helpful, but source freshness should carry the trust.
 
 ## Next Frontend Work
 
-- Add auth and saved user profiles
+- Add auth/session flow
 - Add PDF report export/download
 - Add provider onboarding screens
 - Add paid report flow
-- Add richer admin CRUD for routes, sources, opportunities, watchlists, and partner services
+- Add richer admin CRUD for routes, sources, opportunities, watchlists, profiles, and partner services
