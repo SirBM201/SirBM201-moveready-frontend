@@ -10,6 +10,7 @@ export default function DashboardPage() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
+          <a href="/saved-routes">Saved Routes</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/readiness">Readiness</a>
           <a href="/watchlist">Watchlist</a>
@@ -22,7 +23,7 @@ export default function DashboardPage() {
           <span className="eyebrow">Available now: profile saving</span>
           <h1>Build one relocation profile for reports, alerts, and services.</h1>
           <p className="lede">
-            Save the user context once, then use it to generate readiness reports, create watchlist alerts, request services, and support future account-based dashboards.
+            Save the user context once, then use it to generate readiness reports, save routes, create watchlist alerts, request services, and support future account-based dashboards.
           </p>
         </div>
       </section>
