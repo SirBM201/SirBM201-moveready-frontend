@@ -17,6 +17,11 @@ const liveRoutes = [
     text: "Track documents, appointments, payment deadlines, result checks, travel dates, and follow-up steps.",
   },
   {
+    title: "Trusted service requests",
+    href: "/services",
+    text: "Request courier, legalization, insurance, translation, expert review, admission, accommodation, pickup, and settlement support.",
+  },
+  {
     title: "Watchlist and alerts",
     href: "/watchlist",
     text: "Save routes, opportunities, scholarships, countries, or services and choose opt-in alert preferences for updates.",
@@ -88,15 +93,16 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/opportunities">Opportunities</a>
+          <a href="/services">Services</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
-          <a href="/partners/apply">Partner Apply</a>
+          <a href="/partners/apply">Provider Apply</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/country-checker">Countries</a>
-          <a href="/platform">Services</a>
+          <a href="/platform">Platform</a>
           <a href="/report-preview">Report</a>
         </nav>
       </header>
@@ -106,10 +112,11 @@ export default function Home() {
           <span className="eyebrow">Source-backed relocation readiness</span>
           <h1>Choose the route, then get ready properly.</h1>
           <p className="lede">
-            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, timeline events, provider support, and next steps from source-backed data.
+            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, timeline events, trusted services, and next steps from source-backed data.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/services">Request trusted service</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
           </div>
         </div>
@@ -153,7 +160,7 @@ export default function Home() {
       <section className="section" id="modules">
         <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, official opportunities, saved routes, timelines, watchlists, provider applications, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          The current tools focus on route intelligence, official opportunities, saved routes, timelines, watchlists, provider applications, service requests, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
@@ -168,12 +175,15 @@ export default function Home() {
       <section className="section" id="platform-map">
         <div className="section-heading-row">
           <div>
-            <h2>MoveReady services</h2>
+            <h2>MoveReady platform</h2>
             <p className="section-intro">
-              Additional services are being prepared so users can move from route choice to alerts, documents, funds, trusted services, and settlement support inside one platform.
+              Services are organized so users can move from route choice to alerts, documents, funds, trusted support, and settlement inside one platform.
             </p>
           </div>
-          <a className="btn" href="/platform">View services</a>
+          <div className="actions">
+            <a className="btn primary" href="/services">Request service</a>
+            <a className="btn" href="/platform">View platform</a>
+          </div>
         </div>
         <div className="module-preview-grid">
           {previewModules.map((module) => (
@@ -204,6 +214,7 @@ export default function Home() {
             <span className="badge">Scholarship options</span>
             <span className="badge">Timeline events</span>
             <span className="badge">Provider support</span>
+            <span className="badge">Service requests</span>
             <span className="badge">Opportunity alerts</span>
             <span className="badge">Source freshness</span>
           </div>
