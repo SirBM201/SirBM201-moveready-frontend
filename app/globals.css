@@ -597,6 +597,52 @@ h1 {
   font-size: 24px;
 }
 
+.service-context-box {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  min-height: 44px;
+  border: 1px solid #b9d7d3;
+  border-radius: 8px;
+  background: #f2faf8;
+  padding: 10px 12px;
+}
+
+.service-context-box strong {
+  color: var(--brand-strong);
+  font-size: 14px;
+}
+
+.service-context-box span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.service-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.service-strip-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 18px;
+}
+
+.service-strip-item h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.service-strip-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .checkbox-field {
   display: flex;
   align-items: flex-start;
@@ -702,7 +748,8 @@ h1 {
   .module-row,
   .admin-toolbar,
   .request-card-main,
-  .request-details {
+  .request-details,
+  .service-strip {
     grid-template-columns: 1fr;
   }
 
