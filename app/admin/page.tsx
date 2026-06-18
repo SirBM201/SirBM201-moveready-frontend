@@ -11,13 +11,14 @@ const adminModules = [
   ["Saved routes", "Review routes, countries, opportunities, scholarships, and services users saved for later follow-up.", "#saved-routes"],
   ["Timeline events", "Review application tasks, deadlines, appointments, payments, result checks, travel dates, and follow-up steps.", "#timeline-events"],
   ["Partner applications", "Screen providers for courier, insurance, legalization, translation, expert review, admission, accommodation, airport pickup, and settlement workflows.", "#partner-applications"],
+  ["Provider directory", "Check the public provider directory surface before approved partner listings are published.", "/providers"],
   ["Service requests", "Review user interest for alerts, courier, insurance, legalization, documents, and expert support.", "#service-requests"],
   ["Watchlist subscriptions", "Review opt-in monitoring requests for routes, opportunities, scholarships, countries, and services.", "#watchlist-subscriptions"],
   ["Readiness checks", "Inspect saved name, document, funds, and refusal-risk checks.", "#readiness-checks"],
   ["Reports", "Inspect generated reports, delivery status, refreshes, and stale-report warnings.", "/admin/reports"],
-  ["Sources", "Manage official source links, reliability level, and review frequency.", "/admin/reviews"],
-  ["Routes", "Create and approve country-specific route versions.", "/admin/reviews"],
-  ["Reviews", "Handle source-change alerts and route-review tasks.", "/admin/reviews"],
+  ["Sources", "Add trusted source links, reliability level, owner organization, and review context.", "/admin/reviews"],
+  ["Routes", "Create and approve country-specific route versions after source review.", "/admin/reviews"],
+  ["Launch checks", "Review public readiness, trust, source, and safety surfaces before launch.", "/launch-readiness"],
 ];
 
 export default function AdminPage() {
@@ -34,6 +35,7 @@ export default function AdminPage() {
           <a href="/dashboard">Dashboard</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
+          <a href="/providers">Providers</a>
           <a href="/partners/apply">Partner Apply</a>
           <a href="/platform">Platform</a>
           <a href="/watchlist">Watchlist</a>
