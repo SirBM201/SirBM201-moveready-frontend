@@ -1,8 +1,10 @@
 import AdminReadinessChecks from "@/components/AdminReadinessChecks";
 import AdminServiceRequests from "@/components/AdminServiceRequests";
+import AdminUserProfiles from "@/components/AdminUserProfiles";
 import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscriptions";
 
 const adminModules = [
+  ["User profiles", "Review saved relocation profiles, contact preferences, goals, funds, family count, readiness score, and follow-up status."],
   ["Service requests", "Review user interest for alerts, courier, insurance, legalization, documents, and expert support."],
   ["Watchlist subscriptions", "Review opt-in monitoring requests for routes, opportunities, scholarships, countries, and services."],
   ["Readiness checks", "Inspect saved name, document, funds, and refusal-risk checks."],
@@ -22,6 +24,7 @@ export default function AdminPage() {
         </a>
         <nav className="nav">
           <a href="/admin/reviews">Reviews</a>
+          <a href="/dashboard">Dashboard</a>
           <a href="/platform">Platform</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
@@ -30,7 +33,7 @@ export default function AdminPage() {
       </header>
       <section className="section">
         <h2>Admin workspace</h2>
-        <p className="section-intro">Admin tools protect the trust system: user requests, watchlists, sources, snapshots, route versions, review tasks, readiness checks, and report freshness.</p>
+        <p className="section-intro">Admin tools protect the trust system: profiles, user requests, watchlists, sources, snapshots, route versions, review tasks, readiness checks, and report freshness.</p>
         <div className="grid">
           {adminModules.map(([title, text]) => (
             <article className="card" key={title}>
@@ -40,6 +43,7 @@ export default function AdminPage() {
           ))}
         </div>
       </section>
+      <AdminUserProfiles />
       <AdminServiceRequests />
       <AdminWatchlistSubscriptions />
       <AdminReadinessChecks />
