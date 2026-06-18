@@ -1,18 +1,34 @@
-const dashboardItems = [
-  ["Saved routes", "Compare selected countries and pathways."],
-  ["Readiness score", "Track documents, funds, budget, insurance, and source freshness."],
-  ["Reports", "Open generated relocation readiness reports."],
-  ["Alerts", "Get notified when a route version changes or a report becomes stale."],
-];
+import ProfileDashboard from "@/components/ProfileDashboard";
 
 export default function DashboardPage() {
   return (
     <main className="page-shell">
-      <header className="topbar"><a className="brand" href="/"><strong>Project MoveReady</strong><span>User dashboard</span></a><nav className="nav"><a href="/route-checker">Route Checker</a><a href="/my-reports">My Reports</a></nav></header>
-      <section className="section">
-        <h2>Dashboard foundation</h2>
-        <p className="section-intro">This placeholder prepares the user area. Later it will connect to auth, saved routes, generated reports, and route-change alerts.</p>
-        <div className="grid">{dashboardItems.map(([title, text]) => <article className="card" key={title}><h3>{title}</h3><p>{text}</p></article>)}</div>
+      <header className="topbar">
+        <a className="brand" href="/">
+          <strong>Project MoveReady</strong>
+          <span>User dashboard</span>
+        </a>
+        <nav className="nav" aria-label="Main navigation">
+          <a href="/">Home</a>
+          <a href="/route-checker">Route Checker</a>
+          <a href="/readiness">Readiness</a>
+          <a href="/watchlist">Watchlist</a>
+          <a href="/my-reports">My Reports</a>
+        </nav>
+      </header>
+
+      <section className="hero-band compact-hero">
+        <div className="hero-copy">
+          <span className="eyebrow">Available now: profile saving</span>
+          <h1>Build one relocation profile for reports, alerts, and services.</h1>
+          <p className="lede">
+            Save the user context once, then use it to generate readiness reports, create watchlist alerts, request services, and support future account-based dashboards.
+          </p>
+        </div>
+      </section>
+
+      <section className="section no-top-pad">
+        <ProfileDashboard />
       </section>
     </main>
   );
