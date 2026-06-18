@@ -17,8 +17,11 @@ export default function PlatformPage() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/opportunities">Opportunities</a>
+          <a href="/saved-routes">Saved Routes</a>
+          <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
+          <a href="/partners/apply">Partner Apply</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/country-checker">Countries</a>
@@ -31,12 +34,13 @@ export default function PlatformPage() {
           <span className="eyebrow">MoveReady services</span>
           <h1>Visa, relocation, documents, alerts, and trusted services in one place.</h1>
           <p className="lede">
-            MoveReady brings route intelligence, official opportunity monitoring, documents, funds, alerts, courier, legalization, insurance, appointments, family planning, and post-arrival support into one source-backed platform.
+            MoveReady brings route intelligence, official opportunity monitoring, documents, funds, timelines, alerts, courier, legalization, insurance, appointments, family planning, and post-arrival support into one source-backed platform.
           </p>
           <div className="actions">
             <a className="btn primary" href="/readiness">Use readiness tools</a>
             <a className="btn" href="/watchlist">Create watchlist alert</a>
-            <a className="btn" href="/opportunities">View official opportunities</a>
+            <a className="btn" href="/timeline">Create timeline</a>
+            <a className="btn" href="/partners/apply">Apply as provider</a>
           </div>
         </div>
       </section>
