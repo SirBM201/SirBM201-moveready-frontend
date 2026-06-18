@@ -22,12 +22,12 @@ const trustSections = [
   {
     title: "Partner screening before handoff",
     status: "Required",
-    summary: "Courier, insurance, legalisation, translation, accommodation, admission, and settlement providers should be reviewed before public listing or user handoff.",
+    summary: "Courier, insurance, legalization, translation, accommodation, admission, and settlement providers should be reviewed before public listing or user handoff.",
   },
   {
     title: "Sensitive document handling",
     status: "Required",
-    summary: "Passport, certificate, notarization, apostille, and legalisation support should be treated as premium trusted services with tracking, insurance, and clear responsibility boundaries.",
+    summary: "Passport, certificate, notarization, apostille, and legalization support should be treated as premium trusted services with tracking, insurance, and clear responsibility boundaries.",
   },
 ];
 
@@ -65,7 +65,7 @@ export default function TrustPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Use route checker</a>
-            <a className="btn" href="/platform/opportunities">View opportunities</a>
+            <a className="btn" href="/opportunities">View opportunities</a>
             <a className="btn" href="/partners/apply">Provider apply</a>
           </div>
         </div>
