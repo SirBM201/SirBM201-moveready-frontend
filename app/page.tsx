@@ -7,6 +7,11 @@ const liveRoutes = [
     text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
   },
   {
+    title: "Finland D visa route",
+    href: "/routes/finland-d-visa",
+    text: "Check D visa readiness for eligible Finnish residence permit routes, passport handling, family planning, timeline, and first-arrival costs.",
+  },
+  {
     title: "Saved routes",
     href: "/saved-routes",
     text: "Keep selected countries, visa routes, scholarships, opportunities, and services for later lookup by email or phone.",
@@ -71,7 +76,7 @@ const liveRoutes = [
 const trustItems = [
   { value: "Source-first", label: "AI explains approved route data" },
   { value: "Versioned", label: "Route facts keep an audit trail" },
-  { value: "Reviewed", label: "Admin checks track source changes" },
+  { value: "Safety-first", label: "No approval or lottery guarantees" },
   { value: "Expandable", label: "New services plug in cleanly" },
 ];
 
@@ -100,7 +105,10 @@ export default function Home() {
           <a href="/readiness">Readiness</a>
           <a href="/partners/apply">Provider Apply</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
+          <a href="/routes/finland-d-visa">Finland Route</a>
           <a href="/route-checker">Route Checker</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/safety">Safety</a>
           <a href="/country-checker">Countries</a>
           <a href="/platform">Platform</a>
           <a href="/report-preview">Report</a>
@@ -118,6 +126,7 @@ export default function Home() {
             <a className="btn primary" href="/route-checker">Start route checker</a>
             <a className="btn" href="/services">Request trusted service</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
+            <a className="btn" href="/safety">Review safety rules</a>
           </div>
         </div>
 
