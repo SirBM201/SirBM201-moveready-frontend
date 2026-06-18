@@ -237,7 +237,7 @@ export default function RouteReadinessForm() {
           </div>
         </div>
 
-        <label className="consent-row" htmlFor="report_contact_consent">
+        <label className="checkbox-field" htmlFor="report_contact_consent">
           <input id="report_contact_consent" type="checkbox" checked={form.consent_to_contact === "true"} onChange={(event) => updateField("consent_to_contact", event.target.checked ? "true" : "false")} />
           <span>Save my contact details with this report so I can retrieve it later and receive follow-up about this route.</span>
         </label>
