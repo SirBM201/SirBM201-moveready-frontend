@@ -12,6 +12,10 @@ type ServiceOption = {
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
+type Props = {
+  defaultService?: string;
+};
+
 const serviceOptions: ServiceOption[] = [
   { slug: "courier", title: "Passport and document courier", description: "Trusted handling for passports, certificates, embassy documents, and route evidence." },
   { slug: "legalization", title: "Notarization, apostille, and legalization", description: "Document authentication, embassy legalization, translation, and attestation support." },
@@ -29,8 +33,12 @@ function getService(slug: string) {
   return serviceOptions.find((item) => item.slug === slug) || serviceOptions[0];
 }
 
-export default function GeneralServiceRequestForm() {
-  const [serviceSlug, setServiceSlug] = useState(serviceOptions[0].slug);
+function validService(slug?: string) {
+  return !!slug && serviceOptions.some((item) => item.slug === slug);
+}
+
+export default function GeneralServiceRequestForm({ defaultService }: Props) {
+  const [serviceSlug, setServiceSlug] = useState(validService(defaultService) ? defaultService! : serviceOptions[0].slug);
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("Ready to submit a service request.");
 
@@ -38,13 +46,15 @@ export default function GeneralServiceRequestForm() {
     try {
       const params = new URLSearchParams(window.location.search);
       const service = params.get("service") || params.get("type");
-      if (service && serviceOptions.some((item) => item.slug === service)) {
-        setServiceSlug(service);
+      if (validService(service || undefined)) {
+        setServiceSlug(service!);
+      } else if (validService(defaultService)) {
+        setServiceSlug(defaultService!);
       }
     } catch {
-      // keep default service
+      if (validService(defaultService)) setServiceSlug(defaultService!);
     }
-  }, []);
+  }, [defaultService]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,7 +102,7 @@ export default function GeneralServiceRequestForm() {
       setState("success");
       setMessage(response.stored === false ? "Request received. Storage will activate after backend setup is complete." : "Request saved. MoveReady will contact you with next steps.");
       form.reset();
-      setServiceSlug(serviceOptions[0].slug);
+      setServiceSlug(validService(defaultService) ? defaultService! : serviceOptions[0].slug);
     } catch {
       setState("error");
       setMessage("Unable to submit this request right now. If Railway is still blocked, try again after the backend redeploys.");
