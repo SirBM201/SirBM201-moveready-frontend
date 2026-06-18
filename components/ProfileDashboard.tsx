@@ -110,7 +110,7 @@ export default function ProfileDashboard() {
       });
       setProfile(data.profile);
       setLookupContact(data.profile.email || data.profile.phone || "");
-      setMessage("Profile saved. You can now use it as the basis for reports, watchlists, and service requests.");
+      setMessage("Profile saved. You can now use it as the basis for reports, saved routes, watchlists, and service requests.");
     } catch (error) {
       const apiError = error as ApiError;
       setMessage(apiError?.status === 503 ? "Unable to save profile. Confirm SQL 008 has been run and backend redeployed." : "Unable to save profile.");
@@ -217,6 +217,7 @@ export default function ProfileDashboard() {
               </div>
               <div className="actions">
                 <a className="btn primary" href="/route-checker">Generate readiness report</a>
+                <a className="btn" href="/saved-routes">Save route</a>
                 <a className="btn" href="/watchlist">Create watchlist alert</a>
                 <a className="btn" href="/readiness">Run readiness tools</a>
               </div>
