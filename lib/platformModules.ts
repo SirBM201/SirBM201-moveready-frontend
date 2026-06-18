@@ -68,7 +68,7 @@ export const platformModules: PlatformModule[] = [
     summary: "Guide document authentication flows by issuing country, receiving country, document type, and route purpose.",
     readiness: "Route document notes can already show legalization requirements where official sources confirm them.",
     launchScope: "Service requests, provider routing, translation support, document pickup, status tracking, and user instructions.",
-    href: "/platform/legalization",
+    href: "/services?service=legalization",
   },
   {
     slug: "courier",
@@ -78,7 +78,7 @@ export const platformModules: PlatformModule[] = [
     summary: "Coordinate trusted handling for passports, certificates, embassy submissions, and notarization/legalization pickups.",
     readiness: "The service request form is live for user interest, and provider applications can now be captured for admin review.",
     launchScope: "Courier partners, tracking, insurance options, destination handling rules, special instructions, and pricing.",
-    href: "/platform/courier",
+    href: "/services?service=courier",
   },
   {
     slug: "insurance",
@@ -108,7 +108,7 @@ export const platformModules: PlatformModule[] = [
     summary: "Plan spouse, children, dependent documents, extra funds, accommodation, school, insurance, and arrival tasks.",
     readiness: "Family count already affects starter budget estimates in the route checker.",
     launchScope: "Per-family-member documents, dependent proof, funds adjustment, insurance, school planning, and arrival checklist.",
-    href: "/platform/family-relocation",
+    href: "/route-checker",
   },
   {
     slug: "settlement",
@@ -118,7 +118,7 @@ export const platformModules: PlatformModule[] = [
     summary: "Continue after approval with airport pickup, SIM, bank, tax number, registration, housing, school, and transport tasks.",
     readiness: "Users can request post-arrival support while route-specific arrival checklists are prepared.",
     launchScope: "Arrival tasks, local partner services, reminders, family settlement needs, and location-specific guidance.",
-    href: "/platform/settlement",
+    href: "/services?service=settlement",
   },
   {
     slug: "partners",
