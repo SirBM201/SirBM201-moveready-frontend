@@ -76,7 +76,7 @@ export const platformModules: PlatformModule[] = [
     category: "Execution services",
     availability: "partner_approval_pending",
     summary: "Coordinate trusted handling for passports, certificates, embassy submissions, and notarization/legalization pickups.",
-    readiness: "The service request form is live for early interest while trusted provider onboarding is handled.",
+    readiness: "The service request form is live for user interest, and provider applications can now be captured for admin review.",
     launchScope: "Courier partners, tracking, insurance options, destination handling rules, special instructions, and pricing.",
     href: "/platform/courier",
   },
@@ -96,9 +96,9 @@ export const platformModules: PlatformModule[] = [
     category: "Timeline",
     availability: "coming_soon",
     summary: "Track embassy, visa center, biometrics, document submission, passport collection, and deadline events.",
-    readiness: "Users can request this service while manual timeline tracking and reminders are prepared.",
+    readiness: "Users can save timeline events now. External appointment monitoring requires source permission and approved provider setup.",
     launchScope: "Appointment dates, biometrics, document submission, collection, deadline reminders, and permitted availability monitoring.",
-    href: "/platform/appointments",
+    href: "/timeline",
   },
   {
     slug: "family-relocation",
@@ -126,9 +126,9 @@ export const platformModules: PlatformModule[] = [
     category: "Marketplace",
     availability: "partner_approval_pending",
     summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, and settlement providers.",
-    readiness: "The app has service request capture and an admin dashboard for reviewing provider/service interest.",
+    readiness: "Provider application capture and admin screening are available. Public handoff should only use approved providers.",
     launchScope: "Provider vetting, expert review, service requests, commission tracking, handoff notes, and user support workflow.",
-    href: "/platform/partners",
+    href: "/partners/apply",
   },
 ];
 
