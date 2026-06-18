@@ -104,9 +104,14 @@ export default function RouteReadinessForm() {
     setError("");
     setStatus("Generating checklist, budget estimate, and readiness report...");
 
+    const contactConsent = form.consent_to_contact === "true";
     const payload = {
       ...form,
-      consent_to_contact: form.consent_to_contact === "true",
+      full_name: contactConsent ? form.full_name : "",
+      email: contactConsent ? form.email : "",
+      phone: contactConsent ? form.phone : "",
+      preferred_contact_channel: contactConsent ? form.preferred_contact_channel : "",
+      consent_to_contact: contactConsent,
       available_funds_amount: Number(form.available_funds_amount || 0),
       family_members_count: Number(form.family_members_count || 0),
       timeline_months: Number(form.timeline_months || 0),
