@@ -1,3 +1,5 @@
+import LiveRouteDetail from "@/components/LiveRouteDetail";
+
 const facts = [
   {
     title: "D visa purpose",
@@ -41,7 +43,7 @@ export default function FinlandDVisaPage() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="/"><strong>Project MoveReady</strong><span>Finland D visa route</span></a>
-        <nav className="nav"><a href="/route-checker">Route Checker</a><a href="/saved-routes">Saved Routes</a><a href="/timeline">Timeline</a><a href="/services">Services</a></nav>
+        <nav className="nav"><a href="/route-checker">Route Checker</a><a href="/saved-routes">Saved Routes</a><a href="/timeline">Timeline</a><a href="/services">Services</a><a href="/sources">Sources</a></nav>
       </header>
 
       <section className="hero-band compact-hero">
@@ -51,18 +53,21 @@ export default function FinlandDVisaPage() {
           <p className="lede">A focused workspace for users who may qualify for Finland's D visa through an eligible residence permit route such as start-up entrepreneur, specialist, study, research, or selected work-based permits.</p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Generate readiness report</a>
+            <a className="btn" href="/saved-routes">Save route</a>
             <a className="btn" href="/timeline">Build timeline</a>
             <a className="btn" href="/services">Request document support</a>
           </div>
         </div>
       </section>
 
+      <LiveRouteDetail countryCode="FI" routeCode="d-visa" />
+
       <section className="route-detail-shell">
         <div className="route-detail-layout">
           <aside className="route-detail-side">
-            <span className="overline">Route status</span>
+            <span className="overline">Source notes</span>
             <h2>Finland D visa pathway</h2>
-            <p>Use this page to check whether the D visa makes sense for the residence permit route, travel timeline, passport handling, family plan, and document readiness.</p>
+            <p>Use this route with current Migri and Finnish mission instructions. The D visa is tied to eligible residence permit routes and passport handling rules.</p>
             <div className="badge-row">
               <span className="badge">Finland</span>
               <span className="badge">D visa</span>
@@ -74,12 +79,11 @@ export default function FinlandDVisaPage() {
               <div><strong>Primary rule</strong><span>Requires granted or held residence permit</span></div>
               <div><strong>Public source</strong><span>Finnish Immigration Service</span></div>
             </div>
-            <a className="btn primary full" href="/saved-routes">Save this route</a>
           </aside>
 
           <div className="route-detail-main">
             <section className="detail-section">
-              <h3>Key route facts</h3>
+              <h3>Public source notes</h3>
               <div className="mini-list">
                 {facts.map((fact) => (
                   <div key={fact.title}><strong>{fact.title}</strong><span>{fact.text}</span></div>
