@@ -7,6 +7,11 @@ const liveRoutes = [
     text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
   },
   {
+    title: "Saved routes",
+    href: "/saved-routes",
+    text: "Keep selected countries, visa routes, scholarships, opportunities, and services for later lookup by email or phone.",
+  },
+  {
     title: "Watchlist and alerts",
     href: "/watchlist",
     text: "Save routes, opportunities, scholarships, countries, or services and choose opt-in alert preferences for updates.",
@@ -73,6 +78,7 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/opportunities">Opportunities</a>
+          <a href="/saved-routes">Saved Routes</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
@@ -135,7 +141,7 @@ export default function Home() {
       <section className="section" id="modules">
         <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, official opportunities, watchlists, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          The current tools focus on route intelligence, official opportunities, saved routes, watchlists, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
