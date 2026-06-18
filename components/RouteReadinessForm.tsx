@@ -46,6 +46,11 @@ type ResultState = {
 };
 
 const defaultForm = {
+  full_name: "",
+  email: "",
+  phone: "",
+  preferred_contact_channel: "email",
+  consent_to_contact: "false",
   goal: "business",
   route_category: "startup",
   current_country: "Kuwait",
@@ -101,6 +106,7 @@ export default function RouteReadinessForm() {
 
     const payload = {
       ...form,
+      consent_to_contact: form.consent_to_contact === "true",
       available_funds_amount: Number(form.available_funds_amount || 0),
       family_members_count: Number(form.family_members_count || 0),
       timeline_months: Number(form.timeline_months || 0),
@@ -145,6 +151,31 @@ export default function RouteReadinessForm() {
         </div>
 
         <div className="form-grid two-col">
+          <div className="field">
+            <label htmlFor="full_name">Full name</label>
+            <input id="full_name" value={form.full_name} onChange={(event) => updateField("full_name", event.target.value)} placeholder="Optional" />
+          </div>
+
+          <div className="field">
+            <label htmlFor="email">Email for report lookup</label>
+            <input id="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Optional" type="email" />
+          </div>
+
+          <div className="field">
+            <label htmlFor="phone">WhatsApp / phone</label>
+            <input id="phone" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Optional" />
+          </div>
+
+          <div className="field">
+            <label htmlFor="preferred_contact_channel">Preferred contact</label>
+            <select id="preferred_contact_channel" value={form.preferred_contact_channel} onChange={(event) => updateField("preferred_contact_channel", event.target.value)}>
+              <option value="email">Email</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="telegram">Telegram</option>
+              <option value="phone">Phone</option>
+            </select>
+          </div>
+
           <div className="field">
             <label htmlFor="goal">Main goal</label>
             <select id="goal" value={form.goal} onChange={(event) => updateField("goal", event.target.value)}>
@@ -205,6 +236,11 @@ export default function RouteReadinessForm() {
             <input id="timeline_months" inputMode="numeric" value={form.timeline_months} onChange={(event) => updateField("timeline_months", event.target.value)} />
           </div>
         </div>
+
+        <label className="consent-row" htmlFor="report_contact_consent">
+          <input id="report_contact_consent" type="checkbox" checked={form.consent_to_contact === "true"} onChange={(event) => updateField("consent_to_contact", event.target.checked ? "true" : "false")} />
+          <span>Save my contact details with this report so I can retrieve it later and receive follow-up about this route.</span>
+        </label>
 
         <button className="btn primary full" type="submit" disabled={loading}>
           {loading ? "Generating..." : "Generate readiness plan"}
