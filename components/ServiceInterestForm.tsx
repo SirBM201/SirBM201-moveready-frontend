@@ -68,7 +68,7 @@ export default function ServiceInterestForm({ serviceSlug, serviceTitle }: Servi
         useAuthToken: false,
       });
       setState("success");
-      setMessage(response.stored === false ? "Request received. Storage will activate after setup is completed." : "Request received. We will contact you when this service is ready.");
+      setMessage(response.stored === false ? "Request received. Storage will activate after setup is completed." : "Request saved. MoveReady will contact you with next steps.");
       form.reset();
       setRouteHint("");
     } catch {
@@ -81,8 +81,8 @@ export default function ServiceInterestForm({ serviceSlug, serviceTitle }: Servi
     <form className="interest-form" onSubmit={handleSubmit}>
       <div>
         <span className="overline">Service request</span>
-        <h3>Get notified or request support</h3>
-        <p>Submit your details if you want updates or early access for this service.</p>
+        <h3>Request support</h3>
+        <p>Submit your details if you want help, updates, or follow-up for this service.</p>
       </div>
 
       <div className="form-grid two-col">
