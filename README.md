@@ -51,6 +51,7 @@ The public app now includes live route checks, official opportunities, watchlist
 - Refusal-risk screener
 - Service request forms for coming-soon and partner-dependent services
 - Admin user profile review dashboard after migration `008_user_relocation_profiles.sql`
+- Admin generated report review dashboard at `/admin/reports`
 - Admin service request dashboard
 - Admin watchlist subscription dashboard after migration `007_watchlist_alert_subscriptions.sql`
 - Admin readiness check dashboard after migration `006_readiness_check_runs.sql`
