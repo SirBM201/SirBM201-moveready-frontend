@@ -4,6 +4,14 @@ import { useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 
+type ReportSection = {
+  title?: string;
+  body?: string;
+  section_key?: string;
+  section_title?: string;
+  section_content?: string;
+};
+
 type ReportRow = {
   id?: string;
   report_ref?: string;
@@ -20,7 +28,7 @@ type ReportRow = {
   family_members_count?: number;
   report_payload?: {
     report_ref?: string;
-    sections?: { title?: string; body?: string }[];
+    sections?: ReportSection[];
     next_steps?: string[];
   };
 };
@@ -32,6 +40,14 @@ function formatDate(value?: string) {
   } catch {
     return value;
   }
+}
+
+function sectionTitle(section: ReportSection) {
+  return section.section_title || section.title || "Report section";
+}
+
+function sectionBody(section: ReportSection) {
+  return section.section_content || section.body || "No detail recorded.";
 }
 
 export default function ReportsLookup() {
@@ -119,12 +135,15 @@ export default function ReportsLookup() {
                   </div>
                   {sections.length ? (
                     <div className="result-stack compact-stack">
-                      {sections.slice(0, 4).map((section, index) => (
-                        <div className="result-block soft" key={`${section.title}-${index}`}>
-                          <h3>{section.title || "Report section"}</h3>
-                          <p>{section.body || "No detail recorded."}</p>
-                        </div>
-                      ))}
+                      {sections.slice(0, 4).map((section, index) => {
+                        const title = sectionTitle(section);
+                        return (
+                          <div className="result-block soft" key={`${section.section_key || title}-${index}`}>
+                            <h3>{title}</h3>
+                            <p>{sectionBody(section)}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : null}
                   <div className="actions">
