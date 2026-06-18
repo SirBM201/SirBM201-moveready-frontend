@@ -12,6 +12,7 @@ export default function DashboardPage() {
           <a href="/">Home</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
+          <a href="/services">Services</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/readiness">Readiness</a>
           <a href="/watchlist">Watchlist</a>
@@ -29,6 +30,7 @@ export default function DashboardPage() {
           <div className="actions">
             <a className="btn primary" href="/timeline">Open timeline</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
+            <a className="btn" href="/services">Request service</a>
           </div>
         </div>
       </section>
