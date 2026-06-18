@@ -12,6 +12,11 @@ const liveRoutes = [
     text: "Keep selected countries, visa routes, scholarships, opportunities, and services for later lookup by email or phone.",
   },
   {
+    title: "Application timeline",
+    href: "/timeline",
+    text: "Track documents, appointments, payment deadlines, result checks, travel dates, and follow-up steps.",
+  },
+  {
     title: "Watchlist and alerts",
     href: "/watchlist",
     text: "Save routes, opportunities, scholarships, countries, or services and choose opt-in alert preferences for updates.",
@@ -79,6 +84,7 @@ export default function Home() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/opportunities">Opportunities</a>
           <a href="/saved-routes">Saved Routes</a>
+          <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
           <a href="/routes/estonia-startup">Estonia Route</a>
@@ -94,7 +100,7 @@ export default function Home() {
           <span className="eyebrow">Source-backed relocation readiness</span>
           <h1>Choose the route, then get ready properly.</h1>
           <p className="lede">
-            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, and next steps from source-backed data.
+            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, timeline events, and next steps from source-backed data.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
@@ -141,7 +147,7 @@ export default function Home() {
       <section className="section" id="modules">
         <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, official opportunities, saved routes, watchlists, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          The current tools focus on route intelligence, official opportunities, saved routes, timelines, watchlists, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
@@ -190,6 +196,7 @@ export default function Home() {
             <span className="badge">Budget estimate</span>
             <span className="badge">Insurance notes</span>
             <span className="badge">Scholarship options</span>
+            <span className="badge">Timeline events</span>
             <span className="badge">Opportunity alerts</span>
             <span className="badge">Source freshness</span>
           </div>
