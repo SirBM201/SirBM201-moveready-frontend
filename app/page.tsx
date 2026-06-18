@@ -2,6 +2,26 @@ import { platformModules } from "@/lib/platformModules";
 
 const liveRoutes = [
   {
+    title: "Launch workspace",
+    href: "/workspace",
+    text: "Open the main working surface for routes, countries, opportunities, watchlists, saved routes, timelines, services, reports, and admin review.",
+  },
+  {
+    title: "Trust center",
+    href: "/trust",
+    text: "Explain source-backed guidance, no approval guarantees, opt-in notifications, partner screening, and sensitive-document controls.",
+  },
+  {
+    title: "Source review",
+    href: "/sources",
+    text: "Show how official sources, last verified dates, review due dates, risk labels, and route versioning protect users.",
+  },
+  {
+    title: "Launch readiness",
+    href: "/launch-readiness",
+    text: "Review active product surfaces, deployment checks, provider screening boundaries, and launch safety controls.",
+  },
+  {
     title: "Official ballots and quota opportunities",
     href: "/opportunities",
     text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
@@ -97,21 +117,19 @@ export default function Home() {
           <span>Global relocation readiness platform</span>
         </a>
         <nav className="nav" aria-label="Main navigation">
+          <a href="/workspace">Workspace</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/services">Services</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
-          <a href="/partners/apply">Provider Apply</a>
-          <a href="/routes/estonia-startup">Estonia Route</a>
           <a href="/routes/finland-d-visa">Finland Route</a>
           <a href="/route-checker">Route Checker</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/safety">Safety</a>
-          <a href="/country-checker">Countries</a>
+          <a href="/trust">Trust</a>
+          <a href="/sources">Sources</a>
+          <a href="/launch-readiness">Launch</a>
           <a href="/platform">Platform</a>
-          <a href="/report-preview">Report</a>
         </nav>
       </header>
 
@@ -126,7 +144,7 @@ export default function Home() {
             <a className="btn primary" href="/route-checker">Start route checker</a>
             <a className="btn" href="/services">Request trusted service</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
-            <a className="btn" href="/safety">Review safety rules</a>
+            <a className="btn" href="/trust">Review trust rules</a>
           </div>
         </div>
 
