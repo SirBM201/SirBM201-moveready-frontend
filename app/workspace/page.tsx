@@ -21,7 +21,13 @@ const workflows = [
     title: "Finland D visa route",
     status: "Available",
     href: "/routes/finland-d-visa",
-    summary: "Use the Migri-backed D visa route page while the database seed is completed.",
+    summary: "Use the Migri-backed D visa route page with live database detail after the corrected SQL is active.",
+  },
+  {
+    title: "Startup evidence pack",
+    status: "Available",
+    href: "/startup-evidence",
+    summary: "Organize founder profile, startup proof, traction, country fit, funds, and submission-readiness review.",
   },
   {
     title: "Official opportunities",
@@ -54,6 +60,30 @@ const workflows = [
     summary: "Capture requests for courier, documents, insurance, translation, accommodation, and settlement help.",
   },
   {
+    title: "Courier requests",
+    status: "Available",
+    href: "/courier",
+    summary: "Capture passport, certificate, embassy, notarization, legalization, and sensitive-document courier needs.",
+  },
+  {
+    title: "Document legalization",
+    status: "Available",
+    href: "/legalization",
+    summary: "Capture notarization, apostille, attestation, embassy legalization, authentication, and translation needs.",
+  },
+  {
+    title: "Family planner",
+    status: "Available",
+    href: "/family-planner",
+    summary: "Plan spouse, children, extra documents, extra funds, school, accommodation, and arrival tasks.",
+  },
+  {
+    title: "Settlement support",
+    status: "Available",
+    href: "/settlement",
+    summary: "Capture airport pickup, accommodation, SIM, bank, registration, insurance, school, and local setup requests.",
+  },
+  {
     title: "Provider applications",
     status: "Available",
     href: "/partners/apply",
@@ -64,6 +94,18 @@ const workflows = [
     status: "Available",
     href: "/my-reports",
     summary: "Retrieve saved readiness reports by reference, email, or phone.",
+  },
+  {
+    title: "Source review",
+    status: "Available",
+    href: "/sources",
+    summary: "Review source-backed guidance, last verified dates, risk labels, and route versioning controls.",
+  },
+  {
+    title: "Launch readiness",
+    status: "Available",
+    href: "/launch-readiness",
+    summary: "Check product surfaces, deployment checks, provider boundaries, and public safety rules.",
   },
   {
     title: "Admin review",
@@ -95,6 +137,7 @@ export default function WorkspacePage() {
           <a href="/route-checker">Route Checker</a>
           <a href="/platform/opportunities">Opportunities</a>
           <a href="/services">Services</a>
+          <a href="/sources">Sources</a>
           <a href="/admin">Admin</a>
         </nav>
       </header>
@@ -109,6 +152,7 @@ export default function WorkspacePage() {
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route check</a>
             <a className="btn" href="/watchlist">Create watchlist</a>
+            <a className="btn" href="/services">Request service</a>
             <a className="btn" href="/admin">Open admin</a>
           </div>
         </div>
