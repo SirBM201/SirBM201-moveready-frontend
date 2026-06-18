@@ -606,8 +606,14 @@ h1 {
   font-size: 14px;
 }
 
-.checkbox-field input {
-  margin-top: 4px;
+.checkbox-field input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  accent-color: var(--brand);
 }
 
 .admin-toolbar {
