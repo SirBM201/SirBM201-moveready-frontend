@@ -1,3 +1,5 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const workflows = [
   {
     title: "Route readiness",
@@ -45,7 +47,7 @@ const workflows = [
     title: "Official opportunities",
     status: "Available",
     href: "/opportunities",
-    summary: "Track lottery, ballot, quota, and invitation-pool opportunities with scam-safe guidance.",
+    summary: "Track lottery, ballot, and invitation-pool opportunities with scam-safe guidance.",
   },
   {
     title: "Watchlist alerts",
@@ -145,22 +147,7 @@ const controls = [
 export default function WorkspacePage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Workspace</span>
-        </a>
-        <nav className="nav">
-          <a href="/dashboard">Dashboard</a>
-          <a href="/compare">Compare</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/services">Services</a>
-          <a href="/providers">Providers</a>
-          <a href="/sources">Sources</a>
-          <a href="/admin">Admin</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Workspace" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
