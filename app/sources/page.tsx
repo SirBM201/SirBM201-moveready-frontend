@@ -78,38 +78,74 @@ const opportunitySources = [
   {
     route: "USA Diversity Visa Program",
     owner: "U.S. Department of State",
+    source: "Diversity Visa Program entry page",
+    href: "https://travel.state.gov/content/travel/en/us-visas/immigrate/diversity-visa-program-entry.html",
     review: "Before registration opens, before result-check opens, and when annual instructions change.",
     risk: "Scam warnings, duplicate-entry rule, confirmation-number storage, and official submission only.",
   },
   {
     route: "Canada International Experience Canada",
     owner: "Immigration, Refugees and Citizenship Canada",
+    source: "IEC rounds of invitations page",
+    href: "https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/iec/rounds-invitations.html",
     review: "Weekly during open seasons where invitation numbers, spots, and chances are updated.",
     risk: "Pool entry is not approval; invitation deadlines and country-specific pools must be monitored.",
   },
   {
     route: "Australia Work and Holiday 462 ballot",
     owner: "Australian Department of Home Affairs",
+    source: "Subclass 462 ballot and country-cap guidance",
+    href: "https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news/new-work-and-holiday-subclass-462-visa-pre-application-process",
     review: "When program-year caps, ballot windows, or country-cap statuses change.",
     risk: "Selection only permits application; subclass 462 eligibility and visa grant remain separate.",
   },
   {
     route: "UK India Young Professionals Scheme",
     owner: "GOV.UK",
+    source: "India Young Professionals Scheme ballot system",
+    href: "https://www.gov.uk/guidance/india-young-professionals-scheme-visa-ballot-system",
     review: "Before each ballot round and when savings, age, qualification, or application rules change.",
     risk: "Ballot selection is not visa approval; eligible Indian citizenship and savings evidence matter.",
   },
   {
-    route: "New Zealand quota ballots",
+    route: "New Zealand Pacific Access and Samoan Quota ballots",
     owner: "Immigration New Zealand",
+    source: "PAC and Samoan Quota online registration",
+    href: "https://www.immigration.govt.nz/formshelp/pac-sq-registration",
     review: "When ballot registration, results, invitation, job-offer, or residence requirements change.",
     risk: "Ballot draw is not final residence approval; registration numbers and official invitation steps matter.",
   },
   {
-    route: "Japan, Korea, Hong Kong, and Ireland working holiday routes",
-    owner: "Government immigration or foreign-affairs source for each route",
-    review: "Before any route is marked open, and when quotas, age limits, funds, insurance, or embassy instructions change.",
-    risk: "Country-specific eligibility, holiday-first purpose, quota limits, and arrival obligations must be clear.",
+    route: "Japan Working Holiday Programme",
+    owner: "Ministry of Foreign Affairs of Japan",
+    source: "Working Holiday Programmes in Japan",
+    href: "https://www.mofa.go.jp/j_info/visit/w_holiday/index.html",
+    review: "Before showing country availability, quota limits, age rules, or local embassy instructions.",
+    risk: "Eligibility and document steps can vary by nationality and local embassy/consulate.",
+  },
+  {
+    route: "Korea Working Holiday Visa",
+    owner: "Korea Working Holiday Info Center / Overseas Koreans Agency",
+    source: "Working Holiday Info Center requirements",
+    href: "https://whic.mofa.go.kr/contents.do?contentsNo=38&menuNo=90",
+    review: "Before any quota, insurance, fund, or embassy appointment instruction is displayed.",
+    risk: "Applicants should confirm current quota and document rules with the nearest Korean embassy or consulate.",
+  },
+  {
+    route: "Hong Kong Working Holiday Scheme",
+    owner: "Hong Kong Immigration Department",
+    source: "Working Holiday Scheme page",
+    href: "https://www.immd.gov.hk/eng/services/visas/working_holiday_scheme.html",
+    review: "Before showing participating countries, annual quotas, temporary work limits, or dependant restrictions.",
+    risk: "The route is holiday-first and does not permit permanent employment or dependant joining under the same scheme.",
+  },
+  {
+    route: "Ireland Working Holiday Authorisation",
+    owner: "Irish Immigration Service Delivery",
+    source: "Working holidays in Ireland",
+    href: "https://www.irishimmigration.ie/coming-to-work-in-ireland/what-are-my-options-for-working-in-ireland/coming-to-work-for-more-than-90-days/working-holidays-in-ireland/",
+    review: "Before showing eligible nationalities, country-specific channels, validity, registration, or dependants guidance.",
+    risk: "Places are limited, applications must follow nationality-specific instructions, and arrival registration may be required.",
   },
 ];
 
@@ -198,6 +234,7 @@ export default function SourcesPage() {
             <div key={item.route}>
               <strong>{item.route}</strong>
               <span><b>Owner:</b> {item.owner}</span>
+              <span><b>Source:</b> <a className="text-link" href={item.href} target="_blank" rel="noreferrer">{item.source}</a></span>
               <span><b>Review trigger:</b> {item.review}</span>
               <span><b>Risk control:</b> {item.risk}</span>
             </div>
