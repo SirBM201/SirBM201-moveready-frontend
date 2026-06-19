@@ -1,3 +1,5 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const options = [
   {
     name: "Readiness report",
@@ -25,10 +27,7 @@ const options = [
 export default function PricingPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/"><strong>Project MoveReady</strong><span>Pricing and requests</span></a>
-        <nav className="nav"><a href="/services">Services</a><a href="/route-checker">Route Checker</a><a href="/safety">Safety</a></nav>
-      </header>
+      <SiteHeader sectionLabel="Pricing and requests" />
 
       <section className="legal-hero">
         <span className="eyebrow">Launch pricing</span>
