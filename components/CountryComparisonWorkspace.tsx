@@ -294,14 +294,18 @@ function attachKnownOpportunities(rows: Partial<ComparisonRow>[], opportunities:
   });
 
   const missingRows = allOpportunities
-    .filter((opportunity) => opportunity.country_code && !existingCountryCodes.has(opportunity.country_code))
+    .filter((opportunity) => {
+      const countryCode = opportunity.country_code || "";
+      return countryCode && !existingCountryCodes.has(countryCode);
+    })
     .reduce<Partial<ComparisonRow>[]>((acc, opportunity) => {
-      if (acc.some((row) => row.country_code === opportunity.country_code)) return acc;
-      const country = getCountryFallback(opportunity.country_code) || {
-        country_code: opportunity.country_code || "",
+      const countryCode = opportunity.country_code || "";
+      if (acc.some((row) => row.country_code === countryCode)) return acc;
+      const country = getCountryFallback(countryCode) || {
+        country_code: countryCode,
         country_name: opportunity.country_name || "Country pending",
       };
-      const countryOpportunities = allOpportunities.filter((item) => item.country_code === opportunity.country_code);
+      const countryOpportunities = allOpportunities.filter((item) => item.country_code === countryCode);
       acc.push({
         ...country,
         routes: [],
