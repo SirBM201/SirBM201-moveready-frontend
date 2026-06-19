@@ -19,6 +19,14 @@ type ApiInit = Omit<RequestInit, "body"> & {
   useAuthToken?: boolean;
 };
 
+const AUTH_TOKEN_KEYS = [
+  "moveready_access_token",
+  "moveready_session_token",
+  "relocation_access_token",
+  "auth_token",
+  "access_token",
+];
+
 function isPlainObject(v: any) {
   if (v === null || typeof v !== "object") return false;
   const proto = Object.getPrototypeOf(v);
@@ -28,8 +36,7 @@ function isPlainObject(v: any) {
 function safeGetLocalToken(): string | null {
   try {
     if (typeof window === "undefined") return null;
-    const tokenKeys = ["moveready_access_token", "relocation_access_token", "auth_token", "access_token"];
-    for (const key of tokenKeys) {
+    for (const key of AUTH_TOKEN_KEYS) {
       const value = localStorage.getItem(key) || sessionStorage.getItem(key);
       if (value && value.trim() && value !== "undefined" && value !== "null") {
         return value.trim();
@@ -44,7 +51,7 @@ function safeGetLocalToken(): string | null {
 export function clearStoredAuthToken() {
   try {
     if (typeof window === "undefined") return;
-    ["moveready_access_token", "relocation_access_token", "auth_token", "access_token"].forEach((key) => {
+    AUTH_TOKEN_KEYS.forEach((key) => {
       localStorage.removeItem(key);
       sessionStorage.removeItem(key);
     });
