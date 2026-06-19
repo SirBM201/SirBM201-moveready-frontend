@@ -56,6 +56,10 @@ const guideLinks: Record<string, string> = {
   "UK-IYPS": "/opportunities/uk-india-young-professionals",
   "NZ-PAC": "/opportunities/new-zealand-quota-ballots",
   "NZ-SQ": "/opportunities/new-zealand-quota-ballots",
+  "JP-WH": "/opportunities/japan-working-holiday",
+  "KR-WH": "/opportunities/korea-working-holiday",
+  "HK-WHS": "/opportunities/hong-kong-working-holiday",
+  "IE-WHA": "/opportunities/ireland-working-holiday",
 };
 
 function formatDate(value?: string | null) {
