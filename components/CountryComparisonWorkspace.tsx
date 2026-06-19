@@ -45,6 +45,12 @@ const riskWeight: Record<string, number> = {
   high: 3,
 };
 
+const confidenceWeight: Record<string, number> = {
+  low: 1,
+  medium: 2,
+  high: 3,
+};
+
 function labelFromRisk(routes: RouteItem[]) {
   const scored = routes
     .map((route) => String(route.risk_level || "").toLowerCase())
@@ -56,29 +62,69 @@ function labelFromRisk(routes: RouteItem[]) {
 function confidenceFromRoutes(routes: RouteItem[]) {
   const labels = routes.map((route) => route.source_confidence).filter(Boolean) as string[];
   if (!labels.length) return "source review required";
-  if (labels.some((label) => label.toLowerCase() === "high")) return "high";
-  return labels[0];
+  const sorted = labels.sort((a, b) => (confidenceWeight[b.toLowerCase()] || 0) - (confidenceWeight[a.toLowerCase()] || 0));
+  return sorted[0];
+}
+
+function freshnessFromRoutes(routes: RouteItem[]) {
+  if (routes.some((route) => route.freshness_status === "active")) return "active route available";
+  if (routes.some((route) => route.freshness_status === "review_due")) return "source review due";
+  return routes.length ? "review route before use" : "route data needed";
+}
+
+function normalizeRows(rows: Partial<ComparisonRow>[]) {
+  return rows.map((row) => {
+    const routes = row.routes || [];
+    const routeCategories = row.route_categories?.length
+      ? row.route_categories
+      : (Array.from(new Set(routes.map((route) => route.route_category).filter(Boolean))) as string[]);
+
+    return {
+      id: row.id,
+      country_code: row.country_code || "",
+      country_name: row.country_name || "Country pending",
+      region: row.region,
+      currency_code: row.currency_code,
+      summary: row.summary,
+      routes,
+      route_count: Number(row.route_count ?? routes.length ?? 0),
+      route_categories: routeCategories,
+      risk_label: row.risk_label || labelFromRisk(routes),
+      source_confidence_label: row.source_confidence_label || confidenceFromRoutes(routes),
+      freshness_label: row.freshness_label || freshnessFromRoutes(routes),
+      active_route_count: row.active_route_count,
+      review_due_route_count: row.review_due_route_count,
+      last_verified_at: row.last_verified_at,
+    } satisfies ComparisonRow;
+  });
 }
 
 function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[]): ComparisonRow[] {
-  return countries.map((country) => {
+  return normalizeRows(countries.map((country) => {
     const countryRoutes = routes.filter((route) => route.country_code === country.country_code);
-    const routeCategories = Array.from(new Set(countryRoutes.map((route) => route.route_category).filter(Boolean))) as string[];
     return {
       ...country,
       routes: countryRoutes,
-      route_count: countryRoutes.length,
-      route_categories: routeCategories,
-      risk_label: labelFromRisk(countryRoutes),
-      source_confidence_label: confidenceFromRoutes(countryRoutes),
-      freshness_label: countryRoutes.some((route) => route.freshness_status === "active") ? "active route available" : "review route before use",
     };
-  });
+  }));
+}
+
+function getRiskRank(label: string) {
+  return riskWeight[label.toLowerCase()] || 99;
+}
+
+function getConfidenceRank(label: string) {
+  const value = label.toLowerCase();
+  if (value.includes("review")) return 0;
+  return confidenceWeight[value] || 0;
 }
 
 export default function CountryComparisonWorkspace() {
   const [comparisonRows, setComparisonRows] = useState<ComparisonRow[]>([]);
   const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [confidenceFilter, setConfidenceFilter] = useState("");
+  const [sortMode, setSortMode] = useState("route_count");
   const [status, setStatus] = useState("Loading country comparison data...");
 
   useEffect(() => {
@@ -88,7 +134,7 @@ export default function CountryComparisonWorkspace() {
       try {
         const comparisonData = await apiJson<{ countries: ComparisonRow[]; source_status?: string }>("relocation/country-comparison", { timeoutMs: 15000 });
         if (cancelled) return;
-        setComparisonRows(comparisonData.countries || []);
+        setComparisonRows(normalizeRows(comparisonData.countries || []));
         setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded" : "Live country comparison loaded");
       } catch {
         try {
@@ -112,23 +158,76 @@ export default function CountryComparisonWorkspace() {
     };
   }, []);
 
+  const categories = useMemo(() => {
+    return Array.from(new Set(comparisonRows.flatMap((country) => country.route_categories))).filter(Boolean).sort();
+  }, [comparisonRows]);
+
+  const metrics = useMemo(() => {
+    const countries = comparisonRows.length;
+    const routes = comparisonRows.reduce((total, country) => total + country.route_count, 0);
+    const active = comparisonRows.reduce((total, country) => total + (country.active_route_count || country.routes.filter((route) => route.freshness_status === "active").length), 0);
+    const highConfidence = comparisonRows.filter((country) => country.source_confidence_label.toLowerCase() === "high").length;
+    return { countries, routes, active, highConfidence };
+  }, [comparisonRows]);
+
   const rows = useMemo<ComparisonRow[]>(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return comparisonRows;
-    return comparisonRows.filter((country) => {
+    const filtered = comparisonRows.filter((country) => {
       const routeText = country.routes.map((route) => [route.route_name, route.route_code, route.route_category, route.summary].filter(Boolean).join(" ")).join(" ");
-      return [country.country_name, country.country_code, country.region, country.summary, routeText]
+      const matchesQuery = !q || [country.country_name, country.country_code, country.region, country.summary, routeText]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(q));
+      const matchesCategory = !categoryFilter || country.route_categories.includes(categoryFilter);
+      const matchesConfidence = !confidenceFilter || country.source_confidence_label.toLowerCase() === confidenceFilter;
+      return matchesQuery && matchesCategory && matchesConfidence;
     });
-  }, [comparisonRows, query]);
+
+    return filtered.sort((a, b) => {
+      if (sortMode === "country") return a.country_name.localeCompare(b.country_name);
+      if (sortMode === "risk") return getRiskRank(a.risk_label) - getRiskRank(b.risk_label);
+      if (sortMode === "confidence") return getConfidenceRank(b.source_confidence_label) - getConfidenceRank(a.source_confidence_label);
+      return b.route_count - a.route_count;
+    });
+  }, [categoryFilter, comparisonRows, confidenceFilter, query, sortMode]);
 
   return (
     <div className="country-compare-workspace">
+      <div className="metric-grid compact-metric-grid">
+        <div className="metric-item"><strong>{metrics.countries}</strong><span>Countries</span></div>
+        <div className="metric-item"><strong>{metrics.routes}</strong><span>Route records</span></div>
+        <div className="metric-item"><strong>{metrics.active}</strong><span>Active route versions</span></div>
+        <div className="metric-item"><strong>{metrics.highConfidence}</strong><span>High-confidence countries</span></div>
+      </div>
+
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="country-search">Search country, route, region, or summary</label>
           <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, startup, D visa" />
+        </div>
+        <div className="field">
+          <label htmlFor="country-category-filter">Route category</label>
+          <select id="country-category-filter" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <option value="">All categories</option>
+            {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="country-confidence-filter">Source confidence</label>
+          <select id="country-confidence-filter" value={confidenceFilter} onChange={(event) => setConfidenceFilter(event.target.value)}>
+            <option value="">All confidence levels</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="country-sort">Sort by</label>
+          <select id="country-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
+            <option value="route_count">Most route records</option>
+            <option value="confidence">Source confidence</option>
+            <option value="risk">Lowest risk signal</option>
+            <option value="country">Country name</option>
+          </select>
         </div>
         <a className="btn primary" href="/route-checker">Generate readiness report</a>
         <a className="btn" href="/compare">Compare route families</a>
@@ -183,6 +282,21 @@ export default function CountryComparisonWorkspace() {
 
       <style>{`
         .country-compare-workspace { display: grid; gap: 24px; }
+        .compact-metric-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .metric-item {
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          padding: 16px 18px;
+          background: #fff;
+          display: grid;
+          gap: 4px;
+        }
+        .metric-item strong { font-size: 1.6rem; color: var(--ink); }
+        .metric-item span { color: var(--muted); font-weight: 700; }
         .comparison-table { display: grid; gap: 12px; }
         .comparison-row {
           display: grid;
@@ -210,10 +324,12 @@ export default function CountryComparisonWorkspace() {
         .stacked-actions { align-items: stretch; flex-direction: column; }
         .stacked-actions .btn { width: 100%; justify-content: center; }
         @media (max-width: 1100px) {
+          .compact-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .comparison-row { grid-template-columns: 1fr 1fr; }
           .comparison-head { display: none; }
         }
         @media (max-width: 720px) {
+          .compact-metric-grid { grid-template-columns: 1fr; }
           .comparison-row { grid-template-columns: 1fr; }
         }
       `}</style>
