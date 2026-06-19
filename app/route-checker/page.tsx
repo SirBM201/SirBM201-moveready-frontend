@@ -1,13 +1,11 @@
+import SiteHeader from "@/components/SiteHeader";
 import LiveRouteGrid from "@/components/LiveRouteGrid";
 import RouteReadinessForm from "@/components/RouteReadinessForm";
 
 export default function RouteCheckerPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/"><strong>Project MoveReady</strong><span>Route checker</span></a>
-        <nav className="nav"><a href="/">Home</a><a href="/routes/estonia-startup">Estonia Route</a><a href="/document-checklist">Documents</a><a href="/budget-calculator">Budget</a><a href="/report-preview">Report</a></nav>
-      </header>
+      <SiteHeader sectionLabel="Route checker" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
