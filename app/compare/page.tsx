@@ -70,6 +70,20 @@ const routes = [
     ],
   },
   {
+    name: "Canada International Experience Canada",
+    country: "Canada",
+    category: "Invitation pool / youth mobility",
+    status: "Available",
+    risk: "Country-specific",
+    strength: "Useful for eligible citizens tracking Working Holiday, Young Professionals, or International Co-op pools and invitation rounds.",
+    watch: "Country-specific spots, invitation rounds, final-round notices, eligibility, documents, funds, insurance, and arrival planning.",
+    actions: [
+      { label: "Open route", href: "/routes/canada-iec" },
+      { label: "Save route", href: "/saved-routes?country=CA&route=iec" },
+      { label: "Create alert", href: "/watchlist?type=opportunity&code=CA-IEC&title=Canada%20International%20Experience%20Canada" },
+    ],
+  },
+  {
     name: "Japan Working Holiday Programme",
     country: "Japan",
     category: "Youth mobility / annual quota",
