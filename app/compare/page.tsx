@@ -1,3 +1,5 @@
+import styles from "./compare.module.css";
+
 const routes = [
   {
     name: "Estonia startup founder pathway",
@@ -93,9 +95,9 @@ export default function ComparePage() {
       <section className="section no-top-pad">
         <h2>Comparison map</h2>
         <p className="section-intro">These are the first route families in the launch surface. Each card points to a next action instead of leaving users with only information.</p>
-        <div className="compare-grid">
+        <div className={styles.compareGrid}>
           {routes.map((route) => (
-            <article className="comparison-card" key={route.name}>
+            <article className="card" key={route.name}>
               <div className="panel-heading">
                 <div>
                   <span className="overline">{route.country}</span>
@@ -111,7 +113,7 @@ export default function ComparePage() {
                 <div><strong>Best use</strong><span>{route.strength}</span></div>
                 <div><strong>Monitor</strong><span>{route.watch}</span></div>
               </div>
-              <div className="actions compact-actions">
+              <div className="actions">
                 {route.actions.map((action) => (
                   <a className={action.label.includes("Open") || action.label.includes("Run") ? "btn primary" : "btn"} href={action.href} key={action.href}>{action.label}</a>
                 ))}
