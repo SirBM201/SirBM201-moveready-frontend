@@ -1,3 +1,4 @@
+import SiteHeader from "@/components/SiteHeader";
 import { platformModules } from "@/lib/platformModules";
 
 const liveRoutes = [
@@ -131,31 +132,7 @@ export default function Home() {
 
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Global relocation readiness platform</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/workspace">Workspace</a>
-          <a href="/compare">Compare</a>
-          <a href="/country-comparison">Countries</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/services">Services</a>
-          <a href="/saved-routes">Saved Routes</a>
-          <a href="/timeline">Timeline</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/readiness">Readiness</a>
-          <a href="/routes/canada-iec">Canada IEC</a>
-          <a href="/routes/finland-d-visa">Finland Route</a>
-          <a href="/routes/portugal-entrepreneur">Portugal Route</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/trust">Trust</a>
-          <a href="/sources">Sources</a>
-          <a href="/launch-readiness">Launch</a>
-          <a href="/platform">Platform</a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <section className="hero-band" id="checker">
         <div className="hero-copy">
