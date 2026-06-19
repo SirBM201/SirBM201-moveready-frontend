@@ -7,6 +7,11 @@ const liveRoutes = [
     text: "Open the main working surface for routes, countries, opportunities, watchlists, saved routes, timelines, services, reports, and admin review.",
   },
   {
+    title: "Compare routes",
+    href: "/compare",
+    text: "Compare Estonia startup, Finland D visa, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
+  },
+  {
     title: "Trust center",
     href: "/trust",
     text: "Explain source-backed guidance, no approval guarantees, opt-in notifications, partner screening, and sensitive-document controls.",
@@ -118,6 +123,7 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/workspace">Workspace</a>
+          <a href="/compare">Compare</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/services">Services</a>
           <a href="/saved-routes">Saved Routes</a>
@@ -142,6 +148,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/compare">Compare routes</a>
             <a className="btn" href="/services">Request trusted service</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
             <a className="btn" href="/trust">Review trust rules</a>
