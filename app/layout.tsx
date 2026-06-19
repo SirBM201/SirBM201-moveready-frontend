@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 import "./legal.css";
+import "./responsive-polish.css";
 
 export const metadata: Metadata = {
   title: "Project MoveReady",
