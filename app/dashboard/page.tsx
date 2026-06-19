@@ -73,6 +73,7 @@ export default function DashboardPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="#profile-dashboard">Create or load profile</a>
+            <a className="btn" href="/login">Sign in</a>
             <a className="btn" href="/my-reports">My reports</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
             <a className="btn" href="/watchlist">Watchlist</a>
