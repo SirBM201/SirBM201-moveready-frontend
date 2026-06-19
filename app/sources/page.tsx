@@ -1,3 +1,4 @@
+import OpportunitySourceReadinessPanel from "@/components/OpportunitySourceReadinessPanel";
 import SourceReadinessPanel from "@/components/SourceReadinessPanel";
 
 const sourceControls = [
@@ -113,6 +114,10 @@ export default function SourcesPage() {
 
       <section className="section no-top-pad">
         <SourceReadinessPanel />
+      </section>
+
+      <section className="section">
+        <OpportunitySourceReadinessPanel />
       </section>
 
       <section className="section">
