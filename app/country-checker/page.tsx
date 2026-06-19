@@ -5,11 +5,23 @@ export default function CountryCheckerPage() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="/"><strong>Project MoveReady</strong><span>Country checker</span></a>
-        <nav className="nav"><a href="/route-checker">Route Checker</a><a href="/report-preview">Report</a></nav>
+        <nav className="nav" aria-label="Main navigation">
+          <a href="/country-comparison">Compare Countries</a>
+          <a href="/compare">Compare Routes</a>
+          <a href="/route-checker">Route Checker</a>
+          <a href="/report-preview">Report</a>
+        </nav>
       </header>
       <section className="section">
-        <h2>Country comparison starter</h2>
-        <p className="section-intro">This page now loads countries through the API. As reviewed facts are added, it will compare route availability, funds pressure, family options, study options, startup fit, and arrival readiness.</p>
+        <div className="section-heading-row">
+          <div>
+            <h2>Country comparison starter</h2>
+            <p className="section-intro">This page loads countries through the API. Use the comparison workspace for route counts, source confidence, risk signals, saved countries, and watchlist actions.</p>
+          </div>
+          <div className="actions">
+            <a className="btn primary" href="/country-comparison">Open comparison workspace</a>
+          </div>
+        </div>
         <LiveCountryGrid />
       </section>
     </main>
