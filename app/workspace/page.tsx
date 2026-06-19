@@ -6,10 +6,16 @@ const workflows = [
     summary: "Generate checklist, budget estimate, risk label, and readiness report from route inputs.",
   },
   {
+    title: "Route comparison",
+    status: "Available",
+    href: "/compare",
+    summary: "Compare Estonia startup, Finland D visa, Portugal entrepreneur, official opportunities, and readiness routes before committing.",
+  },
+  {
     title: "Country comparison",
     status: "Available",
     href: "/country-checker",
-    summary: "Review supported countries and route records as they are approved in the source-backed database.",
+    summary: "Review supported countries, route records, opportunity coverage, risk signals, and source confidence.",
   },
   {
     title: "Estonia startup route",
@@ -22,6 +28,12 @@ const workflows = [
     status: "Available",
     href: "/routes/finland-d-visa",
     summary: "Use the Migri-backed D visa route page with live database detail after source records are active.",
+  },
+  {
+    title: "Portugal entrepreneur route",
+    status: "Available",
+    href: "/routes/portugal-entrepreneur",
+    summary: "Prepare Portugal independent-work, entrepreneur, business evidence, funds, document, and insurance readiness.",
   },
   {
     title: "Startup evidence pack",
@@ -140,6 +152,7 @@ export default function WorkspacePage() {
         </a>
         <nav className="nav">
           <a href="/dashboard">Dashboard</a>
+          <a href="/compare">Compare</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/services">Services</a>
@@ -158,6 +171,7 @@ export default function WorkspacePage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route check</a>
+            <a className="btn" href="/compare">Compare routes</a>
             <a className="btn" href="/watchlist">Create watchlist</a>
             <a className="btn" href="/services">Request service</a>
             <a className="btn" href="/admin">Open admin</a>
