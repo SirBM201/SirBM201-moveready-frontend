@@ -69,6 +69,93 @@ const confidenceWeight: Record<string, number> = {
   high: 3,
 };
 
+const knownRouteFallbacks: RouteItem[] = [
+  {
+    route_code: "startup-founder",
+    route_name: "Estonia startup founder pathway",
+    route_category: "startup",
+    country_code: "EE",
+    country_name: "Estonia",
+    risk_level: "medium",
+    freshness_status: "available_starter",
+    source_confidence: "high",
+    summary: "For non-EU founders preparing Startup Committee evidence, D visa readiness, funds, documents, insurance, and startup-route next steps.",
+  },
+  {
+    route_code: "d-visa",
+    route_name: "Finland D visa / fast-track pathway",
+    route_category: "work",
+    country_code: "FI",
+    country_name: "Finland",
+    risk_level: "medium",
+    freshness_status: "available_starter",
+    source_confidence: "high",
+    summary: "For eligible Finnish residence-permit applicants using D visa or fast-track travel readiness after the correct official process.",
+  },
+  {
+    route_code: "entrepreneur-independent-work",
+    route_name: "Portugal entrepreneur and independent work pathway",
+    route_category: "business",
+    country_code: "PT",
+    country_name: "Portugal",
+    risk_level: "medium",
+    freshness_status: "available_starter",
+    source_confidence: "high",
+    summary: "For entrepreneurs, independent professionals, and startup founders comparing national visa readiness, documents, funds, insurance, and residence next steps.",
+  },
+];
+
+function routeKey(route: RouteItem) {
+  return `${route.country_code || ""}-${route.route_code || route.route_name || ""}`;
+}
+
+function mergeKnownRoutes(routes: RouteItem[]) {
+  const existing = new Set(routes.map(routeKey));
+  return [
+    ...routes,
+    ...knownRouteFallbacks.filter((route) => !existing.has(routeKey(route))),
+  ];
+}
+
+function attachKnownRoutes(rows: Partial<ComparisonRow>[]) {
+  const knownCountryCodes = new Set(knownRouteFallbacks.map((route) => route.country_code).filter(Boolean));
+  const existingCountryCodes = new Set(rows.map((row) => row.country_code).filter(Boolean));
+  const mergedRows = rows.map((row) => {
+    const existingRoutes = row.routes || [];
+    const knownMatches = knownRouteFallbacks.filter((route) => route.country_code === row.country_code);
+    const existingRouteKeys = new Set(existingRoutes.map(routeKey));
+    const routes = [
+      ...existingRoutes,
+      ...knownMatches.filter((route) => !existingRouteKeys.has(routeKey(route))),
+    ];
+
+    return {
+      ...row,
+      routes,
+      route_count: Math.max(Number(row.route_count ?? 0), routes.length),
+    };
+  });
+
+  const missingRows = Array.from(knownCountryCodes)
+    .filter((countryCode) => countryCode && !existingCountryCodes.has(countryCode))
+    .map((countryCode) => {
+      const route = knownRouteFallbacks.find((item) => item.country_code === countryCode);
+      const routes = knownRouteFallbacks.filter((item) => item.country_code === countryCode);
+      return {
+        country_code: countryCode || "",
+        country_name: route?.country_name || "Country pending",
+        region: "Europe",
+        currency_code: "EUR",
+        summary: route?.summary,
+        routes,
+        route_count: routes.length,
+        opportunities: [],
+      };
+    });
+
+  return [...mergedRows, ...missingRows];
+}
+
 function labelFromRisk(routes: RouteItem[]) {
   const scored = routes
     .map((route) => String(route.risk_level || "").toLowerCase())
@@ -90,6 +177,7 @@ function confidenceFromRecords(routes: RouteItem[], opportunities: Opportunity[]
 function freshnessFromRoutes(routes: RouteItem[]) {
   if (routes.some((route) => route.freshness_status === "active")) return "active route available";
   if (routes.some((route) => route.freshness_status === "review_due")) return "source review due";
+  if (routes.some((route) => route.freshness_status === "available_starter")) return "available starter route";
   return routes.length ? "review route before use" : "route data needed";
 }
 
@@ -129,8 +217,8 @@ function normalizeRows(rows: Partial<ComparisonRow>[]) {
       summary: row.summary,
       routes,
       opportunities,
-      route_count: Number(row.route_count ?? routes.length ?? 0),
-      opportunity_count: Number(row.opportunity_count ?? opportunities.length ?? 0),
+      route_count: Math.max(Number(row.route_count ?? 0), routes.length),
+      opportunity_count: Math.max(Number(row.opportunity_count ?? 0), opportunities.length),
       route_categories: routeCategories,
       opportunity_types: opportunityTypes,
       risk_label: row.risk_label || labelFromRisk(routes),
@@ -146,15 +234,16 @@ function normalizeRows(rows: Partial<ComparisonRow>[]) {
 }
 
 function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[], opportunities: Opportunity[]): ComparisonRow[] {
-  return normalizeRows(countries.map((country) => {
-    const countryRoutes = routes.filter((route) => route.country_code === country.country_code);
+  return normalizeRows(attachKnownRoutes(countries.map((country) => {
+    const mergedRoutes = mergeKnownRoutes(routes);
+    const countryRoutes = mergedRoutes.filter((route) => route.country_code === country.country_code);
     const countryOpportunities = opportunities.filter((opportunity) => opportunity.country_code === country.country_code);
     return {
       ...country,
       routes: countryRoutes,
       opportunities: countryOpportunities,
     };
-  }));
+  })));
 }
 
 function getRiskRank(label: string) {
@@ -193,8 +282,9 @@ export default function CountryComparisonWorkspace() {
       try {
         const comparisonData = await apiJson<{ countries: ComparisonRow[]; source_status?: string }>("relocation/country-comparison", { timeoutMs: 15000 });
         if (cancelled) return;
-        setComparisonRows(normalizeRows(attachOpportunities(comparisonData.countries || [], opportunities)));
-        setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded" : "Live country comparison loaded");
+        const rows = normalizeRows(attachKnownRoutes(attachOpportunities(comparisonData.countries || [], opportunities)));
+        setComparisonRows(rows);
+        setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded with launch routes" : "Live country comparison loaded with launch routes");
       } catch {
         try {
           const [countryData, routeData] = await Promise.all([
@@ -203,10 +293,11 @@ export default function CountryComparisonWorkspace() {
           ]);
           if (cancelled) return;
           setComparisonRows(rowsFromCountryAndRoutes(countryData.countries || [], routeData.routes || [], opportunities));
-          setStatus("Live country, route, and opportunity data loaded");
+          setStatus("Live country, route, and opportunity data loaded with launch routes");
         } catch {
           if (cancelled) return;
-          setStatus("Unable to load live comparison data. Check backend URL or deployment status.");
+          setComparisonRows(normalizeRows(attachKnownRoutes([])));
+          setStatus("Starter launch routes loaded. Live comparison data is temporarily unavailable.");
         }
       }
     }
@@ -225,7 +316,7 @@ export default function CountryComparisonWorkspace() {
     const countries = comparisonRows.length;
     const routes = comparisonRows.reduce((total, country) => total + country.route_count, 0);
     const opportunities = comparisonRows.reduce((total, country) => total + country.opportunity_count, 0);
-    const active = comparisonRows.reduce((total, country) => total + (country.active_route_count || country.routes.filter((route) => route.freshness_status === "active").length), 0);
+    const active = comparisonRows.reduce((total, country) => total + (country.active_route_count || country.routes.filter((route) => ["active", "available_starter"].includes(String(route.freshness_status || ""))).length), 0);
     const highConfidence = comparisonRows.filter((country) => country.source_confidence_label.toLowerCase() === "high").length;
     return { countries, routes, opportunities, active, highConfidence };
   }, [comparisonRows]);
@@ -258,14 +349,14 @@ export default function CountryComparisonWorkspace() {
         <div className="metric-item"><strong>{metrics.countries}</strong><span>Countries</span></div>
         <div className="metric-item"><strong>{metrics.routes}</strong><span>Route records</span></div>
         <div className="metric-item"><strong>{metrics.opportunities}</strong><span>Opportunity records</span></div>
-        <div className="metric-item"><strong>{metrics.active}</strong><span>Active route versions</span></div>
+        <div className="metric-item"><strong>{metrics.active}</strong><span>Available route versions</span></div>
         <div className="metric-item"><strong>{metrics.highConfidence}</strong><span>High-confidence countries</span></div>
       </div>
 
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="country-search">Search country, route, opportunity, region, or summary</label>
-          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, startup, D visa, working holiday" />
+          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, Portugal, startup, D visa, working holiday" />
         </div>
         <div className="field">
           <label htmlFor="country-category-filter">Route or opportunity category</label>
