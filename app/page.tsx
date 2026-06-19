@@ -12,6 +12,11 @@ const liveRoutes = [
     text: "Compare Estonia startup, Finland D visa, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
   },
   {
+    title: "Compare countries",
+    href: "/country-comparison",
+    text: "Compare countries by live route availability, route categories, risk signals, source confidence, saved-country actions, and watchlist next steps.",
+  },
+  {
     title: "Trust center",
     href: "/trust",
     text: "Explain source-backed guidance, no approval guarantees, opt-in notifications, partner screening, and sensitive-document controls.",
@@ -124,6 +129,7 @@ export default function Home() {
         <nav className="nav" aria-label="Main navigation">
           <a href="/workspace">Workspace</a>
           <a href="/compare">Compare</a>
+          <a href="/country-comparison">Countries</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/services">Services</a>
           <a href="/saved-routes">Saved Routes</a>
@@ -149,6 +155,7 @@ export default function Home() {
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
             <a className="btn" href="/compare">Compare routes</a>
+            <a className="btn" href="/country-comparison">Compare countries</a>
             <a className="btn" href="/services">Request trusted service</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
             <a className="btn" href="/trust">Review trust rules</a>
@@ -194,7 +201,7 @@ export default function Home() {
       <section className="section" id="modules">
         <h2>Live readiness tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, official opportunities, saved routes, timelines, watchlists, provider applications, service requests, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          The current tools focus on route intelligence, country comparison, official opportunities, saved routes, timelines, watchlists, provider applications, service requests, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
         </p>
         <div className="grid">
           {liveRoutes.map((route) => (
