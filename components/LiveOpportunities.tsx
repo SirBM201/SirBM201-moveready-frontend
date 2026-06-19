@@ -49,6 +49,11 @@ const statusLabels: Record<string, string> = {
   unknown: "Check official source",
 };
 
+const guideLinks: Record<string, string> = {
+  "US-DV": "/opportunities/usa-dv",
+  "CA-IEC": "/opportunities/canada-iec",
+};
+
 function formatDate(value?: string | null) {
   if (!value) return "Not set";
   try {
@@ -177,7 +182,8 @@ export default function LiveOpportunities() {
             </div>
 
             <div className="actions small-actions">
-              <a className="btn primary" href={item.official_url} target="_blank" rel="noreferrer">Official source</a>
+              {guideLinks[item.opportunity_code] ? <a className="btn primary" href={guideLinks[item.opportunity_code]}>View guide</a> : null}
+              <a className={guideLinks[item.opportunity_code] ? "btn" : "btn primary"} href={item.official_url} target="_blank" rel="noreferrer">Official source</a>
               {item.result_check_url ? <a className="btn" href={item.result_check_url} target="_blank" rel="noreferrer">Result check</a> : null}
               <a className="btn" href={`/watchlist?type=opportunity&route=${encodeURIComponent(item.opportunity_code)}`}>Request alert</a>
             </div>
