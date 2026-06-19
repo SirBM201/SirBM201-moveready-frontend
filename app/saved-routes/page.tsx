@@ -1,34 +1,63 @@
+import SiteHeader from "@/components/SiteHeader";
 import SavedRoutesManager from "@/components/SavedRoutesManager";
+
+const savedRouteUses = [
+  {
+    title: "Compare again later",
+    detail: "Keep serious countries, routes, scholarships, opportunities, and service ideas instead of starting from zero each visit.",
+  },
+  {
+    title: "Connect to reports",
+    detail: "Saved routes should become the route context for readiness reports and future report refreshes.",
+  },
+  {
+    title: "Create alerts",
+    detail: "A saved route can later become a watchlist item for opening dates, deadline windows, or rule changes.",
+  },
+];
 
 export default function SavedRoutesPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Saved routes</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/dashboard">Dashboard</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/my-reports">My Reports</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Saved routes" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Available now: route saving</span>
-          <h1>Keep the routes and opportunities you want to revisit.</h1>
+          <span className="eyebrow">Account Center: saved decisions</span>
+          <h1>Keep the routes and opportunities worth revisiting.</h1>
           <p className="lede">
-            Save a route, opportunity, scholarship, country, or service with contact consent, then retrieve it later by email or phone.
+            Saved Routes turns browsing into a proper relocation workspace. Users can keep countries, route families, opportunities, and services under the same contact identity, then return later by email or phone.
           </p>
+          <div className="actions">
+            <a className="btn primary" href="/compare">Compare routes</a>
+            <a className="btn" href="/country-comparison">Compare countries</a>
+            <a className="btn" href="/dashboard">Back to Account Center</a>
+          </div>
         </div>
       </section>
 
       <section className="section no-top-pad">
+        <div className="section-heading-row">
+          <div>
+            <p className="overline">Why saving matters</p>
+            <h2>Saved routes are the bridge between planning and action</h2>
+            <p className="section-intro">
+              A saved route should eventually connect to reports, timeline steps, watchlist alerts, and provider requests. For MVP, contact-based lookup already gives users a practical way to continue their planning.
+            </p>
+          </div>
+          <span className="status-dot">Contact lookup</span>
+        </div>
+        <div className="grid">
+          {savedRouteUses.map((item) => (
+            <article className="card" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
         <SavedRoutesManager />
       </section>
     </main>
