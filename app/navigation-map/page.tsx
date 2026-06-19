@@ -1,3 +1,5 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const primaryFlows = [
   {
     title: "Decision Center",
@@ -85,21 +87,7 @@ function PageGroup({ title, intro, items }: { title: string; intro: string; item
 export default function NavigationMapPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Navigation Map</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/decision-center">Decision Center</a>
-          <a href="/workspace">Workspace</a>
-          <a href="/country-comparison">Countries</a>
-          <a href="/compare">Compare</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/services">Services</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Navigation Map" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
