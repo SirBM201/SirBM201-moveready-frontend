@@ -1,3 +1,5 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const decisionStages = [
   {
     step: "1",
@@ -91,21 +93,7 @@ const launchPriorities = [
 export default function DecisionCenterPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Decision Center</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/workspace">Workspace</a>
-          <a href="/country-comparison">Countries</a>
-          <a href="/compare">Compare</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/services">Services</a>
-          <a href="/sources">Sources</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Decision Center" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
