@@ -1,5 +1,3 @@
-import LiveRouteDetail from "@/components/LiveRouteDetail";
-
 const routeFacts = [
   {
     title: "Pool-based opportunity",
@@ -80,7 +78,21 @@ export default function CanadaIecRoutePage() {
       </section>
 
       <section className="section no-top-pad">
-        <LiveRouteDetail countryCode="CA" routeCode="iec" />
+        <article className="card">
+          <div className="panel-heading">
+            <div>
+              <span className="overline">Route status</span>
+              <h2>Canada IEC monitoring route</h2>
+            </div>
+            <span className="badge">Available</span>
+          </div>
+          <p>Use this workspace to prepare profile evidence and monitor country-specific invitation rounds. Database-backed route facts can be added later without changing this page.</p>
+          <div className="badge-row">
+            <span className="badge">Invitation pool</span>
+            <span className="badge">Watchlist ready</span>
+            <span className="badge">No guarantee claims</span>
+          </div>
+        </article>
       </section>
 
       <section className="section">
