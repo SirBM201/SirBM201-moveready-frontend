@@ -39,6 +39,33 @@ const sensitiveAreas = [
   "Provider applications and service handoffs",
 ];
 
+const routeSources = [
+  {
+    route: "Estonia startup founder pathway",
+    owner: "Startup Estonia / Estonian startup ecosystem route guidance",
+    source: "Startup Estonia foreign-founder startup visa guide",
+    href: "https://startupestonia.ee/startup-visa/foreign-founder/",
+    review: "Review Startup Committee criteria, application-code steps, D visa/residence next steps, and founder eligibility before route reports are issued.",
+    risk: "A startup-code decision is not the same as visa or residence approval. Users still need official visa/residence steps and documents.",
+  },
+  {
+    route: "Finland D visa / fast-track pathway",
+    owner: "Finnish Immigration Service (Migri)",
+    source: "Migri D visa and fast-track pages",
+    href: "https://migri.fi/en/d-visa",
+    review: "Review D visa eligibility, residence-permit sequence, passport sticker handling, family inclusion, and fast-track categories before advice is shown.",
+    risk: "D visa does not replace the residence-permit basis. Users should not treat it as a standalone work or residence route.",
+  },
+  {
+    route: "Portugal entrepreneur and independent work pathway",
+    owner: "Portugal Ministry of Foreign Affairs visa portal",
+    source: "National visa type and residency documentation pages",
+    href: "https://vistos.mne.gov.pt/en/national-visas/general-information/type-of-visa",
+    review: "Review residency visa type, independent professional activity evidence, entrepreneur evidence, residence permit step, and document legalization rules.",
+    risk: "Independent-work, entrepreneur, digital-nomad, and Startup Visa evidence should not be mixed without route-specific source review.",
+  },
+];
+
 const opportunitySources = [
   {
     route: "USA Diversity Visa Program",
@@ -118,6 +145,24 @@ export default function SourcesPage() {
 
       <section className="section">
         <OpportunitySourceReadinessPanel />
+      </section>
+
+      <section className="section">
+        <h2>Route source matrix</h2>
+        <p className="section-intro">
+          These are the first launch route families that need regular source review before users rely on route-specific readiness reports.
+        </p>
+        <div className="mini-list">
+          {routeSources.map((item) => (
+            <div key={item.route}>
+              <strong>{item.route}</strong>
+              <span><b>Owner:</b> {item.owner}</span>
+              <span><b>Source:</b> <a className="text-link" href={item.href} target="_blank" rel="noreferrer">{item.source}</a></span>
+              <span><b>Review trigger:</b> {item.review}</span>
+              <span><b>Risk control:</b> {item.risk}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="section">
