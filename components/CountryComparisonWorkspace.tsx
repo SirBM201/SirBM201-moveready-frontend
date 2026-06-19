@@ -174,7 +174,7 @@ export default function CountryComparisonWorkspace() {
           gap: 20px;
           align-items: start;
           padding: 22px;
-          border: 1px solid var(--border);
+          border: 1px solid var(--line);
           border-radius: 8px;
           background: #fff;
         }
