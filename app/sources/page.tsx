@@ -1,3 +1,5 @@
+import SourceReadinessPanel from "@/components/SourceReadinessPanel";
+
 const sourceControls = [
   {
     title: "Official source registry",
@@ -46,6 +48,8 @@ export default function SourcesPage() {
         </a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
+          <a href="/country-comparison">Countries</a>
+          <a href="/compare">Compare</a>
           <a href="/trust">Trust</a>
           <a href="/launch-readiness">Launch Readiness</a>
           <a href="/route-checker">Route Checker</a>
@@ -59,7 +63,7 @@ export default function SourcesPage() {
           <span className="eyebrow">Source-backed guidance</span>
           <h1>Show users what is verified, what changed, and what needs review.</h1>
           <p className="lede">
-            MoveReady should treat official sources as the source of truth. AI and reports explain approved data; they do not replace government, embassy, institution, or provider instructions.
+            MoveReady treats official sources as the source of truth. AI and reports explain approved data; they do not replace government, embassy, institution, or provider instructions.
           </p>
           <div className="actions">
             <a className="btn primary" href="/admin/reviews">Open admin review queue</a>
@@ -69,6 +73,10 @@ export default function SourcesPage() {
       </section>
 
       <section className="section no-top-pad">
+        <SourceReadinessPanel />
+      </section>
+
+      <section className="section">
         <h2>Source controls</h2>
         <p className="section-intro">
           These controls are the difference between a generic travel chatbot and a serious relocation readiness platform.
