@@ -52,6 +52,10 @@ const statusLabels: Record<string, string> = {
 const guideLinks: Record<string, string> = {
   "US-DV": "/opportunities/usa-dv",
   "CA-IEC": "/opportunities/canada-iec",
+  "AU-462-BALLOT": "/opportunities/australia-462-ballot",
+  "UK-IYPS": "/opportunities/uk-india-young-professionals",
+  "NZ-PAC": "/opportunities/new-zealand-quota-ballots",
+  "NZ-SQ": "/opportunities/new-zealand-quota-ballots",
 };
 
 function formatDate(value?: string | null) {
