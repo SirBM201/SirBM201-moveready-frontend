@@ -43,6 +43,20 @@ const routes = [
     ],
   },
   {
+    name: "Portugal entrepreneur and independent work pathway",
+    country: "Portugal",
+    category: "Business / independent work",
+    status: "Available",
+    risk: "Medium",
+    strength: "Useful for founders and independent professionals preparing residency visa evidence, financial means, insurance, and post-arrival residence permit steps.",
+    watch: "Consular instructions, entrepreneur evidence, independent work evidence, document legalization, insurance, and AIMA follow-up steps.",
+    actions: [
+      { label: "Open route", href: "/routes/portugal-entrepreneur" },
+      { label: "Save route", href: "/saved-routes?country=PT&route=entrepreneur-independent-work" },
+      { label: "Create alert", href: "/watchlist?type=route&code=PT-entrepreneur-independent-work&title=Portugal%20entrepreneur%20and%20independent%20work%20pathway" },
+    ],
+  },
+  {
     name: "Official ballots and quota opportunities",
     country: "Multiple countries",
     category: "Lottery / ballot / quota",
@@ -149,7 +163,7 @@ export default function ComparePage() {
           <span className="eyebrow">Route comparison</span>
           <h1>Compare before you commit.</h1>
           <p className="lede">
-            Use MoveReady to compare countries, startup routes, D visa pathways, lottery/ballot opportunities, youth mobility routes, and readiness tools before spending money on documents, appointments, travel, or service providers.
+            Use MoveReady to compare countries, startup routes, D visa pathways, entrepreneur routes, lottery/ballot opportunities, youth mobility routes, and readiness tools before spending money on documents, appointments, travel, or service providers.
           </p>
           <div className="actions">
             <a className="btn primary" href="/country-comparison">Compare countries</a>
