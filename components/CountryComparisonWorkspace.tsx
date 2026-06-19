@@ -29,9 +29,14 @@ type RouteItem = {
 
 type ComparisonRow = Country & {
   routes: RouteItem[];
-  riskLabel: string;
-  confidenceLabel: string;
-  categories: string[];
+  route_count: number;
+  route_categories: string[];
+  risk_label: string;
+  source_confidence_label: string;
+  freshness_label: string;
+  active_route_count?: number;
+  review_due_route_count?: number;
+  last_verified_at?: string | null;
 };
 
 const riskWeight: Record<string, number> = {
@@ -55,9 +60,24 @@ function confidenceFromRoutes(routes: RouteItem[]) {
   return labels[0];
 }
 
+function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[]): ComparisonRow[] {
+  return countries.map((country) => {
+    const countryRoutes = routes.filter((route) => route.country_code === country.country_code);
+    const routeCategories = Array.from(new Set(countryRoutes.map((route) => route.route_category).filter(Boolean))) as string[];
+    return {
+      ...country,
+      routes: countryRoutes,
+      route_count: countryRoutes.length,
+      route_categories: routeCategories,
+      risk_label: labelFromRisk(countryRoutes),
+      source_confidence_label: confidenceFromRoutes(countryRoutes),
+      freshness_label: countryRoutes.some((route) => route.freshness_status === "active") ? "active route available" : "review route before use",
+    };
+  });
+}
+
 export default function CountryComparisonWorkspace() {
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [routes, setRoutes] = useState<RouteItem[]>([]);
+  const [comparisonRows, setComparisonRows] = useState<ComparisonRow[]>([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("Loading country comparison data...");
 
@@ -66,17 +86,23 @@ export default function CountryComparisonWorkspace() {
 
     async function load() {
       try {
-        const [countryData, routeData] = await Promise.all([
-          apiJson<{ countries: Country[] }>("relocation/countries", { timeoutMs: 15000 }),
-          apiJson<{ routes: RouteItem[] }>("relocation/routes", { timeoutMs: 15000 }),
-        ]);
+        const comparisonData = await apiJson<{ countries: ComparisonRow[]; source_status?: string }>("relocation/country-comparison", { timeoutMs: 15000 });
         if (cancelled) return;
-        setCountries(countryData.countries || []);
-        setRoutes(routeData.routes || []);
-        setStatus("Live country and route data loaded");
+        setComparisonRows(comparisonData.countries || []);
+        setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded" : "Live country comparison loaded");
       } catch {
-        if (cancelled) return;
-        setStatus("Unable to load live comparison data. Check backend URL or deployment status.");
+        try {
+          const [countryData, routeData] = await Promise.all([
+            apiJson<{ countries: Country[] }>("relocation/countries", { timeoutMs: 15000 }),
+            apiJson<{ routes: RouteItem[] }>("relocation/routes", { timeoutMs: 15000 }),
+          ]);
+          if (cancelled) return;
+          setComparisonRows(rowsFromCountryAndRoutes(countryData.countries || [], routeData.routes || []));
+          setStatus("Live country and route data loaded");
+        } catch {
+          if (cancelled) return;
+          setStatus("Unable to load live comparison data. Check backend URL or deployment status.");
+        }
       }
     }
 
@@ -88,32 +114,21 @@ export default function CountryComparisonWorkspace() {
 
   const rows = useMemo<ComparisonRow[]>(() => {
     const q = query.trim().toLowerCase();
-    return countries
-      .filter((country) => {
-        if (!q) return true;
-        return [country.country_name, country.country_code, country.region, country.summary]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(q));
-      })
-      .map((country) => {
-        const countryRoutes = routes.filter((route) => route.country_code === country.country_code);
-        const categories = Array.from(new Set(countryRoutes.map((route) => route.route_category).filter(Boolean))) as string[];
-        return {
-          ...country,
-          routes: countryRoutes,
-          riskLabel: labelFromRisk(countryRoutes),
-          confidenceLabel: confidenceFromRoutes(countryRoutes),
-          categories,
-        };
-      });
-  }, [countries, query, routes]);
+    if (!q) return comparisonRows;
+    return comparisonRows.filter((country) => {
+      const routeText = country.routes.map((route) => [route.route_name, route.route_code, route.route_category, route.summary].filter(Boolean).join(" ")).join(" ");
+      return [country.country_name, country.country_code, country.region, country.summary, routeText]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(q));
+    });
+  }, [comparisonRows, query]);
 
   return (
     <div className="country-compare-workspace">
       <div className="admin-toolbar">
         <div className="field">
-          <label htmlFor="country-search">Search country, region, or summary</label>
-          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, Europe" />
+          <label htmlFor="country-search">Search country, route, region, or summary</label>
+          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, startup, D visa" />
         </div>
         <a className="btn primary" href="/route-checker">Generate readiness report</a>
         <a className="btn" href="/compare">Compare route families</a>
@@ -137,21 +152,22 @@ export default function CountryComparisonWorkspace() {
               <div className="badge-row">
                 {country.currency_code ? <span className="badge">{country.currency_code}</span> : null}
                 <span className="badge">{country.country_code}</span>
+                {country.last_verified_at ? <span className="badge">Verified: {new Date(country.last_verified_at).toLocaleDateString()}</span> : null}
               </div>
             </div>
             <div role="cell">
-              <strong>{country.routes.length} route record{country.routes.length === 1 ? "" : "s"}</strong>
+              <strong>{country.route_count} route record{country.route_count === 1 ? "" : "s"}</strong>
               <div className="badge-row compact-badges">
-                {(country.categories.length ? country.categories : ["route review required"]).map((category) => (
+                {(country.route_categories.length ? country.route_categories : ["route review required"]).map((category) => (
                   <span className="badge" key={category}>{category}</span>
                 ))}
               </div>
             </div>
             <div role="cell">
               <div className="mini-list compact-list">
-                <div><strong>Risk</strong><span>{country.riskLabel}</span></div>
-                <div><strong>Source confidence</strong><span>{country.confidenceLabel}</span></div>
-                <div><strong>Freshness</strong><span>{country.routes.some((route) => route.freshness_status === "active") ? "active route available" : "review route before use"}</span></div>
+                <div><strong>Risk</strong><span>{country.risk_label}</span></div>
+                <div><strong>Source confidence</strong><span>{country.source_confidence_label}</span></div>
+                <div><strong>Freshness</strong><span>{country.freshness_label}</span></div>
               </div>
             </div>
             <div className="actions stacked-actions" role="cell">
