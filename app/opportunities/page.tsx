@@ -26,6 +26,26 @@ const opportunityGuides = [
     href: "/opportunities/new-zealand-quota-ballots",
     text: "Monitor Pacific Access Category and Samoan Quota ballot results, family evidence, and residence application readiness.",
   },
+  {
+    title: "Japan Working Holiday Programme",
+    href: "/opportunities/japan-working-holiday",
+    text: "Check partner-country eligibility, embassy instructions, quota timing, funds, insurance, and holiday-first purpose rules.",
+  },
+  {
+    title: "Korea Working Holiday Visa",
+    href: "/opportunities/korea-working-holiday",
+    text: "Prepare for nationality-specific eligibility, quotas, funds, insurance, arrival registration, and working-holiday conditions.",
+  },
+  {
+    title: "Hong Kong Working Holiday Scheme",
+    href: "/opportunities/hong-kong-working-holiday",
+    text: "Track participating countries, annual quotas, first-come quota risk, funds, insurance, and application-status steps.",
+  },
+  {
+    title: "Ireland Working Holiday Authorisation",
+    href: "/opportunities/ireland-working-holiday",
+    text: "Confirm citizenship-specific authorisation rules, funds, insurance, arrival registration, and safe timing before travel.",
+  },
 ];
 
 export default function OpportunitiesPage() {
