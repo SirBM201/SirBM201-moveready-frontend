@@ -1,3 +1,4 @@
+import SiteHeader from "@/components/SiteHeader";
 import GeneralServiceRequestForm from "@/components/GeneralServiceRequestForm";
 
 const services = [
@@ -12,22 +13,7 @@ const services = [
 export default function ServicesPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Trusted services</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/platform">Platform</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/saved-routes">Saved Routes</a>
-          <a href="/timeline">Timeline</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/partners/apply">Provider Apply</a>
-          <a href="/route-checker">Route Checker</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Trusted services" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
