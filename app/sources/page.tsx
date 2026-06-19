@@ -38,6 +38,45 @@ const sensitiveAreas = [
   "Provider applications and service handoffs",
 ];
 
+const opportunitySources = [
+  {
+    route: "USA Diversity Visa Program",
+    owner: "U.S. Department of State",
+    review: "Before registration opens, before result-check opens, and when annual instructions change.",
+    risk: "Scam warnings, duplicate-entry rule, confirmation-number storage, and official submission only.",
+  },
+  {
+    route: "Canada International Experience Canada",
+    owner: "Immigration, Refugees and Citizenship Canada",
+    review: "Weekly during open seasons where invitation numbers, spots, and chances are updated.",
+    risk: "Pool entry is not approval; invitation deadlines and country-specific pools must be monitored.",
+  },
+  {
+    route: "Australia Work and Holiday 462 ballot",
+    owner: "Australian Department of Home Affairs",
+    review: "When program-year caps, ballot windows, or country-cap statuses change.",
+    risk: "Selection only permits application; subclass 462 eligibility and visa grant remain separate.",
+  },
+  {
+    route: "UK India Young Professionals Scheme",
+    owner: "GOV.UK",
+    review: "Before each ballot round and when savings, age, qualification, or application rules change.",
+    risk: "Ballot selection is not visa approval; eligible Indian citizenship and savings evidence matter.",
+  },
+  {
+    route: "New Zealand quota ballots",
+    owner: "Immigration New Zealand",
+    review: "When ballot registration, results, invitation, job-offer, or residence requirements change.",
+    risk: "Ballot draw is not final residence approval; registration numbers and official invitation steps matter.",
+  },
+  {
+    route: "Japan, Korea, Hong Kong, and Ireland working holiday routes",
+    owner: "Government immigration or foreign-affairs source for each route",
+    review: "Before any route is marked open, and when quotas, age limits, funds, insurance, or embassy instructions change.",
+    risk: "Country-specific eligibility, holiday-first purpose, quota limits, and arrival obligations must be clear.",
+  },
+];
+
 export default function SourcesPage() {
   return (
     <main className="page-shell">
@@ -87,6 +126,23 @@ export default function SourcesPage() {
               <h3>{item.title}</h3>
               <p>{item.text}</p>
             </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2>Opportunity source matrix</h2>
+        <p className="section-intro">
+          Official opportunity routes need stricter checks because users are vulnerable to fake lottery, ballot, job, and guarantee claims.
+        </p>
+        <div className="mini-list">
+          {opportunitySources.map((item) => (
+            <div key={item.route}>
+              <strong>{item.route}</strong>
+              <span><b>Owner:</b> {item.owner}</span>
+              <span><b>Review trigger:</b> {item.review}</span>
+              <span><b>Risk control:</b> {item.risk}</span>
+            </div>
           ))}
         </div>
       </section>
