@@ -64,6 +64,14 @@ const routeSources = [
     review: "Review residency visa type, independent professional activity evidence, entrepreneur evidence, residence permit step, and document legalization rules.",
     risk: "Independent-work, entrepreneur, digital-nomad, and Startup Visa evidence should not be mixed without route-specific source review.",
   },
+  {
+    route: "Canada International Experience Canada",
+    owner: "Immigration, Refugees and Citizenship Canada",
+    source: "IEC overview, profile, and invitation-round pages",
+    href: "https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/iec.html",
+    review: "Review eligible country/territory pools, invitation rounds, available spots, chances, deadlines, and category-specific documents before route reports are issued.",
+    risk: "Pool entry is not approval and does not guarantee an invitation. Users must follow country-specific official instructions after receiving an Invitation to Apply.",
+  },
 ];
 
 const opportunitySources = [
