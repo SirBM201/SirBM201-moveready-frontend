@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import AccountSummary from "@/components/AccountSummary";
 import ProfileDashboard from "@/components/ProfileDashboard";
 
 const accountAreas = [
@@ -101,6 +102,10 @@ export default function DashboardPage() {
             </a>
           ))}
         </div>
+      </section>
+
+      <section className="section">
+        <AccountSummary />
       </section>
 
       <section className="section">
