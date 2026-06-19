@@ -1,3 +1,5 @@
+import ApprovedProviderDirectory from "@/components/ApprovedProviderDirectory";
+
 const providerCategories = [
   ["Courier and document delivery", "Passport, certificate, embassy, notarization, and legalization logistics."],
   ["Notarization and legalization", "Notary, apostille, attestation, embassy legalization, and certified translation support."],
@@ -50,8 +52,19 @@ export default function ProvidersPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
+            <h2>Approved Providers</h2>
+            <p className="section-intro">Only admin-approved providers are listed publicly. Pending applications stay private.</p>
+          </div>
+          <span className="status-dot">Approved only</span>
+        </div>
+        <ApprovedProviderDirectory />
+      </section>
+
+      <section className="section">
+        <div className="section-heading-row">
+          <div>
             <h2>Provider Categories</h2>
-            <p className="section-intro">These are the approved partner categories MoveReady can support as the network is screened.</p>
+            <p className="section-intro">These are the partner categories MoveReady can support as the network is screened.</p>
           </div>
           <span className="status-dot">Screening required</span>
         </div>
