@@ -1,19 +1,10 @@
+import SiteHeader from "@/components/SiteHeader";
 import CountryComparisonWorkspace from "@/components/CountryComparisonWorkspace";
 
 export default function CountryComparisonPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/"><strong>Project MoveReady</strong><span>Country comparison</span></a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/compare">Compare Routes</a>
-          <a href="/country-checker">Countries</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/services">Services</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Country comparison" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
