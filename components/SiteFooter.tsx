@@ -1,29 +1,30 @@
 const footerGroups = [
   {
-    title: "Product",
+    title: "Plan",
     links: [
-      { label: "Route checker", href: "/route-checker" },
-      { label: "Opportunities", href: "/opportunities" },
-      { label: "Watchlist", href: "/watchlist" },
-      { label: "Services", href: "/services" },
+      { label: "Decision Center", href: "/decision-center" },
+      { label: "Countries", href: "/country-comparison" },
+      { label: "Routes", href: "/compare" },
+      { label: "Route Checker", href: "/route-checker" },
     ],
   },
   {
-    title: "Readiness",
+    title: "Act",
     links: [
-      { label: "Saved routes", href: "/saved-routes" },
-      { label: "Timeline", href: "/timeline" },
-      { label: "Readiness tools", href: "/readiness" },
-      { label: "My reports", href: "/my-reports" },
+      { label: "Opportunities", href: "/opportunities" },
+      { label: "Services", href: "/services" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "My Account", href: "/dashboard" },
     ],
   },
   {
     title: "Trust",
     links: [
-      { label: "Safety rules", href: "/safety" },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
-      { label: "Provider apply", href: "/partners/apply" },
+      { label: "Trust", href: "/trust" },
+      { label: "Sources", href: "/sources" },
+      { label: "Safety", href: "/safety" },
+      { label: "Provider Application", href: "/partners/apply" },
+      { label: "My Reports", href: "/my-reports" },
     ],
   },
 ];
