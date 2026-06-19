@@ -119,7 +119,7 @@ export default function SourceReadinessPanel() {
 
       {!visibleRoutes.length ? <p className="form-status">No route records match this filter.</p> : null}
 
-      <style jsx>{`
+      <style>{`
         .source-readiness-panel { display: grid; gap: 18px; }
         .button-badge { cursor: pointer; font: inherit; }
         .source-table { display: grid; gap: 12px; }
