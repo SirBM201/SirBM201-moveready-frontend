@@ -2,6 +2,19 @@ import styles from "./compare.module.css";
 
 const routes = [
   {
+    name: "Country comparison workspace",
+    country: "Multiple countries",
+    category: "Decision support",
+    status: "Available",
+    risk: "Route-specific",
+    strength: "Best first step when a user is still choosing between countries before committing to one visa path.",
+    watch: "Route availability, risk label, source confidence, saved countries, country alerts, and readiness next steps.",
+    actions: [
+      { label: "Compare countries", href: "/country-comparison" },
+      { label: "Open countries", href: "/country-checker" },
+    ],
+  },
+  {
     name: "Estonia startup founder pathway",
     country: "Estonia",
     category: "Startup / founder",
@@ -58,7 +71,7 @@ const routes = [
 ];
 
 const scoreRows = [
-  ["Decision support", "Compare route fit before spending money."],
+  ["Decision support", "Compare countries and route families before spending money."],
   ["Preparation", "Move from interest to documents, funds, timeline, reports, and services."],
   ["Monitoring", "Save routes and create opt-in alerts for date/rule changes."],
   ["Execution", "Request courier, legalization, insurance, expert review, and settlement support."],
@@ -71,6 +84,7 @@ export default function ComparePage() {
         <a className="brand" href="/"><strong>Project MoveReady</strong><span>Compare routes</span></a>
         <nav className="nav" aria-label="Main navigation">
           <a href="/">Home</a>
+          <a href="/country-comparison">Countries</a>
           <a href="/opportunities">Opportunities</a>
           <a href="/readiness">Readiness</a>
           <a href="/saved-routes">Saved Routes</a>
@@ -83,10 +97,11 @@ export default function ComparePage() {
           <span className="eyebrow">Route comparison</span>
           <h1>Compare before you commit.</h1>
           <p className="lede">
-            Use MoveReady to compare startup routes, D visa pathways, lottery/ballot opportunities, and readiness tools before spending money on documents, appointments, travel, or service providers.
+            Use MoveReady to compare countries, startup routes, D visa pathways, lottery/ballot opportunities, and readiness tools before spending money on documents, appointments, travel, or service providers.
           </p>
           <div className="actions">
-            <a className="btn primary" href="/route-checker">Generate readiness report</a>
+            <a className="btn primary" href="/country-comparison">Compare countries</a>
+            <a className="btn" href="/route-checker">Generate readiness report</a>
             <a className="btn" href="/saved-routes">Save a route</a>
           </div>
         </div>
@@ -115,7 +130,7 @@ export default function ComparePage() {
               </div>
               <div className="actions">
                 {route.actions.map((action) => (
-                  <a className={action.label.includes("Open") || action.label.includes("Run") ? "btn primary" : "btn"} href={action.href} key={action.href}>{action.label}</a>
+                  <a className={action.label.includes("Open") || action.label.includes("Run") || action.label.includes("Compare") ? "btn primary" : "btn"} href={action.href} key={action.href}>{action.label}</a>
                 ))}
               </div>
             </article>
