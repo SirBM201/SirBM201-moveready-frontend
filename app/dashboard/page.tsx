@@ -25,7 +25,7 @@ export default function DashboardPage() {
           <span className="eyebrow">Available now: profile saving</span>
           <h1>Build one relocation profile for reports, alerts, routes, and timelines.</h1>
           <p className="lede">
-            Save the user context once, then use it to generate readiness reports, save routes, create timeline events, request watchlist alerts, request services, and support future account-based dashboards.
+            Save the user context once, then use it to generate readiness reports, save routes, create timeline events, request watchlist alerts, request services, and keep follow-up information consistent across MoveReady.
           </p>
           <div className="actions">
             <a className="btn primary" href="/timeline">Open timeline</a>
