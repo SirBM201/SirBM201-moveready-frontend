@@ -27,10 +27,30 @@ const AUTH_TOKEN_KEYS = [
   "access_token",
 ];
 
+const ACCOUNT_WRITE_PREFIXES = [
+  "profiles",
+  "saved-routes",
+  "watchlist/subscriptions",
+  "timeline",
+  "platform/service-interest",
+];
+
 function isPlainObject(v: any) {
   if (v === null || typeof v !== "object") return false;
   const proto = Object.getPrototypeOf(v);
   return proto === Object.prototype || proto === null;
+}
+
+function cleanApiPath(path: string) {
+  let cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  if (cleanPath.startsWith("api/")) cleanPath = cleanPath.slice(4);
+  return cleanPath.replace(/^\/+/, "");
+}
+
+function shouldAttachAccountToken(path: string, method: string) {
+  if (method === "GET" || method === "HEAD") return false;
+  const cleanPath = cleanApiPath(path).replace(/\/$/, "");
+  return ACCOUNT_WRITE_PREFIXES.some((prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
 }
 
 function safeGetLocalToken(): string | null {
@@ -61,9 +81,7 @@ export function clearStoredAuthToken() {
 }
 
 function buildUrl(path: string, query?: ApiInit["query"]) {
-  let cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  if (cleanPath.startsWith("api/")) cleanPath = cleanPath.slice(4);
-
+  const cleanPath = cleanApiPath(path);
   const base = CONFIG.apiBase.replace(/\/$/, "");
   const url = `${base}/api/${cleanPath}`;
 
@@ -85,7 +103,8 @@ export async function apiJson<T = any>(path: string, init: ApiInit = {}, token?:
     ...(init.headers as Record<string, string>),
   };
 
-  const effectiveToken = init.useAuthToken === false ? null : (token || safeGetLocalToken());
+  const forceAccountToken = shouldAttachAccountToken(path, method);
+  const effectiveToken = init.useAuthToken === false && !forceAccountToken ? null : (token || safeGetLocalToken());
   if (effectiveToken) headers.Authorization = `Bearer ${effectiveToken}`;
 
   let bodyToSend: BodyInit | undefined;
