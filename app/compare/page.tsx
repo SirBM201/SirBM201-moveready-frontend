@@ -56,6 +56,58 @@ const routes = [
     ],
   },
   {
+    name: "Japan Working Holiday Programme",
+    country: "Japan",
+    category: "Youth mobility / annual quota",
+    status: "Available",
+    risk: "Country-specific",
+    strength: "Useful for eligible partner-country nationals planning a holiday-first stay in Japan with incidental work rights.",
+    watch: "Partner-country eligibility, embassy instructions, quota timing, funds, insurance, and purpose rules.",
+    actions: [
+      { label: "Open guide", href: "/opportunities/japan-working-holiday" },
+      { label: "Create alert", href: "/watchlist?type=opportunity&code=JP-WH&title=Japan%20Working%20Holiday%20Programme" },
+    ],
+  },
+  {
+    name: "Korea Working Holiday Visa",
+    country: "South Korea",
+    category: "Youth mobility / annual quota",
+    status: "Available",
+    risk: "Country-specific",
+    strength: "Useful for eligible partner-country nationals planning a temporary holiday stay with limited work rights in Korea.",
+    watch: "Nationality eligibility, quota, application location, funds, insurance, and arrival registration.",
+    actions: [
+      { label: "Open guide", href: "/opportunities/korea-working-holiday" },
+      { label: "Create alert", href: "/watchlist?type=opportunity&code=KR-WH&title=Korea%20Working%20Holiday%20Visa" },
+    ],
+  },
+  {
+    name: "Hong Kong Working Holiday Scheme",
+    country: "Hong Kong",
+    category: "Youth mobility / first-come quota",
+    status: "Available",
+    risk: "Quota-sensitive",
+    strength: "Useful for eligible participating-country nationals where annual quota availability and application timing matter.",
+    watch: "Participating countries, annual quota, first-come processing, funds, insurance, and temporary work limits.",
+    actions: [
+      { label: "Open guide", href: "/opportunities/hong-kong-working-holiday" },
+      { label: "Create alert", href: "/watchlist?type=opportunity&code=HK-WHS&title=Hong%20Kong%20Working%20Holiday%20Scheme" },
+    ],
+  },
+  {
+    name: "Ireland Working Holiday Authorisation",
+    country: "Ireland",
+    category: "Youth mobility / authorisation",
+    status: "Available",
+    risk: "Country-specific",
+    strength: "Useful for eligible partner-country nationals who need citizenship-specific authorisation rules and arrival planning.",
+    watch: "Eligibility country, age range, funds, insurance, application channel, and arrival registration.",
+    actions: [
+      { label: "Open guide", href: "/opportunities/ireland-working-holiday" },
+      { label: "Create alert", href: "/watchlist?type=opportunity&code=IE-WHA&title=Ireland%20Working%20Holiday%20Authorisation" },
+    ],
+  },
+  {
     name: "Document and funds readiness",
     country: "All target countries",
     category: "Readiness tools",
@@ -97,7 +149,7 @@ export default function ComparePage() {
           <span className="eyebrow">Route comparison</span>
           <h1>Compare before you commit.</h1>
           <p className="lede">
-            Use MoveReady to compare countries, startup routes, D visa pathways, lottery/ballot opportunities, and readiness tools before spending money on documents, appointments, travel, or service providers.
+            Use MoveReady to compare countries, startup routes, D visa pathways, lottery/ballot opportunities, youth mobility routes, and readiness tools before spending money on documents, appointments, travel, or service providers.
           </p>
           <div className="actions">
             <a className="btn primary" href="/country-comparison">Compare countries</a>
