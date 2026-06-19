@@ -9,7 +9,7 @@ const liveRoutes = [
   {
     title: "Compare routes",
     href: "/compare",
-    text: "Compare Estonia startup, Finland D visa, Portugal entrepreneur route, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
+    text: "Compare Estonia startup, Finland D visa, Portugal entrepreneur route, Canada IEC, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
   },
   {
     title: "Compare countries",
@@ -35,6 +35,11 @@ const liveRoutes = [
     title: "Official ballots and quota opportunities",
     href: "/opportunities",
     text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
+  },
+  {
+    title: "Canada IEC route",
+    href: "/routes/canada-iec",
+    text: "Track International Experience Canada pools, invitation rounds, country-specific spots, documents, funds, insurance, and arrival readiness.",
   },
   {
     title: "Finland D visa route",
@@ -141,6 +146,7 @@ export default function Home() {
           <a href="/timeline">Timeline</a>
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
+          <a href="/routes/canada-iec">Canada IEC</a>
           <a href="/routes/finland-d-visa">Finland Route</a>
           <a href="/routes/portugal-entrepreneur">Portugal Route</a>
           <a href="/route-checker">Route Checker</a>
