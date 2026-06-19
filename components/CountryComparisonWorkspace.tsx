@@ -165,7 +165,7 @@ export default function CountryComparisonWorkspace() {
 
       {!rows.length ? <p className="form-status">No countries match that filter.</p> : null}
 
-      <style jsx>{`
+      <style>{`
         .country-compare-workspace { display: grid; gap: 24px; }
         .comparison-table { display: grid; gap: 12px; }
         .comparison-row {
