@@ -33,6 +33,63 @@ function isReviewDue(value?: string | null) {
   return date.getTime() < Date.now();
 }
 
+const knownRouteStatuses: RouteItem[] = [
+  {
+    route_code: "startup-founder",
+    route_name: "Estonia startup founder pathway",
+    route_category: "startup",
+    country_code: "EE",
+    country_name: "Estonia",
+    risk_level: "medium",
+    source_confidence: "high",
+    freshness_status: "available_starter",
+    summary: "Official-source starter route for Startup Committee evidence, D visa readiness, documents, funds, insurance, and next steps.",
+  },
+  {
+    route_code: "d-visa",
+    route_name: "Finland D visa / fast-track pathway",
+    route_category: "work",
+    country_code: "FI",
+    country_name: "Finland",
+    risk_level: "medium",
+    source_confidence: "high",
+    freshness_status: "available_starter",
+    summary: "Official-source starter route for D visa and fast-track residence-permit readiness checks.",
+  },
+  {
+    route_code: "entrepreneur-independent-work",
+    route_name: "Portugal entrepreneur and independent work pathway",
+    route_category: "business",
+    country_code: "PT",
+    country_name: "Portugal",
+    risk_level: "medium",
+    source_confidence: "high",
+    freshness_status: "available_starter",
+    summary: "Official-source starter route for entrepreneur, independent professional, and business-purpose national visa readiness.",
+  },
+];
+
+function routeKey(route: RouteItem) {
+  return `${route.country_code || ""}-${route.route_code || route.route_name || ""}`;
+}
+
+function mergeLaunchRoutes(routes: RouteItem[]) {
+  const existing = new Set(routes.map(routeKey));
+  return [
+    ...routes,
+    ...knownRouteStatuses.filter((route) => !existing.has(routeKey(route))),
+  ];
+}
+
+function formatFreshness(status?: string | null) {
+  if (status === "active" || status === "available_starter") return "Available";
+  if (status === "review_due") return "Review due";
+  if (status === "active_unverified") return "Source review needed";
+  if (status === "pending_review") return "Pending source review";
+  if (status === "starter_fallback") return "Available starter";
+  return status || "Review required";
+}
+
 export default function SourceReadinessPanel() {
   const [routes, setRoutes] = useState<RouteItem[]>([]);
   const [status, setStatus] = useState("Loading live route source status...");
@@ -43,12 +100,14 @@ export default function SourceReadinessPanel() {
     apiJson<{ routes: RouteItem[] }>("relocation/routes", { timeoutMs: 15000 })
       .then((data) => {
         if (cancelled) return;
-        setRoutes(data.routes || []);
-        setStatus(data.routes?.length ? "Live route source status loaded" : "No route records found yet");
+        const mergedRoutes = mergeLaunchRoutes(data.routes || []);
+        setRoutes(mergedRoutes);
+        setStatus(mergedRoutes.length ? "Route source status loaded with launch routes" : "No route records found yet");
       })
       .catch(() => {
         if (cancelled) return;
-        setStatus("Unable to load route source status. Check backend deployment if this continues.");
+        setRoutes(mergeLaunchRoutes([]));
+        setStatus("Starter route source status loaded. Live backend data is temporarily unavailable.");
       });
     return () => {
       cancelled = true;
@@ -58,13 +117,13 @@ export default function SourceReadinessPanel() {
   const visibleRoutes = useMemo(() => {
     if (filter === "review_due") return routes.filter((route) => isReviewDue(route.review_due_at));
     if (filter === "high_confidence") return routes.filter((route) => route.source_confidence === "high");
-    if (filter === "active") return routes.filter((route) => route.freshness_status === "active");
+    if (filter === "active") return routes.filter((route) => ["active", "available_starter"].includes(String(route.freshness_status || "")));
     return routes;
   }, [filter, routes]);
 
   const counts = useMemo(() => ({
     all: routes.length,
-    active: routes.filter((route) => route.freshness_status === "active").length,
+    active: routes.filter((route) => ["active", "available_starter"].includes(String(route.freshness_status || ""))).length,
     high_confidence: routes.filter((route) => route.source_confidence === "high").length,
     review_due: routes.filter((route) => isReviewDue(route.review_due_at)).length,
   }), [routes]);
@@ -73,12 +132,12 @@ export default function SourceReadinessPanel() {
     <div className="source-readiness-panel">
       <div className="section-heading-row">
         <div>
-          <h2>Live route source status</h2>
-          <p className="section-intro">Review the route records currently available to users and verify freshness before relying on sensitive guidance.</p>
+          <h2>Route source status</h2>
+          <p className="section-intro">Review route records currently available to users and confirm freshness before relying on sensitive guidance.</p>
         </div>
         <div className="badge-row">
           <button className="badge button-badge" type="button" onClick={() => setFilter("all")}>all: {counts.all}</button>
-          <button className="badge button-badge" type="button" onClick={() => setFilter("active")}>active: {counts.active}</button>
+          <button className="badge button-badge" type="button" onClick={() => setFilter("active")}>available: {counts.active}</button>
           <button className="badge button-badge" type="button" onClick={() => setFilter("high_confidence")}>high confidence: {counts.high_confidence}</button>
           <button className="badge button-badge" type="button" onClick={() => setFilter("review_due")}>review due: {counts.review_due}</button>
         </div>
@@ -101,7 +160,7 @@ export default function SourceReadinessPanel() {
               <p>{route.summary || "Route summary pending source review."}</p>
             </div>
             <div className="badge-row" role="cell">
-              <span className="badge">{route.freshness_status || "review required"}</span>
+              <span className="badge">{formatFreshness(route.freshness_status)}</span>
               <span className="badge">Risk: {route.risk_level || "not set"}</span>
               <span className="badge">Confidence: {route.source_confidence || "not set"}</span>
             </div>
