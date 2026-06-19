@@ -19,6 +19,33 @@ const reviewActions = [
   { label: "Admin dashboard", href: "/admin" },
 ];
 
+const coverageChecks = [
+  {
+    title: "Official owner",
+    text: "Confirm the government, embassy, immigration authority, institution, or vetted provider responsible for the rule or service.",
+  },
+  {
+    title: "Source URL",
+    text: "Attach the official page used for the route, opportunity, document rule, fee, funds note, or provider claim.",
+  },
+  {
+    title: "Last verified",
+    text: "Record when the source was checked. Users should see freshness instead of relying on hidden assumptions.",
+  },
+  {
+    title: "Review due",
+    text: "Set the next review date for time-sensitive windows, invitation rounds, caps, fees, document rules, and service availability.",
+  },
+  {
+    title: "Risk control",
+    text: "State the boundary clearly: no approval guarantee, no lottery selection guarantee, no unofficial submission, and no unvetted provider handoff.",
+  },
+  {
+    title: "Public status",
+    text: "Use launch-safe wording such as Available, Coming soon, Monitoring, Closed, Source review due, or Partner approval pending.",
+  },
+];
+
 export default function AdminReviewsPage() {
   return (
     <main className="page-shell">
@@ -48,6 +75,21 @@ export default function AdminReviewsPage() {
         <div className="actions">
           {reviewActions.map((action) => (
             <a className={action.href.startsWith("#") ? "btn primary" : "btn"} href={action.href} key={action.href}>{action.label}</a>
+          ))}
+        </div>
+      </section>
+
+      <section className="section no-top-pad">
+        <h2>Launch verification checklist</h2>
+        <p className="section-intro">
+          Apply these checks before publishing a new country, route, opportunity, document rule, funds note, or partner service as available.
+        </p>
+        <div className="grid">
+          {coverageChecks.map((item) => (
+            <article className="card" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
           ))}
         </div>
       </section>
