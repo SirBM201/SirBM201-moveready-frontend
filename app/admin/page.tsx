@@ -1,3 +1,4 @@
+import AdminOpportunities from "@/components/AdminOpportunities";
 import AdminPartnerApplications from "@/components/AdminPartnerApplications";
 import AdminReadinessChecks from "@/components/AdminReadinessChecks";
 import AdminSavedRoutes from "@/components/AdminSavedRoutes";
@@ -8,6 +9,7 @@ import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscription
 
 const adminModules = [
   ["User profiles", "Review saved relocation profiles, contact preferences, goals, funds, family count, readiness score, and follow-up status.", "#user-profiles"],
+  ["Official opportunity routes", "Review lottery, ballot, invitation-pool, quota, and country-cap records before public monitoring and alerts rely on them.", "#opportunity-routes"],
   ["Saved routes", "Review routes, countries, opportunities, scholarships, and services users saved for later follow-up.", "#saved-routes"],
   ["Timeline events", "Review application tasks, deadlines, appointments, payments, result checks, travel dates, and follow-up steps.", "#timeline-events"],
   ["Partner applications", "Screen providers for courier, insurance, legalization, translation, expert review, admission, accommodation, airport pickup, and settlement workflows.", "#partner-applications"],
@@ -32,6 +34,7 @@ export default function AdminPage() {
         <nav className="nav">
           <a href="/admin/reports">Reports</a>
           <a href="/admin/reviews">Reviews</a>
+          <a href="#opportunity-routes">Opportunities</a>
           <a href="/dashboard">Dashboard</a>
           <a href="/saved-routes">Saved Routes</a>
           <a href="/timeline">Timeline</a>
@@ -45,7 +48,7 @@ export default function AdminPage() {
       </header>
       <section className="section">
         <h2>Admin workspace</h2>
-        <p className="section-intro">Admin tools protect the trust system: profiles, saved routes, timelines, partner applications, user requests, watchlists, sources, snapshots, route versions, review tasks, readiness checks, and report freshness.</p>
+        <p className="section-intro">Admin tools protect the trust system: profiles, official opportunities, saved routes, timelines, partner applications, user requests, watchlists, sources, snapshots, route versions, review tasks, readiness checks, and report freshness.</p>
         <div className="grid">
           {adminModules.map(([title, text, href]) => (
             <article className="card" key={title}>
@@ -57,6 +60,7 @@ export default function AdminPage() {
         </div>
       </section>
       <div id="user-profiles"><AdminUserProfiles /></div>
+      <div id="opportunity-routes"><AdminOpportunities /></div>
       <div id="saved-routes"><AdminSavedRoutes /></div>
       <div id="timeline-events"><AdminTimelineEvents /></div>
       <div id="partner-applications"><AdminPartnerApplications /></div>
