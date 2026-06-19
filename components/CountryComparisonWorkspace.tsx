@@ -69,6 +69,21 @@ const confidenceWeight: Record<string, number> = {
   high: 3,
 };
 
+const knownCountryFallbacks: Country[] = [
+  { country_code: "EE", country_name: "Estonia", region: "Europe", currency_code: "EUR", summary: "Startup founder, D visa, and digital business route readiness." },
+  { country_code: "FI", country_name: "Finland", region: "Europe", currency_code: "EUR", summary: "D visa, fast-track residence permit, study, work, startup, and family readiness." },
+  { country_code: "PT", country_name: "Portugal", region: "Europe", currency_code: "EUR", summary: "Entrepreneur, independent work, startup, document, funds, insurance, and arrival-readiness routes." },
+  { country_code: "US", country_name: "United States", region: "North America", currency_code: "USD", summary: "Diversity Visa lottery monitoring, result reminders, scam warnings, and document readiness." },
+  { country_code: "CA", country_name: "Canada", region: "North America", currency_code: "CAD", summary: "IEC invitation pools, youth mobility routes, country-specific spots, and arrival readiness." },
+  { country_code: "AU", country_name: "Australia", region: "Oceania", currency_code: "AUD", summary: "Work and Holiday subclass 462 ballot, country caps, evidence readiness, and travel planning." },
+  { country_code: "UK", country_name: "United Kingdom", region: "Europe", currency_code: "GBP", summary: "India Young Professionals ballot and youth-mobility opportunity monitoring." },
+  { country_code: "NZ", country_name: "New Zealand", region: "Oceania", currency_code: "NZD", summary: "Pacific Access Category, Samoan Quota ballot, and residence-readiness planning." },
+  { country_code: "JP", country_name: "Japan", region: "Asia", currency_code: "JPY", summary: "Working Holiday Programme eligibility, embassy instructions, quota timing, and funds readiness." },
+  { country_code: "KR", country_name: "South Korea", region: "Asia", currency_code: "KRW", summary: "Working Holiday Visa partner-country eligibility, quota, insurance, and arrival planning." },
+  { country_code: "HK", country_name: "Hong Kong", region: "Asia", currency_code: "HKD", summary: "Working Holiday Scheme country quotas, first-come availability, funds, and insurance readiness." },
+  { country_code: "IE", country_name: "Ireland", region: "Europe", currency_code: "EUR", summary: "Working Holiday Authorisation rules, country-specific channels, funds, insurance, and arrival registration." },
+];
+
 const knownRouteFallbacks: RouteItem[] = [
   {
     route_code: "startup-founder",
@@ -105,8 +120,109 @@ const knownRouteFallbacks: RouteItem[] = [
   },
 ];
 
+const knownOpportunityFallbacks: Opportunity[] = [
+  {
+    opportunity_code: "US-DV",
+    country_code: "US",
+    country_name: "United States",
+    opportunity_name: "USA Diversity Visa Program",
+    opportunity_type: "lottery",
+    route_category: "official_opportunity",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "CA-IEC",
+    country_code: "CA",
+    country_name: "Canada",
+    opportunity_name: "International Experience Canada",
+    opportunity_type: "invitation_pool",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "AU-462-BALLOT",
+    country_code: "AU",
+    country_name: "Australia",
+    opportunity_name: "Work and Holiday subclass 462 ballot",
+    opportunity_type: "ballot",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "UK-IYPS",
+    country_code: "UK",
+    country_name: "United Kingdom",
+    opportunity_name: "India Young Professionals Scheme",
+    opportunity_type: "ballot",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "NZ-QUOTA",
+    country_code: "NZ",
+    country_name: "New Zealand",
+    opportunity_name: "Pacific Access and Samoan Quota ballots",
+    opportunity_type: "annual_quota",
+    route_category: "residence_ballot",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "JP-WH",
+    country_code: "JP",
+    country_name: "Japan",
+    opportunity_name: "Japan Working Holiday Programme",
+    opportunity_type: "annual_quota",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "KR-WH",
+    country_code: "KR",
+    country_name: "South Korea",
+    opportunity_name: "Korea Working Holiday Visa",
+    opportunity_type: "annual_quota",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "HK-WHS",
+    country_code: "HK",
+    country_name: "Hong Kong",
+    opportunity_name: "Hong Kong Working Holiday Scheme",
+    opportunity_type: "first_come_quota",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+  {
+    opportunity_code: "IE-WHA",
+    country_code: "IE",
+    country_name: "Ireland",
+    opportunity_name: "Ireland Working Holiday Authorisation",
+    opportunity_type: "authorisation",
+    route_category: "youth_mobility",
+    availability_status: "monitoring",
+    source_confidence: "high",
+  },
+];
+
 function routeKey(route: RouteItem) {
   return `${route.country_code || ""}-${route.route_code || route.route_name || ""}`;
+}
+
+function opportunityKey(opportunity: Opportunity) {
+  return `${opportunity.country_code || ""}-${opportunity.opportunity_code || opportunity.opportunity_name || ""}`;
+}
+
+function getCountryFallback(countryCode?: string | null) {
+  return knownCountryFallbacks.find((country) => country.country_code === countryCode);
 }
 
 function mergeKnownRoutes(routes: RouteItem[]) {
@@ -117,8 +233,15 @@ function mergeKnownRoutes(routes: RouteItem[]) {
   ];
 }
 
+function mergeKnownOpportunities(opportunities: Opportunity[]) {
+  const existing = new Set(opportunities.map(opportunityKey));
+  return [
+    ...opportunities,
+    ...knownOpportunityFallbacks.filter((opportunity) => !existing.has(opportunityKey(opportunity))),
+  ];
+}
+
 function attachKnownRoutes(rows: Partial<ComparisonRow>[]) {
-  const knownCountryCodes = new Set(knownRouteFallbacks.map((route) => route.country_code).filter(Boolean));
   const existingCountryCodes = new Set(rows.map((row) => row.country_code).filter(Boolean));
   const mergedRows = rows.map((row) => {
     const existingRoutes = row.routes || [];
@@ -136,17 +259,12 @@ function attachKnownRoutes(rows: Partial<ComparisonRow>[]) {
     };
   });
 
-  const missingRows = Array.from(knownCountryCodes)
-    .filter((countryCode) => countryCode && !existingCountryCodes.has(countryCode))
-    .map((countryCode) => {
-      const route = knownRouteFallbacks.find((item) => item.country_code === countryCode);
-      const routes = knownRouteFallbacks.filter((item) => item.country_code === countryCode);
+  const missingRows = knownCountryFallbacks
+    .filter((country) => !existingCountryCodes.has(country.country_code))
+    .map((country) => {
+      const routes = knownRouteFallbacks.filter((item) => item.country_code === country.country_code);
       return {
-        country_code: countryCode || "",
-        country_name: route?.country_name || "Country pending",
-        region: "Europe",
-        currency_code: "EUR",
-        summary: route?.summary,
+        ...country,
         routes,
         route_count: routes.length,
         opportunities: [],
@@ -154,6 +272,47 @@ function attachKnownRoutes(rows: Partial<ComparisonRow>[]) {
     });
 
   return [...mergedRows, ...missingRows];
+}
+
+function attachKnownOpportunities(rows: Partial<ComparisonRow>[], opportunities: Opportunity[]) {
+  const allOpportunities = mergeKnownOpportunities(opportunities);
+  const existingCountryCodes = new Set(rows.map((row) => row.country_code).filter(Boolean));
+  const rowsWithOpportunities = rows.map((row) => {
+    const countryCode = row.country_code || "";
+    const existing = row.opportunities || [];
+    const matched = allOpportunities.filter((opportunity) => opportunity.country_code === countryCode);
+    const existingKeys = new Set(existing.map(opportunityKey));
+    const merged = [
+      ...existing,
+      ...matched.filter((opportunity) => !existingKeys.has(opportunityKey(opportunity))),
+    ];
+    return {
+      ...row,
+      opportunities: merged,
+      opportunity_count: Math.max(Number(row.opportunity_count ?? 0), merged.length),
+    };
+  });
+
+  const missingRows = allOpportunities
+    .filter((opportunity) => opportunity.country_code && !existingCountryCodes.has(opportunity.country_code))
+    .reduce<Partial<ComparisonRow>[]>((acc, opportunity) => {
+      if (acc.some((row) => row.country_code === opportunity.country_code)) return acc;
+      const country = getCountryFallback(opportunity.country_code) || {
+        country_code: opportunity.country_code || "",
+        country_name: opportunity.country_name || "Country pending",
+      };
+      const countryOpportunities = allOpportunities.filter((item) => item.country_code === opportunity.country_code);
+      acc.push({
+        ...country,
+        routes: [],
+        route_count: 0,
+        opportunities: countryOpportunities,
+        opportunity_count: countryOpportunities.length,
+      });
+      return acc;
+    }, []);
+
+  return [...rowsWithOpportunities, ...missingRows];
 }
 
 function labelFromRisk(routes: RouteItem[]) {
@@ -174,27 +333,16 @@ function confidenceFromRecords(routes: RouteItem[], opportunities: Opportunity[]
   return sorted[0];
 }
 
-function freshnessFromRoutes(routes: RouteItem[]) {
+function freshnessFromRoutes(routes: RouteItem[], opportunities: Opportunity[]) {
   if (routes.some((route) => route.freshness_status === "active")) return "active route available";
   if (routes.some((route) => route.freshness_status === "review_due")) return "source review due";
   if (routes.some((route) => route.freshness_status === "available_starter")) return "available starter route";
+  if (opportunities.length) return "opportunity monitoring available";
   return routes.length ? "review route before use" : "route data needed";
 }
 
 function opportunityTypesFromRows(opportunities: Opportunity[]) {
   return Array.from(new Set(opportunities.map((item) => item.opportunity_type || item.route_category).filter(Boolean))) as string[];
-}
-
-function attachOpportunities(rows: Partial<ComparisonRow>[], opportunities: Opportunity[]) {
-  return rows.map((row) => {
-    const countryCode = row.country_code || "";
-    const existing = row.opportunities || [];
-    const matched = opportunities.filter((opportunity) => opportunity.country_code === countryCode);
-    return {
-      ...row,
-      opportunities: existing.length ? existing : matched,
-    };
-  });
 }
 
 function normalizeRows(rows: Partial<ComparisonRow>[]) {
@@ -223,7 +371,7 @@ function normalizeRows(rows: Partial<ComparisonRow>[]) {
       opportunity_types: opportunityTypes,
       risk_label: row.risk_label || labelFromRisk(routes),
       source_confidence_label: row.source_confidence_label || confidenceFromRecords(routes, opportunities),
-      freshness_label: row.freshness_label || freshnessFromRoutes(routes),
+      freshness_label: row.freshness_label || freshnessFromRoutes(routes, opportunities),
       active_route_count: row.active_route_count,
       review_due_route_count: row.review_due_route_count,
       open_opportunity_count: row.open_opportunity_count ?? opportunities.filter((item) => ["open", "results_open"].includes(String(item.availability_status || ""))).length,
@@ -234,8 +382,8 @@ function normalizeRows(rows: Partial<ComparisonRow>[]) {
 }
 
 function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[], opportunities: Opportunity[]): ComparisonRow[] {
-  return normalizeRows(attachKnownRoutes(countries.map((country) => {
-    const mergedRoutes = mergeKnownRoutes(routes);
+  const mergedRoutes = mergeKnownRoutes(routes);
+  const rows = countries.map((country) => {
     const countryRoutes = mergedRoutes.filter((route) => route.country_code === country.country_code);
     const countryOpportunities = opportunities.filter((opportunity) => opportunity.country_code === country.country_code);
     return {
@@ -243,7 +391,8 @@ function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[], opp
       routes: countryRoutes,
       opportunities: countryOpportunities,
     };
-  })));
+  });
+  return normalizeRows(attachKnownOpportunities(attachKnownRoutes(rows), opportunities));
 }
 
 function getRiskRank(label: string) {
@@ -282,9 +431,9 @@ export default function CountryComparisonWorkspace() {
       try {
         const comparisonData = await apiJson<{ countries: ComparisonRow[]; source_status?: string }>("relocation/country-comparison", { timeoutMs: 15000 });
         if (cancelled) return;
-        const rows = normalizeRows(attachKnownRoutes(attachOpportunities(comparisonData.countries || [], opportunities)));
+        const rows = normalizeRows(attachKnownOpportunities(attachKnownRoutes(comparisonData.countries || []), opportunities));
         setComparisonRows(rows);
-        setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded with launch routes" : "Live country comparison loaded with launch routes");
+        setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded with launch routes and opportunity countries" : "Live country comparison loaded with launch routes and opportunity countries");
       } catch {
         try {
           const [countryData, routeData] = await Promise.all([
@@ -293,11 +442,11 @@ export default function CountryComparisonWorkspace() {
           ]);
           if (cancelled) return;
           setComparisonRows(rowsFromCountryAndRoutes(countryData.countries || [], routeData.routes || [], opportunities));
-          setStatus("Live country, route, and opportunity data loaded with launch routes");
+          setStatus("Live country, route, and opportunity data loaded with launch countries");
         } catch {
           if (cancelled) return;
-          setComparisonRows(normalizeRows(attachKnownRoutes([])));
-          setStatus("Starter launch routes loaded. Live comparison data is temporarily unavailable.");
+          setComparisonRows(normalizeRows(attachKnownOpportunities(attachKnownRoutes([]), [])));
+          setStatus("Starter launch countries loaded. Live comparison data is temporarily unavailable.");
         }
       }
     }
