@@ -9,12 +9,12 @@ const liveRoutes = [
   {
     title: "Compare routes",
     href: "/compare",
-    text: "Compare Estonia startup, Finland D visa, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
+    text: "Compare Estonia startup, Finland D visa, Portugal entrepreneur route, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
   },
   {
     title: "Compare countries",
     href: "/country-comparison",
-    text: "Compare countries by live route availability, route categories, risk signals, source confidence, saved-country actions, and watchlist next steps.",
+    text: "Compare countries by live route availability, route categories, opportunity coverage, risk signals, source confidence, saved-country actions, and watchlist next steps.",
   },
   {
     title: "Trust center",
@@ -40,6 +40,11 @@ const liveRoutes = [
     title: "Finland D visa route",
     href: "/routes/finland-d-visa",
     text: "Check D visa readiness for eligible Finnish residence permit routes, passport handling, family planning, timeline, and first-arrival costs.",
+  },
+  {
+    title: "Portugal entrepreneur route",
+    href: "/routes/portugal-entrepreneur",
+    text: "Check entrepreneur and independent work readiness for Portugal residency visa evidence, funds, document legalization, insurance, and AIMA follow-up steps.",
   },
   {
     title: "Saved routes",
@@ -137,6 +142,7 @@ export default function Home() {
           <a href="/watchlist">Watchlist</a>
           <a href="/readiness">Readiness</a>
           <a href="/routes/finland-d-visa">Finland Route</a>
+          <a href="/routes/portugal-entrepreneur">Portugal Route</a>
           <a href="/route-checker">Route Checker</a>
           <a href="/trust">Trust</a>
           <a href="/sources">Sources</a>
