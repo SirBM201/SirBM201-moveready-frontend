@@ -1,3 +1,4 @@
+import SiteHeader from "@/components/SiteHeader";
 import styles from "./compare.module.css";
 
 const routes = [
@@ -160,17 +161,7 @@ const scoreRows = [
 export default function ComparePage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/"><strong>Project MoveReady</strong><span>Compare routes</span></a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/country-comparison">Countries</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/readiness">Readiness</a>
-          <a href="/saved-routes">Saved Routes</a>
-          <a href="/services">Services</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Compare routes" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
