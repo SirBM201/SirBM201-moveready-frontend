@@ -1,5 +1,33 @@
 import LiveOpportunities from "@/components/LiveOpportunities";
 
+const opportunityGuides = [
+  {
+    title: "USA Diversity Visa Program",
+    href: "/opportunities/usa-dv",
+    text: "Prepare safely for DV entry, confirmation-number storage, result checks, scam warnings, and follow-up documents.",
+  },
+  {
+    title: "Canada International Experience Canada",
+    href: "/opportunities/canada-iec",
+    text: "Track IEC pools, invitation rounds, country eligibility, category fit, deadlines, funds, and insurance readiness.",
+  },
+  {
+    title: "Australia Work and Holiday 462 ballot",
+    href: "/opportunities/australia-462-ballot",
+    text: "Monitor subclass 462 ballot windows for China, India, and Vietnam first-visa applicants and prepare evidence if selected.",
+  },
+  {
+    title: "UK India Young Professionals Scheme",
+    href: "/opportunities/uk-india-young-professionals",
+    text: "Track ballot windows, eligibility, savings evidence, selection limits, and application deadlines for eligible Indian citizens.",
+  },
+  {
+    title: "New Zealand quota ballots",
+    href: "/opportunities/new-zealand-quota-ballots",
+    text: "Monitor Pacific Access Category and Samoan Quota ballot results, family evidence, and residence application readiness.",
+  },
+];
+
 export default function OpportunitiesPage() {
   return (
     <main className="page-shell">
@@ -33,6 +61,19 @@ export default function OpportunitiesPage() {
       </section>
 
       <section className="section no-top-pad">
+        <h2>Opportunity route guides</h2>
+        <p className="section-intro">Use these guide pages to understand the route before saving alerts or preparing documents.</p>
+        <div className="grid">
+          {opportunityGuides.map((guide) => (
+            <a className="card" href={guide.href} key={guide.href}>
+              <h3>{guide.title}</h3>
+              <p>{guide.text}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
         <LiveOpportunities />
       </section>
     </main>
