@@ -1,24 +1,10 @@
+import SiteHeader from "@/components/SiteHeader";
 import ProfileDashboard from "@/components/ProfileDashboard";
 
 export default function DashboardPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>User dashboard</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/saved-routes">Saved Routes</a>
-          <a href="/timeline">Timeline</a>
-          <a href="/services">Services</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/readiness">Readiness</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/my-reports">My Reports</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="User dashboard" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
