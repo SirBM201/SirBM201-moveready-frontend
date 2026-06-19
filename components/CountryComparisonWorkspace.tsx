@@ -27,15 +27,33 @@ type RouteItem = {
   summary?: string | null;
 };
 
+type Opportunity = {
+  id?: string;
+  opportunity_code: string;
+  country_code?: string | null;
+  country_name?: string | null;
+  opportunity_name: string;
+  opportunity_type?: string | null;
+  route_category?: string | null;
+  availability_status?: string | null;
+  source_confidence?: string | null;
+  next_review_due_at?: string | null;
+};
+
 type ComparisonRow = Country & {
   routes: RouteItem[];
+  opportunities: Opportunity[];
   route_count: number;
+  opportunity_count: number;
   route_categories: string[];
+  opportunity_types: string[];
   risk_label: string;
   source_confidence_label: string;
   freshness_label: string;
   active_route_count?: number;
   review_due_route_count?: number;
+  open_opportunity_count?: number;
+  monitoring_opportunity_count?: number;
   last_verified_at?: string | null;
 };
 
@@ -59,8 +77,11 @@ function labelFromRisk(routes: RouteItem[]) {
   return scored[0] || "review required";
 }
 
-function confidenceFromRoutes(routes: RouteItem[]) {
-  const labels = routes.map((route) => route.source_confidence).filter(Boolean) as string[];
+function confidenceFromRecords(routes: RouteItem[], opportunities: Opportunity[]) {
+  const labels = [
+    ...routes.map((route) => route.source_confidence),
+    ...opportunities.map((opportunity) => opportunity.source_confidence),
+  ].filter(Boolean) as string[];
   if (!labels.length) return "source review required";
   const sorted = labels.sort((a, b) => (confidenceWeight[b.toLowerCase()] || 0) - (confidenceWeight[a.toLowerCase()] || 0));
   return sorted[0];
@@ -72,12 +93,32 @@ function freshnessFromRoutes(routes: RouteItem[]) {
   return routes.length ? "review route before use" : "route data needed";
 }
 
+function opportunityTypesFromRows(opportunities: Opportunity[]) {
+  return Array.from(new Set(opportunities.map((item) => item.opportunity_type || item.route_category).filter(Boolean))) as string[];
+}
+
+function attachOpportunities(rows: Partial<ComparisonRow>[], opportunities: Opportunity[]) {
+  return rows.map((row) => {
+    const countryCode = row.country_code || "";
+    const existing = row.opportunities || [];
+    const matched = opportunities.filter((opportunity) => opportunity.country_code === countryCode);
+    return {
+      ...row,
+      opportunities: existing.length ? existing : matched,
+    };
+  });
+}
+
 function normalizeRows(rows: Partial<ComparisonRow>[]) {
   return rows.map((row) => {
     const routes = row.routes || [];
+    const opportunities = row.opportunities || [];
     const routeCategories = row.route_categories?.length
       ? row.route_categories
       : (Array.from(new Set(routes.map((route) => route.route_category).filter(Boolean))) as string[]);
+    const opportunityTypes = row.opportunity_types?.length
+      ? row.opportunity_types
+      : opportunityTypesFromRows(opportunities);
 
     return {
       id: row.id,
@@ -87,24 +128,31 @@ function normalizeRows(rows: Partial<ComparisonRow>[]) {
       currency_code: row.currency_code,
       summary: row.summary,
       routes,
+      opportunities,
       route_count: Number(row.route_count ?? routes.length ?? 0),
+      opportunity_count: Number(row.opportunity_count ?? opportunities.length ?? 0),
       route_categories: routeCategories,
+      opportunity_types: opportunityTypes,
       risk_label: row.risk_label || labelFromRisk(routes),
-      source_confidence_label: row.source_confidence_label || confidenceFromRoutes(routes),
+      source_confidence_label: row.source_confidence_label || confidenceFromRecords(routes, opportunities),
       freshness_label: row.freshness_label || freshnessFromRoutes(routes),
       active_route_count: row.active_route_count,
       review_due_route_count: row.review_due_route_count,
+      open_opportunity_count: row.open_opportunity_count ?? opportunities.filter((item) => ["open", "results_open"].includes(String(item.availability_status || ""))).length,
+      monitoring_opportunity_count: row.monitoring_opportunity_count ?? opportunities.filter((item) => String(item.availability_status || "") === "monitoring").length,
       last_verified_at: row.last_verified_at,
     } satisfies ComparisonRow;
   });
 }
 
-function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[]): ComparisonRow[] {
+function rowsFromCountryAndRoutes(countries: Country[], routes: RouteItem[], opportunities: Opportunity[]): ComparisonRow[] {
   return normalizeRows(countries.map((country) => {
     const countryRoutes = routes.filter((route) => route.country_code === country.country_code);
+    const countryOpportunities = opportunities.filter((opportunity) => opportunity.country_code === country.country_code);
     return {
       ...country,
       routes: countryRoutes,
+      opportunities: countryOpportunities,
     };
   }));
 }
@@ -119,6 +167,15 @@ function getConfidenceRank(label: string) {
   return confidenceWeight[value] || 0;
 }
 
+async function loadOpportunities() {
+  try {
+    const data = await apiJson<{ opportunities: Opportunity[] }>("opportunities", { timeoutMs: 15000 });
+    return data.opportunities || [];
+  } catch {
+    return [];
+  }
+}
+
 export default function CountryComparisonWorkspace() {
   const [comparisonRows, setComparisonRows] = useState<ComparisonRow[]>([]);
   const [query, setQuery] = useState("");
@@ -131,10 +188,12 @@ export default function CountryComparisonWorkspace() {
     let cancelled = false;
 
     async function load() {
+      const opportunities = await loadOpportunities();
+
       try {
         const comparisonData = await apiJson<{ countries: ComparisonRow[]; source_status?: string }>("relocation/country-comparison", { timeoutMs: 15000 });
         if (cancelled) return;
-        setComparisonRows(normalizeRows(comparisonData.countries || []));
+        setComparisonRows(normalizeRows(attachOpportunities(comparisonData.countries || [], opportunities)));
         setStatus(comparisonData.source_status === "starter_fallback" ? "Starter comparison loaded" : "Live country comparison loaded");
       } catch {
         try {
@@ -143,8 +202,8 @@ export default function CountryComparisonWorkspace() {
             apiJson<{ routes: RouteItem[] }>("relocation/routes", { timeoutMs: 15000 }),
           ]);
           if (cancelled) return;
-          setComparisonRows(rowsFromCountryAndRoutes(countryData.countries || [], routeData.routes || []));
-          setStatus("Live country and route data loaded");
+          setComparisonRows(rowsFromCountryAndRoutes(countryData.countries || [], routeData.routes || [], opportunities));
+          setStatus("Live country, route, and opportunity data loaded");
         } catch {
           if (cancelled) return;
           setStatus("Unable to load live comparison data. Check backend URL or deployment status.");
@@ -159,25 +218,27 @@ export default function CountryComparisonWorkspace() {
   }, []);
 
   const categories = useMemo(() => {
-    return Array.from(new Set(comparisonRows.flatMap((country) => country.route_categories))).filter(Boolean).sort();
+    return Array.from(new Set(comparisonRows.flatMap((country) => [...country.route_categories, ...country.opportunity_types]))).filter(Boolean).sort();
   }, [comparisonRows]);
 
   const metrics = useMemo(() => {
     const countries = comparisonRows.length;
     const routes = comparisonRows.reduce((total, country) => total + country.route_count, 0);
+    const opportunities = comparisonRows.reduce((total, country) => total + country.opportunity_count, 0);
     const active = comparisonRows.reduce((total, country) => total + (country.active_route_count || country.routes.filter((route) => route.freshness_status === "active").length), 0);
     const highConfidence = comparisonRows.filter((country) => country.source_confidence_label.toLowerCase() === "high").length;
-    return { countries, routes, active, highConfidence };
+    return { countries, routes, opportunities, active, highConfidence };
   }, [comparisonRows]);
 
   const rows = useMemo<ComparisonRow[]>(() => {
     const q = query.trim().toLowerCase();
     const filtered = comparisonRows.filter((country) => {
       const routeText = country.routes.map((route) => [route.route_name, route.route_code, route.route_category, route.summary].filter(Boolean).join(" ")).join(" ");
-      const matchesQuery = !q || [country.country_name, country.country_code, country.region, country.summary, routeText]
+      const opportunityText = country.opportunities.map((item) => [item.opportunity_name, item.opportunity_code, item.opportunity_type, item.availability_status].filter(Boolean).join(" ")).join(" ");
+      const matchesQuery = !q || [country.country_name, country.country_code, country.region, country.summary, routeText, opportunityText]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(q));
-      const matchesCategory = !categoryFilter || country.route_categories.includes(categoryFilter);
+      const matchesCategory = !categoryFilter || country.route_categories.includes(categoryFilter) || country.opportunity_types.includes(categoryFilter);
       const matchesConfidence = !confidenceFilter || country.source_confidence_label.toLowerCase() === confidenceFilter;
       return matchesQuery && matchesCategory && matchesConfidence;
     });
@@ -186,6 +247,7 @@ export default function CountryComparisonWorkspace() {
       if (sortMode === "country") return a.country_name.localeCompare(b.country_name);
       if (sortMode === "risk") return getRiskRank(a.risk_label) - getRiskRank(b.risk_label);
       if (sortMode === "confidence") return getConfidenceRank(b.source_confidence_label) - getConfidenceRank(a.source_confidence_label);
+      if (sortMode === "opportunity_count") return b.opportunity_count - a.opportunity_count;
       return b.route_count - a.route_count;
     });
   }, [categoryFilter, comparisonRows, confidenceFilter, query, sortMode]);
@@ -195,17 +257,18 @@ export default function CountryComparisonWorkspace() {
       <div className="metric-grid compact-metric-grid">
         <div className="metric-item"><strong>{metrics.countries}</strong><span>Countries</span></div>
         <div className="metric-item"><strong>{metrics.routes}</strong><span>Route records</span></div>
+        <div className="metric-item"><strong>{metrics.opportunities}</strong><span>Opportunity records</span></div>
         <div className="metric-item"><strong>{metrics.active}</strong><span>Active route versions</span></div>
         <div className="metric-item"><strong>{metrics.highConfidence}</strong><span>High-confidence countries</span></div>
       </div>
 
       <div className="admin-toolbar">
         <div className="field">
-          <label htmlFor="country-search">Search country, route, region, or summary</label>
-          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, startup, D visa" />
+          <label htmlFor="country-search">Search country, route, opportunity, region, or summary</label>
+          <input id="country-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Example: Estonia, Finland, startup, D visa, working holiday" />
         </div>
         <div className="field">
-          <label htmlFor="country-category-filter">Route category</label>
+          <label htmlFor="country-category-filter">Route or opportunity category</label>
           <select id="country-category-filter" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value="">All categories</option>
             {categories.map((category) => <option key={category} value={category}>{category}</option>)}
@@ -224,6 +287,7 @@ export default function CountryComparisonWorkspace() {
           <label htmlFor="country-sort">Sort by</label>
           <select id="country-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
             <option value="route_count">Most route records</option>
+            <option value="opportunity_count">Most opportunity records</option>
             <option value="confidence">Source confidence</option>
             <option value="risk">Lowest risk signal</option>
             <option value="country">Country name</option>
@@ -238,7 +302,7 @@ export default function CountryComparisonWorkspace() {
       <div className="comparison-table" role="table" aria-label="Country comparison table">
         <div className="comparison-row comparison-head" role="row">
           <span>Country</span>
-          <span>Routes</span>
+          <span>Routes and opportunities</span>
           <span>Readiness signals</span>
           <span>Next action</span>
         </div>
@@ -261,16 +325,24 @@ export default function CountryComparisonWorkspace() {
                   <span className="badge" key={category}>{category}</span>
                 ))}
               </div>
+              <strong className="submetric">{country.opportunity_count} opportunity record{country.opportunity_count === 1 ? "" : "s"}</strong>
+              <div className="badge-row compact-badges">
+                {(country.opportunity_types.length ? country.opportunity_types : ["opportunities pending"]).map((type) => (
+                  <span className="badge" key={type}>{type}</span>
+                ))}
+              </div>
             </div>
             <div role="cell">
               <div className="mini-list compact-list">
                 <div><strong>Risk</strong><span>{country.risk_label}</span></div>
                 <div><strong>Source confidence</strong><span>{country.source_confidence_label}</span></div>
                 <div><strong>Freshness</strong><span>{country.freshness_label}</span></div>
+                <div><strong>Opportunity status</strong><span>{country.open_opportunity_count || 0} open/result, {country.monitoring_opportunity_count || 0} monitoring</span></div>
               </div>
             </div>
             <div className="actions stacked-actions" role="cell">
               <a className="btn primary" href={`/route-checker?country=${country.country_code}`}>Check route</a>
+              <a className="btn" href={`/opportunities?country=${country.country_code}`}>View opportunities</a>
               <a className="btn" href={`/saved-routes?country=${country.country_code}`}>Save country</a>
               <a className="btn" href={`/watchlist?type=country&code=${country.country_code}&title=${encodeURIComponent(country.country_name)}`}>Create alert</a>
             </div>
@@ -284,7 +356,7 @@ export default function CountryComparisonWorkspace() {
         .country-compare-workspace { display: grid; gap: 24px; }
         .compact-metric-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 14px;
         }
         .metric-item {
@@ -300,7 +372,7 @@ export default function CountryComparisonWorkspace() {
         .comparison-table { display: grid; gap: 12px; }
         .comparison-row {
           display: grid;
-          grid-template-columns: 1.25fr 0.9fr 1fr 0.75fr;
+          grid-template-columns: 1.15fr 1fr 1fr 0.75fr;
           gap: 20px;
           align-items: start;
           padding: 22px;
@@ -319,11 +391,12 @@ export default function CountryComparisonWorkspace() {
         }
         .comparison-row h3 { margin: 8px 0 8px; }
         .comparison-row p { margin: 0 0 14px; color: var(--muted); }
-        .compact-badges { margin-top: 14px; }
+        .compact-badges { margin-top: 12px; }
+        .submetric { display: block; margin-top: 18px; }
         .compact-list { gap: 8px; }
         .stacked-actions { align-items: stretch; flex-direction: column; }
         .stacked-actions .btn { width: 100%; justify-content: center; }
-        @media (max-width: 1100px) {
+        @media (max-width: 1180px) {
           .compact-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .comparison-row { grid-template-columns: 1fr 1fr; }
           .comparison-head { display: none; }
