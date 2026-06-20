@@ -39,7 +39,7 @@ const summaryTiles = [
   { key: "watchlist", label: "Watchlist", href: "/watchlist" },
   { key: "timeline", label: "Timeline", href: "/timeline" },
   { key: "reports", label: "Reports", href: "/my-reports" },
-  { key: "service_requests", label: "Service requests", href: "/services" },
+  { key: "service_requests", label: "Service requests", href: "/service-requests" },
 ] as const;
 
 function formatDate(value?: string) {
