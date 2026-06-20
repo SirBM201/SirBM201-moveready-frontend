@@ -33,6 +33,7 @@ const ACCOUNT_WRITE_PREFIXES = [
   "watchlist/subscriptions",
   "timeline",
   "platform/service-interest",
+  "relocation/reports",
 ];
 
 function isPlainObject(v: any) {
