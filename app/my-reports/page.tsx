@@ -4,15 +4,15 @@ import ReportsLookup from "@/components/ReportsLookup";
 const reportTrustItems = [
   {
     title: "Generated date",
-    detail: "Every report should show when the advice was generated so users know whether it may need a refresh.",
+    detail: "Check when the report was created so you know whether it may need a refresh.",
   },
   {
     title: "Risk label",
-    detail: "Reports should keep visible risk labels instead of sounding like a guaranteed approval path.",
+    detail: "Use the risk label as a warning signal before relying on the route plan.",
   },
   {
-    title: "Source version",
-    detail: "As route data matures, reports should preserve the rule/source version used at the time of generation.",
+    title: "Source status",
+    detail: "Review source status and route context before printing, sharing, or requesting support.",
   },
 ];
 
@@ -23,15 +23,15 @@ export default function MyReportsPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account Center: readiness history</span>
-          <h1>Keep every readiness report connected to the user account.</h1>
+          <span className="eyebrow">Readiness history</span>
+          <h1>Find and review your saved readiness reports.</h1>
           <p className="lede">
-            My Reports lets a user retrieve saved readiness outputs by report reference, email, or phone. In the full account system, these reports become the user’s relocation history with refresh tracking, risk labels, and source-version transparency.
+            Load reports from your signed-in account, report reference, email, or phone. Use each report as an action plan for documents, funds, route questions, and next steps.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Generate new report</a>
             <a className="btn" href="/dashboard">Back to Account Center</a>
-            <a className="btn" href="/report-preview">View report preview</a>
+            <a className="btn" href="/saved-routes">Saved routes</a>
           </div>
         </div>
       </section>
@@ -39,10 +39,10 @@ export default function MyReportsPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
-            <p className="overline">Report ownership</p>
-            <h2>What a saved report should remember</h2>
+            <p className="overline">Report basics</p>
+            <h2>What to check in every report</h2>
             <p className="section-intro">
-              Reports are more than downloadable content. They should preserve the user input, selected route, risk context, source confidence, and generated date so the advice remains transparent and reviewable.
+              A saved report should show the route context, user inputs, risk level, source status, and generated date so you can understand what the advice was based on.
             </p>
           </div>
           <span className="status-dot">Lookup active</span>
