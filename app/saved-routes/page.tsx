@@ -26,7 +26,7 @@ export default function SavedRoutesPage() {
           <span className="eyebrow">Account Center: saved decisions</span>
           <h1>Keep the routes and opportunities worth revisiting.</h1>
           <p className="lede">
-            Saved Routes turns browsing into a proper relocation workspace. Signed-in users can load saved routes from their verified account, while contact lookup remains available for MVP fallback.
+            Saved Routes turns browsing into a proper relocation workspace. Signed-in users can load saved routes from their verified account, and email or phone lookup remains available for quick retrieval.
           </p>
           <div className="actions">
             <a className="btn primary" href="/compare">Compare routes</a>
