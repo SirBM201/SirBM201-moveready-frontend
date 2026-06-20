@@ -219,7 +219,7 @@ export default function SavedRoutesManager() {
     setMessage(`Generating readiness report for ${route.saved_title}...`);
     try {
       const mainGoal = routeMainGoal(route, latestProfile);
-      const data = await apiJson<{ report: GeneratedReport }>("relocation/reports", {
+      const data = await apiJson<{ report: GeneratedReport }>(`saved-route-reports/${route.id}`, {
         method: "POST",
         body: {
           full_name: route.full_name || latestProfile?.full_name || "",
