@@ -95,6 +95,11 @@ function scoreLabel(report: ReportRow) {
   return level || "Not scored";
 }
 
+function reportDetailHref(report: ReportRow) {
+  const ref = report.report_ref || report.report_payload?.report_ref || "";
+  return ref ? `/report-detail?ref=${encodeURIComponent(ref)}` : "/my-reports";
+}
+
 export default function ReportsLookup() {
   const [reportRef, setReportRef] = useState("");
   const [contact, setContact] = useState("");
@@ -235,7 +240,8 @@ export default function ReportsLookup() {
                     </div>
                   ) : null}
                   <div className="actions">
-                    <a className="btn primary" href="/dashboard">Generate updated report</a>
+                    <a className="btn primary" href={reportDetailHref(report)}>Open report</a>
+                    <a className="btn" href="/dashboard">Generate updated report</a>
                     <button className="btn" type="button" onClick={() => window.print()}>Print</button>
                   </div>
                 </article>
