@@ -4,15 +4,15 @@ import WatchlistSignup from "@/components/WatchlistSignup";
 const alertPrinciples = [
   {
     title: "Opt-in only",
-    detail: "Users choose what they want monitored and how they want to be contacted before any alert is sent.",
+    detail: "Choose what you want monitored and how you want to be contacted before any alert is sent.",
   },
   {
     title: "Source-review based",
-    detail: "Alerts should point back to official or reviewed sources, with review due dates where possible.",
+    detail: "Alerts should point back to official or reviewed sources, with review dates where possible.",
   },
   {
-    title: "No outcome guarantees",
-    detail: "Alerts can notify users about changes and windows, but must not imply approval, selection, admission, or job success.",
+    title: "Change alerts only",
+    detail: "Alerts notify you about route changes, opening windows, deadlines, and checklist updates.",
   },
 ];
 
@@ -23,10 +23,10 @@ export default function WatchlistPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account Center: opt-in monitoring</span>
-          <h1>Monitor the routes and opportunities a user cares about.</h1>
+          <span className="eyebrow">Opt-in monitoring</span>
+          <h1>Track the routes and opportunities you care about.</h1>
           <p className="lede">
-            Watchlist alerts help users follow application openings, closing dates, result windows, eligibility changes, document updates, fee changes, and source-review updates. Every alert should remain consent-first and advisory.
+            Watchlist alerts help you follow application openings, closing dates, result windows, eligibility changes, document updates, fee changes, and source-review updates.
           </p>
           <div className="actions">
             <a className="btn primary" href="/opportunities">Browse opportunities</a>
@@ -39,10 +39,10 @@ export default function WatchlistPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
-            <p className="overline">Alert trust rules</p>
-            <h2>Useful alerts without shortcut promises</h2>
+            <p className="overline">Alert rules</p>
+            <h2>Useful alerts without confusion</h2>
             <p className="section-intro">
-              The watchlist should make MoveReady feel active and helpful, while protecting trust. It should notify users about changes, not sell certainty or unofficial shortcuts.
+              The watchlist should make MoveReady feel active and helpful. It should notify you about important changes, not replace your own final checks.
             </p>
           </div>
           <span className="status-dot">Consent first</span>
