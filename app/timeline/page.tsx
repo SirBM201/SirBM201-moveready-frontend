@@ -26,7 +26,7 @@ export default function TimelinePage() {
           <span className="eyebrow">Account Center: timeline tracking</span>
           <h1>Turn relocation plans into dated actions.</h1>
           <p className="lede">
-            Timeline helps users track documents, appointments, deadlines, results, travel steps, and follow-up tasks. In the full account system, each event should connect back to the user profile, selected route, report, or saved opportunity.
+            Timeline helps users track documents, appointments, deadlines, results, travel steps, and follow-up tasks. Signed-in users can now load these dated actions directly from the verified Account Center.
           </p>
           <div className="actions">
             <a className="btn primary" href="#timeline-planner">Add timeline event</a>
@@ -42,10 +42,10 @@ export default function TimelinePage() {
             <p className="overline">Timeline structure</p>
             <h2>Every plan needs dates, reminders, and status</h2>
             <p className="section-intro">
-              The MVP timeline is contact-based. Later, verified login should join timeline events with reports, saved routes, alerts, and service requests so users can see their full relocation progress.
+              The MVP timeline supports both verified account loading and contact fallback. Events should later connect with reports, saved routes, alerts, and service requests so users can see full relocation progress.
             </p>
           </div>
-          <span className="status-dot">Reminder-ready</span>
+          <span className="status-dot">Verified + reminder-ready</span>
         </div>
         <div className="grid">
           {timelineUses.map((item) => (
