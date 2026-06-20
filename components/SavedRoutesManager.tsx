@@ -23,9 +23,33 @@ type SavedRoute = {
   created_at?: string;
 };
 
+type Profile = {
+  id?: string;
+  full_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  current_country?: string | null;
+  target_country?: string | null;
+  main_goal?: string | null;
+  route_category?: string | null;
+  timeline_months?: number | null;
+  family_members_count?: number | null;
+  available_funds_amount?: number | null;
+  available_funds_currency?: string | null;
+  has_previous_refusal?: boolean;
+  preferred_contact_channel?: string | null;
+};
+
+type GeneratedReport = {
+  report_ref?: string;
+  report_title?: string;
+  stored?: boolean;
+};
+
 type AccountSummary = {
   ok: boolean;
   session?: { email?: string };
+  latest_profile?: Profile | null;
   sections?: {
     saved_routes?: {
       rows?: SavedRoute[];
@@ -66,6 +90,15 @@ function formatDate(value?: string) {
   }
 }
 
+function cleanNumber(value: unknown, fallback = 0) {
+  const parsed = Number(value ?? fallback);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function routeMainGoal(route: SavedRoute, profile: Profile | null) {
+  return route.main_goal || route.route_category || profile?.main_goal || profile?.route_category || "relocation";
+}
+
 export default function SavedRoutesManager() {
   const [form, setForm] = useState(defaultForm);
   const [notifyOnChanges, setNotifyOnChanges] = useState(true);
@@ -75,6 +108,9 @@ export default function SavedRoutesManager() {
   const [message, setMessage] = useState("Loading verified saved routes if you are signed in...");
   const [loading, setLoading] = useState(false);
   const [accountEmail, setAccountEmail] = useState("");
+  const [latestProfile, setLatestProfile] = useState<Profile | null>(null);
+  const [reportingRouteId, setReportingRouteId] = useState("");
+  const [generatedRefs, setGeneratedRefs] = useState<Record<string, string>>({});
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -89,8 +125,10 @@ export default function SavedRoutesManager() {
       const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 15000 });
       const rows = data.sections?.saved_routes?.rows || [];
       const email = data.session?.email || "";
+      const profile = data.latest_profile || null;
       setSavedRoutes(rows);
       setAccountEmail(email);
+      setLatestProfile(profile);
       setLookupContact(email);
       if (email) setForm((current) => ({ ...current, email }));
       setMessage(rows.length ? "Verified account saved routes loaded." : "No saved routes are connected to this verified account yet.");
@@ -166,6 +204,58 @@ export default function SavedRoutesManager() {
       setMessage("Unable to load saved routes.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function generateReportFromRoute(route: SavedRoute) {
+    const email = route.email || accountEmail || latestProfile?.email || "";
+    const phone = route.phone || latestProfile?.phone || "";
+    if (!email && !phone) {
+      setMessage("Sign in or attach an email/phone to this saved route before generating a report.");
+      return;
+    }
+
+    setReportingRouteId(route.id);
+    setMessage(`Generating readiness report for ${route.saved_title}...`);
+    try {
+      const mainGoal = routeMainGoal(route, latestProfile);
+      const data = await apiJson<{ report: GeneratedReport }>("relocation/reports", {
+        method: "POST",
+        body: {
+          full_name: route.full_name || latestProfile?.full_name || "",
+          email,
+          phone,
+          preferred_contact_channel: latestProfile?.preferred_contact_channel || "email",
+          consent_to_contact: true,
+          goal: mainGoal,
+          main_goal: mainGoal,
+          route_category: route.route_category || latestProfile?.route_category || mainGoal,
+          current_country: route.current_country || latestProfile?.current_country || "",
+          target_country: route.target_country || latestProfile?.target_country || "",
+          available_funds_amount: cleanNumber(latestProfile?.available_funds_amount, 0),
+          available_funds_currency: latestProfile?.available_funds_currency || "EUR",
+          family_members_count: cleanNumber(latestProfile?.family_members_count, 0),
+          timeline_months: cleanNumber(latestProfile?.timeline_months, 0),
+          has_previous_refusal: Boolean(latestProfile?.has_previous_refusal),
+          source_page: sourcePage(),
+          metadata: {
+            saved_route_id: route.id,
+            saved_route_title: route.saved_title,
+            generated_from: "saved_routes_page",
+            report_basis: latestProfile ? "saved_route_plus_latest_profile" : "saved_route_only",
+          },
+        },
+        timeoutMs: 20000,
+        useAuthToken: false,
+      });
+      const ref = data.report?.report_ref || "";
+      if (ref) setGeneratedRefs((current) => ({ ...current, [route.id]: ref }));
+      setMessage(ref ? `Readiness report generated and saved. Reference: ${ref}. Open My Reports to review it.` : "Readiness report generated and saved. Open My Reports to review it.");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to generate report: ${apiError.data.error}` : "Unable to generate report from this saved route.");
+    } finally {
+      setReportingRouteId("");
     }
   }
 
@@ -259,9 +349,11 @@ export default function SavedRoutesManager() {
                   <span className="badge">{formatDate(route.created_at)}</span>
                 </div>
                 {route.notes ? <p>{route.notes}</p> : null}
+                {generatedRefs[route.id] ? <p className="form-status">Generated report: {generatedRefs[route.id]}</p> : null}
                 <div className="actions">
-                  <a className="btn primary" href="/dashboard#profile-dashboard">Generate report</a>
+                  <button className="btn primary" type="button" onClick={() => generateReportFromRoute(route)} disabled={reportingRouteId === route.id || loading}>{reportingRouteId === route.id ? "Generating..." : "Generate report"}</button>
                   <a className="btn" href={`/watchlist?type=route&route=${encodeURIComponent(route.route_code || route.saved_title)}`}>Create alert</a>
+                  <a className="btn" href="/my-reports">My reports</a>
                   <button className="btn" type="button" onClick={() => archiveRoute(route)} disabled={loading}>Archive</button>
                 </div>
               </article>
