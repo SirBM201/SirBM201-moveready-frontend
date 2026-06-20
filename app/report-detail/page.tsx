@@ -1,13 +1,8 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-
 import ReportDetail from "@/components/ReportDetail";
 import SiteHeader from "@/components/SiteHeader";
 
-export default function ReportDetailPage() {
-  const searchParams = useSearchParams();
-  const reportRef = searchParams.get("ref") || "";
+export default function ReportDetailPage({ searchParams }: { searchParams?: { ref?: string } }) {
+  const reportRef = searchParams?.ref || "";
 
   return (
     <main className="page-shell">
