@@ -42,6 +42,12 @@ type SavedRoute = {
   saved_title?: string | null;
 };
 
+type GeneratedReport = {
+  report_ref: string;
+  report_title?: string;
+  stored?: boolean;
+};
+
 const defaultForm = {
   full_name: "",
   email: "",
@@ -88,6 +94,7 @@ export default function ProfileDashboard() {
   const [loading, setLoading] = useState(false);
   const [routeSaving, setRouteSaving] = useState(false);
   const [watchSaving, setWatchSaving] = useState(false);
+  const [reportSaving, setReportSaving] = useState(false);
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -154,6 +161,52 @@ export default function ProfileDashboard() {
       setMessage("No matching profile found, or profile storage is not active yet.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function generateCurrentReport() {
+    if (!profile) {
+      setMessage("Save or load a profile before generating a readiness report.");
+      return;
+    }
+
+    setReportSaving(true);
+    setMessage("Generating readiness report for this account...");
+    try {
+      const data = await apiJson<{ report: GeneratedReport }>("relocation/reports", {
+        method: "POST",
+        body: {
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          preferred_contact_channel: profile.preferred_contact_channel || "email",
+          consent_to_contact: true,
+          goal: profile.main_goal,
+          main_goal: profile.main_goal,
+          route_category: profile.route_category || profile.main_goal,
+          current_country: profile.current_country,
+          target_country: profile.target_country,
+          available_funds_amount: Number(profile.available_funds_amount || 0),
+          available_funds_currency: profile.available_funds_currency || "EUR",
+          family_members_count: Number(profile.family_members_count || 0),
+          timeline_months: Number(profile.timeline_months || 0),
+          has_previous_refusal: Boolean(profile.has_previous_refusal),
+          source_page: sourcePage(),
+          metadata: {
+            profile_id: profile.id,
+            generated_from: "account_center_profile_summary",
+          },
+        },
+        timeoutMs: 20000,
+        useAuthToken: false,
+      });
+      const ref = data.report?.report_ref ? ` Reference: ${data.report.report_ref}.` : "";
+      setMessage(`Readiness report generated and saved to your account.${ref} Refresh Account Center to update the reports count.`);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to generate report: ${apiError.data.error}` : "Unable to generate readiness report.");
+    } finally {
+      setReportSaving(false);
     }
   }
 
@@ -310,7 +363,7 @@ export default function ProfileDashboard() {
                 <div><strong>Risk flags</strong><span>{snapshot.risk_flags?.length ? snapshot.risk_flags.join(", ") : "No starter flags"}</span></div>
               </div>
               <div className="actions">
-                <a className="btn primary" href="/route-checker">Generate readiness report</a>
+                <button className="btn primary" type="button" onClick={generateCurrentReport} disabled={reportSaving}>{reportSaving ? "Generating report..." : "Generate readiness report"}</button>
                 <button className="btn" type="button" onClick={saveCurrentRoute} disabled={routeSaving}>{routeSaving ? "Saving route..." : "Save route"}</button>
                 <button className="btn" type="button" onClick={createWatchlistAlert} disabled={watchSaving}>{watchSaving ? "Creating alert..." : "Create watchlist alert"}</button>
                 <a className="btn" href="/readiness">Run readiness tools</a>
