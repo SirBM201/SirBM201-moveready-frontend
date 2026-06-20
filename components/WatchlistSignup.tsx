@@ -23,6 +23,8 @@ const watchTypes = [
   ["service", "Service"],
 ];
 
+const watchStatuses = ["active", "paused", "unsubscribed", "closed"];
+
 type WatchlistSubscription = {
   id: string;
   watch_type: string;
@@ -85,6 +87,7 @@ export default function WatchlistSignup() {
   const [watchType, setWatchType] = useState("opportunity");
   const [accountEmail, setAccountEmail] = useState("");
   const [subscriptions, setSubscriptions] = useState<WatchlistSubscription[]>([]);
+  const [updatingSubscriptionId, setUpdatingSubscriptionId] = useState("");
 
   async function loadVerifiedWatchlist(silent = false) {
     if (!silent) {
@@ -171,6 +174,36 @@ export default function WatchlistSignup() {
       setStatus("Unable to save subscription. Confirm SQL 007 has been run and backend redeployed.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function updateSubscriptionStatus(item: WatchlistSubscription, nextStatus: string) {
+    const email = item.email || accountEmail;
+    const phone = item.phone || "";
+    if (!email && !phone) {
+      setStatus("Unable to update this watchlist item without the original contact or verified session.");
+      return;
+    }
+
+    setUpdatingSubscriptionId(item.id);
+    setStatus(`Updating watchlist status to ${nextStatus}...`);
+    try {
+      const data = await apiJson<{ subscription: WatchlistSubscription }>(`watchlist/subscriptions/${item.id}`, {
+        method: "PATCH",
+        body: {
+          status: nextStatus,
+          email: email || undefined,
+          phone: email ? undefined : phone,
+        },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setSubscriptions((current) => current.map((row) => (row.id === item.id ? data.subscription : row)));
+      setStatus(`Watchlist status updated to ${nextStatus}.`);
+    } catch {
+      setStatus("Unable to update watchlist status.");
+    } finally {
+      setUpdatingSubscriptionId("");
     }
   }
 
@@ -262,7 +295,7 @@ export default function WatchlistSignup() {
       <section className="result-panel">
         <article className="result-block featured">
           <p className="overline">Verified watchlist</p>
-          <h2>My active alerts</h2>
+          <h2>My watchlist alerts</h2>
           <p>Load the subscriptions tied to your verified account. Alerts remain advisory until approved delivery providers and templates are enabled.</p>
           <div className="actions">
             <button className="btn primary" type="button" onClick={() => loadVerifiedWatchlist(false)} disabled={submitting}>{submitting ? "Loading..." : "Load my watchlist"}</button>
@@ -291,6 +324,11 @@ export default function WatchlistSignup() {
                   <div><strong>Alert types</strong><span>{item.alert_types?.length ? item.alert_types.map(alertLabel).join(", ") : "No alert types recorded"}</span></div>
                   <div><strong>Consent</strong><span>{item.consent_to_contact ? "Opt-in captured" : "Consent not confirmed"}</span></div>
                   <div><strong>Source page</strong><span>{item.source_page || "Not recorded"}</span></div>
+                </div>
+                <div className="badge-row">
+                  {watchStatuses.map((nextStatus) => (
+                    <button className="status-button" key={nextStatus} type="button" disabled={(item.status || "active") === nextStatus || updatingSubscriptionId === item.id} onClick={() => updateSubscriptionStatus(item, nextStatus)}>{nextStatus}</button>
+                  ))}
                 </div>
               </article>
             ))}
