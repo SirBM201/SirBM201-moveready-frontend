@@ -35,6 +35,13 @@ type Profile = {
   created_at?: string;
 };
 
+type SavedRoute = {
+  id: string;
+  email?: string | null;
+  phone?: string | null;
+  saved_title?: string | null;
+};
+
 const defaultForm = {
   full_name: "",
   email: "",
@@ -65,6 +72,12 @@ function sourcePage() {
   }
 }
 
+function routeTitle(profile: Profile) {
+  const target = profile.target_country || "Selected country";
+  const route = profile.route_category || profile.main_goal || "relocation route";
+  return `${target} ${route} pathway`;
+}
+
 export default function ProfileDashboard() {
   const [form, setForm] = useState(defaultForm);
   const [hasPreviousRefusal, setHasPreviousRefusal] = useState(false);
@@ -73,6 +86,8 @@ export default function ProfileDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [message, setMessage] = useState("Create or retrieve a relocation profile.");
   const [loading, setLoading] = useState(false);
+  const [routeSaving, setRouteSaving] = useState(false);
+  const [watchSaving, setWatchSaving] = useState(false);
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -139,6 +154,85 @@ export default function ProfileDashboard() {
       setMessage("No matching profile found, or profile storage is not active yet.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function saveCurrentRoute() {
+    if (!profile) {
+      setMessage("Save or load a profile before saving a route.");
+      return;
+    }
+
+    setRouteSaving(true);
+    setMessage("Saving this route to your account...");
+    try {
+      const data = await apiJson<{ saved_route: SavedRoute }>("saved-routes", {
+        method: "POST",
+        body: {
+          save_type: "route",
+          saved_title: routeTitle(profile),
+          route_code: profile.route_category || profile.main_goal || "relocation",
+          country_code: profile.target_country === "Estonia" ? "EE" : undefined,
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          current_country: profile.current_country,
+          target_country: profile.target_country,
+          main_goal: profile.main_goal,
+          route_category: profile.route_category,
+          notes: "Saved from the MoveReady Account Center profile summary.",
+          notify_on_changes: true,
+          consent_to_contact: true,
+          source_page: sourcePage(),
+        },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setLookupContact(data.saved_route.email || data.saved_route.phone || lookupContact);
+      setMessage("Route saved to your account. Refresh Account Center to update the saved-routes count.");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to save route: ${apiError.data.error}` : "Unable to save route.");
+    } finally {
+      setRouteSaving(false);
+    }
+  }
+
+  async function createWatchlistAlert() {
+    if (!profile) {
+      setMessage("Save or load a profile before creating a watchlist alert.");
+      return;
+    }
+
+    setWatchSaving(true);
+    setMessage("Creating watchlist alert...");
+    try {
+      await apiJson("watchlist/subscriptions", {
+        method: "POST",
+        body: {
+          watch_type: "route",
+          watch_code: profile.route_category || profile.main_goal || "relocation",
+          watch_title: routeTitle(profile),
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          preferred_channel: profile.preferred_contact_channel || "email",
+          current_country: profile.current_country,
+          target_country: profile.target_country,
+          route_or_goal: profile.main_goal,
+          alert_types: ["opens", "closing_soon", "eligibility_change", "document_change", "funds_change", "review_due"],
+          consent_to_contact: true,
+          source_page: sourcePage(),
+        },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setMessage("Watchlist alert created. Refresh Account Center to update the watchlist count.");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to create watchlist alert: ${apiError.data.error}` : "Unable to create watchlist alert.");
+    } finally {
+      setWatchSaving(false);
     }
   }
 
@@ -217,8 +311,8 @@ export default function ProfileDashboard() {
               </div>
               <div className="actions">
                 <a className="btn primary" href="/route-checker">Generate readiness report</a>
-                <a className="btn" href="/saved-routes">Save route</a>
-                <a className="btn" href="/watchlist">Create watchlist alert</a>
+                <button className="btn" type="button" onClick={saveCurrentRoute} disabled={routeSaving}>{routeSaving ? "Saving route..." : "Save route"}</button>
+                <button className="btn" type="button" onClick={createWatchlistAlert} disabled={watchSaving}>{watchSaving ? "Creating alert..." : "Create watchlist alert"}</button>
                 <a className="btn" href="/readiness">Run readiness tools</a>
               </div>
             </article>
