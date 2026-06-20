@@ -26,7 +26,7 @@ export default function SavedRoutesPage() {
           <span className="eyebrow">Account Center: saved decisions</span>
           <h1>Keep the routes and opportunities worth revisiting.</h1>
           <p className="lede">
-            Saved Routes turns browsing into a proper relocation workspace. Users can keep countries, route families, opportunities, and services under the same contact identity, then return later by email or phone.
+            Saved Routes turns browsing into a proper relocation workspace. Signed-in users can load saved routes from their verified account, while contact lookup remains available for MVP fallback.
           </p>
           <div className="actions">
             <a className="btn primary" href="/compare">Compare routes</a>
@@ -42,10 +42,10 @@ export default function SavedRoutesPage() {
             <p className="overline">Why saving matters</p>
             <h2>Saved routes are the bridge between planning and action</h2>
             <p className="section-intro">
-              A saved route should eventually connect to reports, timeline steps, watchlist alerts, and provider requests. For MVP, contact-based lookup already gives users a practical way to continue their planning.
+              A saved route should eventually connect to reports, timeline steps, watchlist alerts, and provider requests. Verified account loading now makes those records easier to return to without retyping contact details.
             </p>
           </div>
-          <span className="status-dot">Contact lookup</span>
+          <span className="status-dot">Verified + lookup</span>
         </div>
         <div className="grid">
           {savedRouteUses.map((item) => (
