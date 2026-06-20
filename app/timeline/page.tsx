@@ -4,7 +4,7 @@ import TimelinePlanner from "@/components/TimelinePlanner";
 const timelineUses = [
   {
     title: "Document preparation",
-    detail: "Track passports, certificates, funds evidence, business documents, insurance, translations, and legalization steps.",
+    detail: "Track certificates, funds evidence, business documents, insurance, translations, and legalization steps.",
   },
   {
     title: "Application windows",
@@ -23,7 +23,7 @@ export default function TimelinePage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account Center: timeline tracking</span>
+          <span className="eyebrow">Timeline tracking</span>
           <h1>Turn relocation plans into dated actions.</h1>
           <p className="lede">
             Timeline helps users track documents, appointments, deadlines, results, travel steps, and follow-up tasks. Signed-in users can now load these dated actions directly from the verified Account Center.
@@ -42,7 +42,7 @@ export default function TimelinePage() {
             <p className="overline">Timeline structure</p>
             <h2>Every plan needs dates, reminders, and status</h2>
             <p className="section-intro">
-              The MVP timeline supports both verified account loading and contact fallback. Events should later connect with reports, saved routes, alerts, and service requests so users can see full relocation progress.
+              Timeline supports both account loading and email or phone lookup. Events should connect with reports, saved routes, alerts, and service requests so users can see full relocation progress.
             </p>
           </div>
           <span className="status-dot">Verified + reminder-ready</span>
