@@ -91,7 +91,7 @@ export default function AdminReviewConsole() {
 
   useEffect(() => {
     try {
-      const stored = sessionStorage.getItem(ADMIN_KEY_STORAGE) || "";
+      const stored = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
       if (stored) {
         setAdminKey(stored);
         void loadQueue(stored, true);
@@ -123,7 +123,7 @@ export default function AdminReviewConsole() {
       setQueue(data);
       setMessage(`Review queue loaded. Open items: ${data.total_open_items || 0}.`);
       try {
-        sessionStorage.setItem(ADMIN_KEY_STORAGE, key);
+        localStorage.setItem(ADMIN_KEY_STORAGE, key);
       } catch {
         // ignore storage failures
       }
@@ -171,9 +171,9 @@ export default function AdminReviewConsole() {
   function clearKey() {
     setAdminKey("");
     setQueue(null);
-    setMessage("Admin key cleared from this browser session.");
+    setMessage("Admin key cleared from this browser.");
     try {
-      sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+      localStorage.removeItem(ADMIN_KEY_STORAGE);
     } catch {
       // ignore storage failures
     }
@@ -200,8 +200,8 @@ export default function AdminReviewConsole() {
           This console reads protected admin endpoints. Keep service requests, reports, profiles, alerts, and provider applications under review before any handoff or delivery action.
         </p>
         <div className="field">
-          <label htmlFor="admin_key">Admin key</label>
-          <input id="admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="Paste X-MoveReady-Admin-Key" />
+          <label htmlFor="admin_queue_key">Admin key</label>
+          <input id="admin_queue_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="Paste X-MoveReady-Admin-Key" />
         </div>
         <div className="actions">
           <button className="btn primary" type="button" onClick={() => loadQueue()} disabled={loading}>{loading ? "Loading..." : "Load queue"}</button>
