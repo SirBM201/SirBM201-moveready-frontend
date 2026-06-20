@@ -9,9 +9,9 @@ export default function RouteCheckerPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Live MVP workflow</span>
-          <h1>Find the most realistic pathway before spending money.</h1>
-          <p className="lede">Enter a basic profile and generate a starter checklist, budget estimate, and readiness report from the backend.</p>
+          <span className="eyebrow">Route readiness workflow</span>
+          <h1>Find the most realistic pathway before you commit.</h1>
+          <p className="lede">Enter a basic profile and generate a starter checklist, budget estimate, and readiness report.</p>
           <div className="actions">
             <a className="btn" href="/routes/estonia-startup">Open Estonia startup route</a>
           </div>
