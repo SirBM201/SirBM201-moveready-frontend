@@ -20,6 +20,8 @@ type QueueItem = {
   age_hours?: number | null;
   score?: number;
   summary?: string | null;
+  report_ref?: string | null;
+  detail_href?: string | null;
 };
 
 type QueueSection = {
@@ -79,6 +81,18 @@ function formatKind(kind: string) {
 
 function compactContact(item: QueueItem) {
   return item.email || item.phone || item.full_name || "No contact shown";
+}
+
+function detailHref(item: QueueItem) {
+  if (item.detail_href) return item.detail_href;
+  if (item.kind === "generated_report" && item.report_ref) return `/report-detail?ref=${encodeURIComponent(item.report_ref)}`;
+  if (item.kind === "service_request") return "/service-requests";
+  if (item.kind === "saved_route") return "/saved-routes";
+  if (item.kind === "watchlist") return "/watchlist";
+  if (item.kind === "timeline_event") return "/timeline";
+  if (item.kind === "user_profile") return "/dashboard#profile-dashboard";
+  if (item.kind === "partner_application") return "/admin#partner-applications";
+  return "/admin#review-queue";
 }
 
 export default function AdminReviewConsole() {
@@ -261,6 +275,7 @@ export default function AdminReviewConsole() {
                         <span className="badge">Score: {item.score || 0}</span>
                         {item.priority ? <span className="badge">Priority: {item.priority}</span> : null}
                         {item.risk_level ? <span className="badge">Risk: {item.risk_level}</span> : null}
+                        {item.report_ref ? <span className="badge">{item.report_ref}</span> : null}
                         {item.target_country ? <span className="badge">Target: {item.target_country}</span> : null}
                         {item.route_category ? <span className="badge">Route: {item.route_category}</span> : null}
                         <span className="badge">{formatDate(item.created_at)}</span>
@@ -270,15 +285,16 @@ export default function AdminReviewConsole() {
                         <div><strong>Age</strong><span>{item.age_hours ?? "?"} hours</span></div>
                         <div><strong>Summary</strong><span>{item.summary || "No summary recorded."}</span></div>
                       </div>
-                      {action ? (
-                        <div className="actions wrap-actions">
-                          {action.options.map((status) => (
+                      <div className="actions wrap-actions">
+                        <a className="btn primary" href={detailHref(item)}>Open detail</a>
+                        {action ? (
+                          action.options.map((status) => (
                             <button className="btn" type="button" onClick={() => updateStatus(item, status)} disabled={updatingId === item.id} key={status}>
                               {updatingId === item.id ? "Updating..." : status}
                             </button>
-                          ))}
-                        </div>
-                      ) : null}
+                          ))
+                        ) : null}
+                      </div>
                     </article>
                   );
                 })}
