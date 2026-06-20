@@ -1,124 +1,77 @@
 import SiteHeader from "@/components/SiteHeader";
 import { platformModules } from "@/lib/platformModules";
 
-const liveRoutes = [
+const quickStart = [
   {
-    title: "Launch workspace",
-    href: "/workspace",
-    text: "Open the main working surface for routes, countries, opportunities, watchlists, saved routes, timelines, services, reports, and admin review.",
+    title: "1. Check your route",
+    href: "/route-checker",
+    text: "Enter your goal, current country, target country, funds, timeline, and family count to get a starter readiness view.",
   },
   {
-    title: "Compare routes",
+    title: "2. Compare options",
     href: "/compare",
-    text: "Compare Estonia startup, Finland D visa, Portugal entrepreneur route, Canada IEC, official opportunities, readiness tools, saved routes, watchlists, and trusted services before committing.",
+    text: "Compare route families before spending money on documents, applications, bookings, or providers.",
+  },
+  {
+    title: "3. Save what matters",
+    href: "/dashboard",
+    text: "Create a profile, save routes, generate reports, track alerts, and keep your timeline in one account workspace.",
+  },
+];
+
+const publicTools = [
+  {
+    title: "Decision Center",
+    href: "/decision-center",
+    text: "Choose what to do next when you are not sure whether to study, work, start a business, apply for a ballot, or wait.",
   },
   {
     title: "Compare countries",
     href: "/country-comparison",
-    text: "Compare countries by live route availability, route categories, opportunity coverage, risk signals, source confidence, saved-country actions, and watchlist next steps.",
+    text: "Review country fit, route coverage, risk signals, source confidence, and next steps side by side.",
   },
   {
-    title: "Trust center",
-    href: "/trust",
-    text: "Explain source-backed guidance, no approval guarantees, opt-in notifications, partner screening, and sensitive-document controls.",
-  },
-  {
-    title: "Source review",
-    href: "/sources",
-    text: "Show how official sources, last verified dates, review due dates, risk labels, and route versioning protect users.",
-  },
-  {
-    title: "Launch readiness",
-    href: "/launch-readiness",
-    text: "Review active product surfaces, deployment checks, provider screening boundaries, and launch safety controls.",
-  },
-  {
-    title: "Official ballots and quota opportunities",
-    href: "/opportunities",
-    text: "Track DV lottery, youth mobility ballots, IEC pools, country caps, and quota routes with official-source safety notes.",
-  },
-  {
-    title: "Canada IEC route",
-    href: "/routes/canada-iec",
-    text: "Track International Experience Canada pools, invitation rounds, country-specific spots, documents, funds, insurance, and arrival readiness.",
-  },
-  {
-    title: "Finland D visa route",
-    href: "/routes/finland-d-visa",
-    text: "Check D visa readiness for eligible Finnish residence permit routes, passport handling, family planning, timeline, and first-arrival costs.",
-  },
-  {
-    title: "Portugal entrepreneur route",
-    href: "/routes/portugal-entrepreneur",
-    text: "Check entrepreneur and independent work readiness for Portugal residency visa evidence, funds, document legalization, insurance, and AIMA follow-up steps.",
-  },
-  {
-    title: "Saved routes",
-    href: "/saved-routes",
-    text: "Keep selected countries, visa routes, scholarships, opportunities, and services for later lookup by email or phone.",
-  },
-  {
-    title: "Application timeline",
-    href: "/timeline",
-    text: "Track documents, appointments, payment deadlines, result checks, travel dates, and follow-up steps.",
-  },
-  {
-    title: "Trusted service requests",
-    href: "/services",
-    text: "Request courier, legalization, insurance, translation, expert review, admission, accommodation, pickup, and settlement support.",
-  },
-  {
-    title: "Watchlist and alerts",
-    href: "/watchlist",
-    text: "Save routes, opportunities, scholarships, countries, or services and choose opt-in alert preferences for updates.",
-  },
-  {
-    title: "Provider applications",
-    href: "/partners/apply",
-    text: "Capture courier, insurance, legalization, translation, expert review, admission, and settlement providers for screening.",
-  },
-  {
-    title: "Readiness tools",
-    href: "/readiness",
-    text: "Check name consistency, documents, proof-of-funds gaps, and refusal-risk indicators before submitting evidence.",
-  },
-  {
-    title: "Estonia startup route",
-    href: "/routes/estonia-startup",
-    text: "Review Startup Committee, D visa, document, funds, insurance, and budget readiness for Estonia startup founders.",
+    title: "Compare routes",
+    href: "/compare",
+    text: "Compare startup, study, work, family, visitor, scholarship, digital-nomad, and opportunity pathways.",
   },
   {
     title: "Route checker",
     href: "/route-checker",
-    text: "Compare study, work, startup, family, scholarship, visitor, and digital-nomad pathways before spending money.",
+    text: "Generate a starter readiness result before committing time, money, or sensitive documents.",
   },
   {
-    title: "Document checklist",
-    href: "/document-checklist",
-    text: "Turn a route into a practical document list with required, conditional, and recommended items.",
+    title: "Opportunities",
+    href: "/opportunities",
+    text: "Track official ballots, quota routes, scholarships, and application windows with source-safety notes.",
   },
   {
-    title: "Funds and budget readiness",
-    href: "/budget-calculator",
-    text: "Estimate application costs, proof-of-funds pressure, insurance, travel, accommodation, and first-arrival costs.",
+    title: "Services",
+    href: "/services",
+    text: "Request document review, courier, legalization, insurance, translation, accommodation, pickup, or settlement support.",
   },
   {
-    title: "Scholarship matching",
-    href: "/scholarships",
-    text: "Help students find funding routes without making scholarship research the whole product.",
+    title: "My Account",
+    href: "/dashboard",
+    text: "Keep your profile, saved routes, watchlist alerts, timeline, reports, and service requests connected.",
   },
   {
-    title: "Readiness reports",
-    href: "/report-preview",
-    text: "Generate a route-specific action plan with risk notes, source status, and next steps.",
+    title: "My reports",
+    href: "/my-reports",
+    text: "Find readiness reports by verified account, report reference, email, or phone.",
+  },
+  {
+    title: "Trust and safety",
+    href: "/trust",
+    text: "Understand the advisory limits, source-first approach, privacy controls, and consent rules.",
   },
 ];
 
 const trustItems = [
-  { value: "Source-first", label: "AI explains approved route data" },
-  { value: "Versioned", label: "Route facts keep an audit trail" },
-  { value: "Safety-first", label: "No approval or lottery guarantees" },
-  { value: "Expandable", label: "New services plug in cleanly" },
+  { value: "Source-first", label: "Guidance stays tied to official route data" },
+  { value: "Transparent", label: "Reports show risk and source status" },
+  { value: "Consent-first", label: "Alerts and support requests require opt-in" },
+  { value: "No guarantees", label: "MoveReady never promises approval or selection" },
 ];
 
 const availabilityLabel = {
@@ -136,43 +89,28 @@ export default function Home() {
 
       <section className="hero-band" id="checker">
         <div className="hero-copy">
-          <span className="eyebrow">Source-backed relocation readiness</span>
-          <h1>Choose the route, then get ready properly.</h1>
+          <span className="eyebrow">Relocation readiness workspace</span>
+          <h1>Choose your route, then get ready properly.</h1>
           <p className="lede">
-            MoveReady helps users compare realistic visa, study, work, business, family, scholarship, ballot, and relocation pathways, then prepare documents, funds, budget, insurance, timeline events, trusted services, and next steps from source-backed data.
+            MoveReady helps you compare relocation pathways, understand document and funds pressure, create a practical timeline, monitor important changes, and request trusted support when you need it.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/dashboard">Open My Account</a>
             <a className="btn" href="/compare">Compare routes</a>
             <a className="btn" href="/country-comparison">Compare countries</a>
-            <a className="btn" href="/services">Request trusted service</a>
-            <a className="btn" href="/readiness">Use readiness tools</a>
-            <a className="btn" href="/trust">Review trust rules</a>
+            <a className="btn" href="/services">Request support</a>
           </div>
         </div>
 
-        <aside className="workflow-panel" aria-label="Route readiness starter">
-          <h2>Start route readiness</h2>
-          <div className="form-grid">
-            <div className="field">
-              <label htmlFor="goal">Main goal</label>
-              <select id="goal" defaultValue="business">
-                <option value="study">Study or scholarship</option>
-                <option value="work">Work abroad</option>
-                <option value="business">Startup or business</option>
-                <option value="family">Family relocation</option>
-                <option value="visit">Visitor route</option>
-                <option value="ballot">Ballot or quota opportunity</option>
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="from">Current country</label>
-              <input id="from" placeholder="Example: Kuwait" />
-            </div>
-            <div className="field">
-              <label htmlFor="target">Target country</label>
-              <input id="target" placeholder="Example: Estonia, Portugal, Finland" />
-            </div>
+        <aside className="workflow-panel" aria-label="MoveReady quick start">
+          <h2>How to use MoveReady</h2>
+          <div className="mini-list">
+            <div><strong>Start with your route</strong><span>Use the route checker or compare pages to understand realistic options.</span></div>
+            <div><strong>Save your profile</strong><span>Use My Account so reports, saved routes, alerts, and service requests stay connected.</span></div>
+            <div><strong>Act from the report</strong><span>Follow document, funds, timeline, and risk actions before spending money.</span></div>
+          </div>
+          <div className="actions">
             <a className="btn primary" href="/route-checker">Generate starter plan</a>
           </div>
         </aside>
@@ -187,13 +125,34 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="section" id="modules">
-        <h2>Live readiness tools</h2>
+      <section className="section no-top-pad" id="quick-start">
+        <div className="section-heading-row">
+          <div>
+            <p className="overline">Start here</p>
+            <h2>Three steps for every user</h2>
+            <p className="section-intro">
+              The app is designed to keep users from jumping straight into payments, bookings, or service requests without first understanding route fit, risk, documents, funds, and timing.
+            </p>
+          </div>
+          <span className="status-dot">Guided flow</span>
+        </div>
+        <div className="grid">
+          {quickStart.map((route) => (
+            <a className="card" href={route.href} key={route.title}>
+              <h3>{route.title}</h3>
+              <p>{route.text}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="section" id="tools">
+        <h2>Main tools</h2>
         <p className="section-intro">
-          The current tools focus on route intelligence, country comparison, official opportunities, saved routes, timelines, watchlists, provider applications, service requests, document readiness, budget estimates, scholarships, insurance notes, and source-backed reports.
+          These are the public surfaces a normal user should understand first. Internal review, admin, source-management, and launch-check pages stay outside the main user journey.
         </p>
         <div className="grid">
-          {liveRoutes.map((route) => (
+          {publicTools.map((route) => (
             <a className="card" href={route.href} key={route.title}>
               <h3>{route.title}</h3>
               <p>{route.text}</p>
@@ -205,14 +164,14 @@ export default function Home() {
       <section className="section" id="platform-map">
         <div className="section-heading-row">
           <div>
-            <h2>MoveReady platform</h2>
+            <h2>MoveReady service areas</h2>
             <p className="section-intro">
-              Services are organized so users can move from route choice to alerts, documents, funds, trusted support, and settlement inside one platform.
+              Service areas are grouped so users can move from route choice to alerts, documents, funds, trusted support, and settlement inside one clear platform.
             </p>
           </div>
           <div className="actions">
-            <a className="btn primary" href="/services">Request service</a>
-            <a className="btn" href="/platform">View platform</a>
+            <a className="btn primary" href="/services">Request support</a>
+            <a className="btn" href="/dashboard">My Account</a>
           </div>
         </div>
         <div className="module-preview-grid">
@@ -228,12 +187,12 @@ export default function Home() {
       </section>
 
       <section className="section" id="report">
-        <h2>Readiness report foundation</h2>
+        <h2>What a readiness report gives you</h2>
         <p className="section-intro">
-          Every sensitive report keeps the route version, source snapshots, risk level, last verified date, review due date, and refresh status used when the report was generated.
+          Each report should preserve the route context, risk level, source status, document gaps, funds pressure, and next actions used when the report was generated.
         </p>
         <article className="card">
-          <h3>Example report sections</h3>
+          <h3>Typical report sections</h3>
           <div className="badge-row">
             <span className="badge">Route summary</span>
             <span className="badge">Eligibility notes</span>
@@ -241,11 +200,8 @@ export default function Home() {
             <span className="badge">Proof of funds</span>
             <span className="badge">Budget estimate</span>
             <span className="badge">Insurance notes</span>
-            <span className="badge">Scholarship options</span>
             <span className="badge">Timeline events</span>
-            <span className="badge">Provider support</span>
             <span className="badge">Service requests</span>
-            <span className="badge">Opportunity alerts</span>
             <span className="badge">Source freshness</span>
           </div>
         </article>
