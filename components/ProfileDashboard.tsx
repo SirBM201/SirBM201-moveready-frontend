@@ -95,6 +95,7 @@ export default function ProfileDashboard() {
   const [routeSaving, setRouteSaving] = useState(false);
   const [watchSaving, setWatchSaving] = useState(false);
   const [reportSaving, setReportSaving] = useState(false);
+  const [serviceSaving, setServiceSaving] = useState(false);
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -289,6 +290,48 @@ export default function ProfileDashboard() {
     }
   }
 
+  async function requestExpertReview() {
+    if (!profile) {
+      setMessage("Save or load a profile before requesting service support.");
+      return;
+    }
+
+    setServiceSaving(true);
+    setMessage("Creating service request for admin review...");
+    try {
+      await apiJson("platform/service-interest", {
+        method: "POST",
+        body: {
+          service_slug: "expert_review",
+          service_title: "Expert or document review",
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          preferred_channel: profile.preferred_contact_channel || "email",
+          current_country: profile.current_country,
+          target_country: profile.target_country,
+          route_or_goal: profile.route_category || profile.main_goal,
+          message: `Please review my ${routeTitle(profile)} profile, readiness report, route evidence, funds plan, and risk flags before any provider handoff.`,
+          consent_to_contact: true,
+          source_page: sourcePage(),
+          metadata: {
+            profile_id: profile.id,
+            requested_from: "account_center_profile_summary",
+            trust_rule: "admin_review_before_provider_handoff",
+          },
+        },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setMessage("Service request saved for admin review. Refresh Account Center to update the service-requests count.");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to create service request: ${apiError.data.error}` : "Unable to create service request.");
+    } finally {
+      setServiceSaving(false);
+    }
+  }
+
   const snapshot = profile?.readiness_snapshot || {};
 
   return (
@@ -366,6 +409,7 @@ export default function ProfileDashboard() {
                 <button className="btn primary" type="button" onClick={generateCurrentReport} disabled={reportSaving}>{reportSaving ? "Generating report..." : "Generate readiness report"}</button>
                 <button className="btn" type="button" onClick={saveCurrentRoute} disabled={routeSaving}>{routeSaving ? "Saving route..." : "Save route"}</button>
                 <button className="btn" type="button" onClick={createWatchlistAlert} disabled={watchSaving}>{watchSaving ? "Creating alert..." : "Create watchlist alert"}</button>
+                <button className="btn" type="button" onClick={requestExpertReview} disabled={serviceSaving}>{serviceSaving ? "Requesting support..." : "Request expert review"}</button>
                 <a className="btn" href="/readiness">Run readiness tools</a>
               </div>
             </article>
