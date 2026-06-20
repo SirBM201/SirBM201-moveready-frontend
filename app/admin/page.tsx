@@ -1,6 +1,7 @@
 import AdminOpportunities from "@/components/AdminOpportunities";
 import AdminPartnerApplications from "@/components/AdminPartnerApplications";
 import AdminReadinessChecks from "@/components/AdminReadinessChecks";
+import AdminReviewConsole from "@/components/AdminReviewConsole";
 import AdminSavedRoutes from "@/components/AdminSavedRoutes";
 import AdminServiceRequests from "@/components/AdminServiceRequests";
 import AdminTimelineEvents from "@/components/AdminTimelineEvents";
@@ -8,6 +9,7 @@ import AdminUserProfiles from "@/components/AdminUserProfiles";
 import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscriptions";
 
 const adminModules = [
+  ["Review queue", "Unified workload for service requests, high-risk reports, partner applications, profiles, saved routes, timelines, and alerts that need admin attention.", "#review-queue"],
   ["User profiles", "Review saved relocation profiles, contact preferences, goals, funds, family count, readiness score, and follow-up status.", "#user-profiles"],
   ["Official opportunity routes", "Review lottery, ballot, invitation-pool, quota, and country-cap records before public monitoring and alerts rely on them.", "#opportunity-routes"],
   ["Saved routes", "Review routes, countries, opportunities, scholarships, and services users saved for later follow-up.", "#saved-routes"],
@@ -32,6 +34,7 @@ export default function AdminPage() {
           <span>Admin</span>
         </a>
         <nav className="nav">
+          <a href="#review-queue">Queue</a>
           <a href="/admin/reports">Reports</a>
           <a href="/admin/reviews">Reviews</a>
           <a href="#opportunity-routes">Opportunities</a>
@@ -59,6 +62,7 @@ export default function AdminPage() {
           ))}
         </div>
       </section>
+      <div id="review-queue"><AdminReviewConsole /></div>
       <div id="user-profiles"><AdminUserProfiles /></div>
       <div id="opportunity-routes"><AdminOpportunities /></div>
       <div id="saved-routes"><AdminSavedRoutes /></div>
