@@ -31,7 +31,7 @@ const accountAreas = [
   {
     title: "Service requests",
     detail: "Only hand users to trusted providers after consent, screening, and clear request context.",
-    href: "/services",
+    href: "/service-requests",
   },
 ];
 
@@ -78,6 +78,7 @@ export default function DashboardPage() {
             <a className="btn" href="/my-reports">My reports</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
             <a className="btn" href="/watchlist">Watchlist</a>
+            <a className="btn" href="/service-requests">Service requests</a>
           </div>
         </div>
       </section>
