@@ -30,6 +30,7 @@ const AUTH_TOKEN_KEYS = [
 const ACCOUNT_WRITE_PREFIXES = [
   "profiles",
   "saved-routes",
+  "saved-route-reports",
   "watchlist/subscriptions",
   "timeline",
   "platform/service-interest",
