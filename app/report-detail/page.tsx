@@ -1,8 +1,10 @@
 import ReportDetail from "@/components/ReportDetail";
 import SiteHeader from "@/components/SiteHeader";
 
-export default function ReportDetailPage({ searchParams }: { searchParams?: { ref?: string } }) {
-  const reportRef = searchParams?.ref || "";
+export default async function ReportDetailPage({ searchParams }: any) {
+  const params = await searchParams;
+  const refValue = params?.ref;
+  const reportRef = Array.isArray(refValue) ? refValue[0] || "" : refValue || "";
 
   return (
     <main className="page-shell">
