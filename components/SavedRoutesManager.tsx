@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 
@@ -21,6 +21,17 @@ type SavedRoute = {
   notify_on_changes?: boolean;
   status?: string;
   created_at?: string;
+};
+
+type AccountSummary = {
+  ok: boolean;
+  session?: { email?: string };
+  sections?: {
+    saved_routes?: {
+      rows?: SavedRoute[];
+      count?: number;
+    };
+  };
 };
 
 const defaultForm = {
@@ -61,17 +72,45 @@ export default function SavedRoutesManager() {
   const [consent, setConsent] = useState(false);
   const [lookupContact, setLookupContact] = useState("");
   const [savedRoutes, setSavedRoutes] = useState<SavedRoute[]>([]);
-  const [message, setMessage] = useState("Save a route or load routes by email/phone.");
+  const [message, setMessage] = useState("Loading verified saved routes if you are signed in...");
   const [loading, setLoading] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  async function loadVerifiedRoutes(silent = false) {
+    if (!silent) {
+      setLoading(true);
+      setMessage("Loading routes from your verified account...");
+    }
+    try {
+      const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 15000 });
+      const rows = data.sections?.saved_routes?.rows || [];
+      const email = data.session?.email || "";
+      setSavedRoutes(rows);
+      setAccountEmail(email);
+      setLookupContact(email);
+      if (email) setForm((current) => ({ ...current, email }));
+      setMessage(rows.length ? "Verified account saved routes loaded." : "No saved routes are connected to this verified account yet.");
+    } catch {
+      if (!silent) setMessage("Sign in first, or use email/phone lookup below.");
+      if (silent) setMessage("Save a route or load routes by email/phone.");
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadVerifiedRoutes(true);
+  }, []);
+
   async function saveRoute(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!form.email.trim() && !form.phone.trim()) {
-      setMessage("Enter an email or phone number.");
+    const contactEmail = form.email.trim() || accountEmail;
+    if (!contactEmail && !form.phone.trim()) {
+      setMessage("Enter an email or phone number, or sign in with email OTP first.");
       return;
     }
     if (!consent) {
@@ -86,6 +125,7 @@ export default function SavedRoutesManager() {
         method: "POST",
         body: {
           ...form,
+          email: contactEmail,
           notify_on_changes: notifyOnChanges,
           consent_to_contact: consent,
           source_page: sourcePage(),
@@ -95,10 +135,10 @@ export default function SavedRoutesManager() {
       });
       setSavedRoutes((current) => [data.saved_route, ...current.filter((item) => item.id !== data.saved_route.id)]);
       setLookupContact(data.saved_route.email || data.saved_route.phone || "");
-      setMessage("Route saved. You can retrieve it later with the same email or phone.");
+      setMessage(accountEmail ? "Route saved to your verified account." : "Route saved. You can retrieve it later with the same email or phone.");
     } catch (error) {
       const apiError = error as ApiError;
-      setMessage(apiError?.status === 503 ? "Unable to save route. Run SQL 009 and redeploy the backend." : "Unable to save route.");
+      setMessage(apiError?.status === 503 ? "Unable to save route. Confirm the saved-routes migration has been run and backend redeployed." : "Unable to save route.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +147,7 @@ export default function SavedRoutesManager() {
   async function loadRoutes() {
     const contact = lookupContact.trim();
     if (!contact) {
-      setMessage("Enter the email or phone used when saving the route.");
+      await loadVerifiedRoutes(false);
       return;
     }
 
@@ -130,9 +170,9 @@ export default function SavedRoutesManager() {
   }
 
   async function archiveRoute(route: SavedRoute) {
-    const contact = route.email || route.phone || lookupContact;
+    const contact = route.email || route.phone || lookupContact || accountEmail;
     if (!contact) {
-      setMessage("Unable to archive without the original contact.");
+      setMessage("Unable to archive without the original contact or verified session.");
       return;
     }
 
@@ -162,8 +202,9 @@ export default function SavedRoutesManager() {
             <p className="overline">Saved routes</p>
             <h2>Save a route or opportunity</h2>
           </div>
-          <span className="status-dot">Available</span>
+          <span className="status-dot">{accountEmail ? "Verified" : "Available"}</span>
         </div>
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. New saved routes will be connected to this verified account.</p> : null}
 
         <div className="form-grid two-col">
           <div className="field"><label htmlFor="save_type">Save type</label><select id="save_type" value={form.save_type} onChange={(event) => update("save_type", event.target.value)}><option value="route">Route</option><option value="opportunity">Opportunity</option><option value="scholarship">Scholarship</option><option value="country">Country</option><option value="service">Service</option></select></div>
@@ -171,7 +212,7 @@ export default function SavedRoutesManager() {
           <div className="field"><label htmlFor="route_code">Route code</label><input id="route_code" value={form.route_code} onChange={(event) => update("route_code", event.target.value)} /></div>
           <div className="field"><label htmlFor="country_code">Country code</label><input id="country_code" value={form.country_code} onChange={(event) => update("country_code", event.target.value.toUpperCase())} /></div>
           <div className="field"><label htmlFor="full_name">Full name</label><input id="full_name" value={form.full_name} onChange={(event) => update("full_name", event.target.value)} /></div>
-          <div className="field"><label htmlFor="email">Email</label><input id="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} /></div>
+          <div className="field"><label htmlFor="email">Email</label><input id="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} placeholder={accountEmail || "you@example.com"} /></div>
           <div className="field"><label htmlFor="phone">WhatsApp / phone</label><input id="phone" value={form.phone} onChange={(event) => update("phone", event.target.value)} /></div>
           <div className="field"><label htmlFor="current_country">Current country</label><input id="current_country" value={form.current_country} onChange={(event) => update("current_country", event.target.value)} /></div>
           <div className="field"><label htmlFor="target_country">Target country</label><input id="target_country" value={form.target_country} onChange={(event) => update("target_country", event.target.value)} /></div>
@@ -193,6 +234,9 @@ export default function SavedRoutesManager() {
           <div className="form-grid two-col">
             <div className="field"><label htmlFor="lookup_contact">Email or phone</label><input id="lookup_contact" value={lookupContact} onChange={(event) => setLookupContact(event.target.value)} placeholder="you@example.com or +965..." /></div>
             <button className="btn primary" type="button" onClick={loadRoutes} disabled={loading}>{loading ? "Loading..." : "Load saved routes"}</button>
+          </div>
+          <div className="actions">
+            <button className="btn" type="button" onClick={() => loadVerifiedRoutes(false)} disabled={loading}>{loading ? "Loading..." : "Load my verified routes"}</button>
           </div>
         </article>
 
@@ -216,8 +260,8 @@ export default function SavedRoutesManager() {
                 </div>
                 {route.notes ? <p>{route.notes}</p> : null}
                 <div className="actions">
-                  <a className="btn primary" href="/route-checker">Generate report</a>
-                  <a className="btn" href="/watchlist">Create alert</a>
+                  <a className="btn primary" href="/dashboard#profile-dashboard">Generate report</a>
+                  <a className="btn" href={`/watchlist?type=route&route=${encodeURIComponent(route.route_code || route.saved_title)}`}>Create alert</a>
                   <button className="btn" type="button" onClick={() => archiveRoute(route)} disabled={loading}>Archive</button>
                 </div>
               </article>
