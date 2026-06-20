@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 
@@ -22,6 +22,17 @@ type TimelineEvent = {
   status: string;
   preferred_channel: string;
   created_at?: string;
+};
+
+type AccountSummary = {
+  ok: boolean;
+  session?: { email?: string };
+  sections?: {
+    timeline?: {
+      rows?: TimelineEvent[];
+      count?: number;
+    };
+  };
 };
 
 const defaultForm = {
@@ -63,22 +74,59 @@ function formatDate(value?: string | null) {
   }
 }
 
+function formatCreated(value?: string) {
+  if (!value) return "Unknown date";
+  try {
+    return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
 export default function TimelinePlanner() {
   const [form, setForm] = useState(defaultForm);
   const [consent, setConsent] = useState(false);
   const [lookupContact, setLookupContact] = useState("");
   const [events, setEvents] = useState<TimelineEvent[]>([]);
-  const [message, setMessage] = useState("Create an application timeline event or load existing events.");
+  const [message, setMessage] = useState("Loading verified timeline events if you are signed in...");
   const [loading, setLoading] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  async function loadVerifiedTimeline(silent = false) {
+    if (!silent) {
+      setLoading(true);
+      setMessage("Loading timeline from your verified account...");
+    }
+    try {
+      const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 15000 });
+      const rows = data.sections?.timeline?.rows || [];
+      const email = data.session?.email || "";
+      setEvents(rows);
+      setAccountEmail(email);
+      setLookupContact(email);
+      if (email) setForm((current) => ({ ...current, email }));
+      setMessage(rows.length ? "Verified account timeline loaded." : "No timeline events are connected to this verified account yet.");
+    } catch {
+      if (!silent) setMessage("Sign in first, or use email/phone lookup below.");
+      if (silent) setMessage("Create an application timeline event or load existing events.");
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadVerifiedTimeline(true);
+  }, []);
+
   async function saveEvent(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!form.email.trim() && !form.phone.trim()) {
-      setMessage("Enter an email or phone number.");
+    const contactEmail = form.email.trim() || accountEmail;
+    if (!contactEmail && !form.phone.trim()) {
+      setMessage("Enter an email or phone number, or sign in with email OTP first.");
       return;
     }
     if (!form.event_title.trim()) {
@@ -95,16 +143,16 @@ export default function TimelinePlanner() {
     try {
       const data = await apiJson<{ timeline_event: TimelineEvent }>("timeline", {
         method: "POST",
-        body: { ...form, consent_to_contact: consent, source_page: sourcePage() },
+        body: { ...form, email: contactEmail, consent_to_contact: consent, source_page: sourcePage() },
         timeoutMs: 15000,
         useAuthToken: false,
       });
       setEvents((current) => [data.timeline_event, ...current.filter((item) => item.id !== data.timeline_event.id)]);
       setLookupContact(data.timeline_event.email || data.timeline_event.phone || "");
-      setMessage("Timeline event saved.");
+      setMessage(accountEmail ? "Timeline event saved to your verified account." : "Timeline event saved.");
     } catch (error) {
       const apiError = error as ApiError;
-      setMessage(apiError?.status === 503 ? "Unable to save timeline. Run SQL 010 and redeploy the backend." : "Unable to save timeline event.");
+      setMessage(apiError?.status === 503 ? "Unable to save timeline. Confirm the timeline migration has been run and backend redeployed." : "Unable to save timeline event.");
     } finally {
       setLoading(false);
     }
@@ -113,7 +161,7 @@ export default function TimelinePlanner() {
   async function loadEvents() {
     const contact = lookupContact.trim();
     if (!contact) {
-      setMessage("Enter the email or phone used for timeline events.");
+      await loadVerifiedTimeline(false);
       return;
     }
 
@@ -136,9 +184,9 @@ export default function TimelinePlanner() {
   }
 
   async function updateStatus(item: TimelineEvent, status: string) {
-    const contact = item.email || item.phone || lookupContact;
+    const contact = item.email || item.phone || lookupContact || accountEmail;
     if (!contact) {
-      setMessage("Unable to update without the original contact.");
+      setMessage("Unable to update without the original contact or verified session.");
       return;
     }
 
@@ -168,12 +216,13 @@ export default function TimelinePlanner() {
             <p className="overline">Timeline tracker</p>
             <h2>Add an application event</h2>
           </div>
-          <span className="status-dot">Available</span>
+          <span className="status-dot">{accountEmail ? "Verified" : "Available"}</span>
         </div>
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. New timeline events will be connected to this verified account.</p> : null}
 
         <div className="form-grid two-col">
           <div className="field"><label htmlFor="full_name">Full name</label><input id="full_name" value={form.full_name} onChange={(event) => update("full_name", event.target.value)} /></div>
-          <div className="field"><label htmlFor="email">Email</label><input id="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} /></div>
+          <div className="field"><label htmlFor="email">Email</label><input id="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} placeholder={accountEmail || "you@example.com"} /></div>
           <div className="field"><label htmlFor="phone">WhatsApp / phone</label><input id="phone" value={form.phone} onChange={(event) => update("phone", event.target.value)} /></div>
           <div className="field"><label htmlFor="preferred_channel">Preferred reminder channel</label><select id="preferred_channel" value={form.preferred_channel} onChange={(event) => update("preferred_channel", event.target.value)}>{channels.map((channel) => <option key={channel} value={channel}>{channel}</option>)}</select></div>
           <div className="field"><label htmlFor="current_country">Current country</label><input id="current_country" value={form.current_country} onChange={(event) => update("current_country", event.target.value)} /></div>
@@ -201,6 +250,9 @@ export default function TimelinePlanner() {
             <div className="field"><label htmlFor="lookup_contact">Email or phone</label><input id="lookup_contact" value={lookupContact} onChange={(event) => setLookupContact(event.target.value)} placeholder="you@example.com or +965..." /></div>
             <button className="btn primary" type="button" onClick={loadEvents} disabled={loading}>{loading ? "Loading..." : "Load timeline"}</button>
           </div>
+          <div className="actions">
+            <button className="btn" type="button" onClick={() => loadVerifiedTimeline(false)} disabled={loading}>{loading ? "Loading..." : "Load my verified timeline"}</button>
+          </div>
         </article>
 
         {events.length ? (
@@ -220,6 +272,7 @@ export default function TimelinePlanner() {
                   <span className="badge">Reminder: {formatDate(item.reminder_date)}</span>
                   <span className="badge">Priority: {item.priority}</span>
                   {item.target_country ? <span className="badge">Target: {item.target_country}</span> : null}
+                  <span className="badge">Created: {formatCreated(item.created_at)}</span>
                 </div>
                 <div className="badge-row">
                   {statuses.map((status) => (
