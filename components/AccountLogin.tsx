@@ -164,7 +164,7 @@ export default function AccountLogin() {
             <p className="overline">Email OTP login</p>
             <h2>Sign in to MoveReady</h2>
           </div>
-          <span className="status-dot">Phase 2 foundation</span>
+          <span className="status-dot">Available now</span>
         </div>
 
         <form className="form-grid" onSubmit={requestCode}>
