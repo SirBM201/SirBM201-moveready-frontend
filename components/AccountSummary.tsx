@@ -51,9 +51,13 @@ function formatDate(value?: string) {
   }
 }
 
+function readable(value?: string | null) {
+  return (value || "").replace(/_/g, " ") || "Not set";
+}
+
 export default function AccountSummary() {
   const [summary, setSummary] = useState<AccountSummaryResponse | null>(null);
-  const [message, setMessage] = useState("Checking for a verified session...");
+  const [message, setMessage] = useState("Checking for a signed-in session...");
   const [loading, setLoading] = useState(true);
 
   async function loadSummary() {
@@ -66,7 +70,7 @@ export default function AccountSummary() {
     } catch (error) {
       const apiError = error as ApiError;
       if (apiError?.status === 401) {
-        setMessage("Sign in to see records connected to your verified account.");
+        setMessage("Sign in to see records connected to your account.");
       } else {
         setMessage(apiError?.message || "Unable to load account summary yet.");
       }
@@ -88,16 +92,16 @@ export default function AccountSummary() {
     <section className="result-block featured">
       <div className="panel-heading">
         <div>
-          <p className="overline">Verified account summary</p>
+          <p className="overline">Account summary</p>
           <h2>{summary?.session?.email ? `Signed in as ${summary.session.email}` : "Connect your account records"}</h2>
         </div>
-        <span className="status-dot">{summary ? "Verified" : loading ? "Checking" : "Sign in"}</span>
+        <span className="status-dot">{summary ? "Signed in" : loading ? "Checking" : "Sign in"}</span>
       </div>
 
       <p>
         {summary
-          ? "These are the MoveReady records currently connected to your verified email session."
-          : "Email OTP login lets MoveReady safely connect profiles, saved routes, reports, alerts, timelines, and service requests under one account."}
+          ? "These are the MoveReady records currently connected to your signed-in email session."
+          : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, and service requests under one account."}
       </p>
 
       {summary ? (
@@ -113,8 +117,8 @@ export default function AccountSummary() {
 
           <div className="mini-list">
             <div><strong>Latest profile</strong><span>{profile?.full_name || profile?.target_country || "No profile connected yet"}</span></div>
-            <div><strong>Goal</strong><span>{profile?.main_goal || "Not set"}</span></div>
-            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {snapshot.readiness_level || "Not calculated"}</span></div>
+            <div><strong>Goal</strong><span>{readable(profile?.main_goal)}</span></div>
+            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readable(snapshot.readiness_level || "Not calculated")}</span></div>
             <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
           </div>
         </>
@@ -123,6 +127,9 @@ export default function AccountSummary() {
       <p className="form-status">{message}</p>
       <div className="actions">
         {summary ? <button className="btn" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button> : <a className="btn primary" href="/login">Sign in with email</a>}
+        <a className="btn" href="#profile-dashboard">Create or update profile</a>
+        <a className="btn" href="/saved-routes">Saved routes</a>
+        <a className="btn" href="/my-reports">My reports</a>
       </div>
     </section>
   );
