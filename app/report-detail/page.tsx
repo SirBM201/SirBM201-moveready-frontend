@@ -13,9 +13,9 @@ export default async function ReportDetailPage({ searchParams }: any) {
       <section className="hero-band compact-hero">
         <div className="hero-copy">
           <span className="eyebrow">Readiness report</span>
-          <h1>Review one MoveReady report with its risk and source context visible.</h1>
+          <h1>Review one MoveReady report clearly.</h1>
           <p className="lede">
-            Report detail pages make generated outputs easier to revisit and print while keeping the advisory trust notice prominent.
+            Use this page to revisit a saved report, print it, or return to My Reports.
           </p>
           <div className="actions">
             <a className="btn primary" href="/my-reports">My reports</a>
