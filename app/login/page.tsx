@@ -1,18 +1,18 @@
 import SiteHeader from "@/components/SiteHeader";
 import AccountLogin from "@/components/AccountLogin";
 
-const loginPhases = [
+const loginBenefits = [
   {
-    title: "Today: contact lookup",
-    detail: "Users can already save and retrieve profiles, routes, reports, alerts, timelines, and requests by email or phone.",
+    title: "Connect your records",
+    detail: "Profiles, saved routes, reports, alerts, timeline events, and service requests can sit under one verified email session.",
   },
   {
-    title: "Next: verified session",
-    detail: "Email OTP login verifies the user before joining all account-owned records into one workspace.",
+    title: "Reduce repeated lookup",
+    detail: "After signing in, Account Center can load your connected records without asking for email or phone on every page.",
   },
   {
-    title: "Later: paid account",
-    detail: "Paid reports, premium monitoring, expert review, provider handoff, and report refresh history can sit behind verified login.",
+    title: "Stay consent-first",
+    detail: "Login does not approve a route or send your details to providers. It only helps protect and connect your own records.",
   },
 ];
 
@@ -23,10 +23,10 @@ export default function LoginPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account login foundation</span>
+          <span className="eyebrow">Secure account access</span>
           <h1>Sign in once, then continue your MoveReady journey.</h1>
           <p className="lede">
-            Email OTP login is the bridge from simple contact lookup to a proper account. It should connect user-owned records while keeping MoveReady consent-first, private, and advisory.
+            Use email login to connect your MoveReady records on this device. You can still use email or phone lookup, but signing in makes the account workspace easier to use.
           </p>
           <div className="actions">
             <a className="btn primary" href="#login-form">Sign in with email</a>
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
       <section className="section no-top-pad">
         <div className="grid">
-          {loginPhases.map((item) => (
+          {loginBenefits.map((item) => (
             <article className="card" key={item.title}>
               <h3>{item.title}</h3>
               <p>{item.detail}</p>
