@@ -3,6 +3,8 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { getActiveProfileId } from "@/lib/profileStorage";
+import { readableLabel } from "@/lib/labels";
 
 type SavedRoute = {
   id: string;
@@ -31,6 +33,7 @@ type Profile = {
   current_country?: string | null;
   target_country?: string | null;
   main_goal?: string | null;
+  goal?: string | null;
   route_category?: string | null;
   timeline_months?: number | null;
   family_members_count?: number | null;
@@ -38,6 +41,7 @@ type Profile = {
   available_funds_currency?: string | null;
   has_previous_refusal?: boolean;
   preferred_contact_channel?: string | null;
+  status?: string | null;
 };
 
 type GeneratedReport = {
@@ -53,6 +57,10 @@ type AccountSummary = {
   sections?: {
     saved_routes?: {
       rows?: SavedRoute[];
+      count?: number;
+    };
+    profiles?: {
+      rows?: Profile[];
       count?: number;
     };
   };
@@ -119,10 +127,6 @@ function cleanNumber(value: unknown, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function readable(value?: string | null) {
-  return (value || "").replace(/_/g, " ") || "Not selected";
-}
-
 function routeCodeFor(value: string) {
   return String(value || "relocation").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "relocation";
 }
@@ -139,7 +143,17 @@ function countryCodeFor(target?: string | null) {
 }
 
 function routeMainGoal(route: SavedRoute, profile: Profile | null) {
-  return route.main_goal || route.route_category || profile?.main_goal || profile?.route_category || "relocation";
+  return route.main_goal || route.route_category || profile?.main_goal || profile?.goal || profile?.route_category || "relocation";
+}
+
+function profileName(profile?: Profile | null) {
+  return profile?.full_name || profile?.email || profile?.phone || "active profile";
+}
+
+function chooseAccountProfile(data: AccountSummary) {
+  const profiles = (data.sections?.profiles?.rows || []).filter((item) => item.status !== "closed");
+  const activeId = getActiveProfileId();
+  return profiles.find((item) => item.id === activeId) || profiles[0] || data.latest_profile || null;
 }
 
 export default function SavedRoutesManager() {
@@ -167,6 +181,28 @@ export default function SavedRoutesManager() {
     setForm((current) => ({ ...current, route_category: value, route_code: routeCodeFor(value) }));
   }
 
+  function applyProfile(profile: Profile | null, email = "") {
+    if (!profile && !email) return;
+    setLatestProfile(profile);
+    setForm((current) => ({
+      ...current,
+      full_name: profile?.full_name || current.full_name,
+      email: email || profile?.email || current.email,
+      phone: profile?.phone || current.phone,
+      current_country: profile?.current_country || current.current_country,
+      target_country: profile?.target_country || current.target_country,
+      main_goal: profile?.main_goal || profile?.goal || current.main_goal,
+      route_category: profile?.route_category || current.route_category,
+      route_code: routeCodeFor(profile?.route_category || profile?.main_goal || profile?.goal || current.route_category),
+      country_code: countryCodeFor(profile?.target_country || current.target_country),
+      saved_title: profile?.target_country ? `${profile.target_country} ${readableLabel(profile.route_category || profile.main_goal || profile.goal || "relocation")} pathway` : current.saved_title,
+    }));
+    if (email || profile?.email || profile?.phone) {
+      setConsent(true);
+      setLookupContact(email || profile?.email || profile?.phone || "");
+    }
+  }
+
   async function loadVerifiedRoutes(silent = false) {
     if (!silent) {
       setLoading(true);
@@ -176,13 +212,11 @@ export default function SavedRoutesManager() {
       const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 15000 });
       const rows = data.sections?.saved_routes?.rows || [];
       const email = data.session?.email || "";
-      const profile = data.latest_profile || null;
+      const profile = chooseAccountProfile(data);
       setSavedRoutes(rows);
       setAccountEmail(email);
-      setLatestProfile(profile);
-      setLookupContact(email);
-      if (email) setForm((current) => ({ ...current, email }));
-      setMessage(rows.length ? "Saved routes loaded from your account." : "No saved routes are connected to this account yet.");
+      applyProfile(profile, email);
+      setMessage(rows.length ? `Saved routes loaded. Using ${profile ? profileName(profile) : "your account"} as route context.` : "No saved routes are connected to this account yet. You can save one from the form.");
     } catch {
       if (!silent) setMessage("Sign in first, or use email/phone lookup below.");
       if (silent) setMessage("Save a route or load routes by email/phone.");
@@ -203,7 +237,7 @@ export default function SavedRoutesManager() {
       return;
     }
     if (!consent) {
-      setMessage("Confirm contact consent before saving this route.");
+      setMessage("Tick the consent box before saving this route.");
       return;
     }
 
@@ -294,8 +328,9 @@ export default function SavedRoutesManager() {
           metadata: {
             saved_route_id: route.id,
             saved_route_title: route.saved_title,
-            generated_from: "saved_routes_page",
-            report_basis: latestProfile ? "saved_route_plus_latest_profile" : "saved_route_only",
+            active_profile_id: latestProfile?.id,
+            generated_from: "saved_routes_page_active_profile",
+            report_basis: latestProfile ? "saved_route_plus_active_profile" : "saved_route_only",
           },
         },
         timeoutMs: 20000,
@@ -343,27 +378,27 @@ export default function SavedRoutesManager() {
         <div className="panel-heading">
           <div>
             <p className="overline">Saved routes</p>
-            <h2>Save a route or opportunity</h2>
+            <h2>Save a route to revisit</h2>
           </div>
           <span className="status-dot">{accountEmail ? "Signed in" : "Available"}</span>
         </div>
-        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. New saved routes will be connected to this account.</p> : <p className="form-status">Use the same email or phone as your profile so routes, reports, and alerts stay connected.</p>}
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. New saved routes will be connected to this account. {latestProfile ? `Using active profile: ${profileName(latestProfile)}.` : ""}</p> : <p className="form-status">Use the same email or phone as your profile so routes, reports, and alerts stay connected.</p>}
 
         <div className="form-grid two-col">
           <div className="field"><label htmlFor="save_type">What are you saving?</label><select id="save_type" value={form.save_type} onChange={(event) => update("save_type", event.target.value)}><option value="route">Route</option><option value="opportunity">Opportunity</option><option value="scholarship">Scholarship</option><option value="country">Country</option><option value="service">Service idea</option></select></div>
-          <div className="field"><label htmlFor="saved_title">Title</label><input id="saved_title" value={form.saved_title} onChange={(event) => update("saved_title", event.target.value)} placeholder="Example: Estonia startup pathway" /></div>
-          <div className="field"><label htmlFor="full_name">Full name</label><input id="full_name" value={form.full_name} onChange={(event) => update("full_name", event.target.value)} /></div>
+          <div className="field"><label htmlFor="saved_title">Name this route</label><input id="saved_title" value={form.saved_title} onChange={(event) => update("saved_title", event.target.value)} placeholder="Example: Estonia startup pathway" /></div>
+          <div className="field"><label htmlFor="full_name">Your name</label><input id="full_name" value={form.full_name} onChange={(event) => update("full_name", event.target.value)} /></div>
           <div className="field"><label htmlFor="email">Email</label><input id="email" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} placeholder={accountEmail || "you@example.com"} /></div>
           <div className="field"><label htmlFor="phone">WhatsApp / phone</label><input id="phone" value={form.phone} onChange={(event) => update("phone", event.target.value)} placeholder="+965 ..." /></div>
-          <div className="field"><label htmlFor="current_country">Current country</label><input id="current_country" value={form.current_country} onChange={(event) => update("current_country", event.target.value)} /></div>
+          <div className="field"><label htmlFor="current_country">Where are you now?</label><input id="current_country" value={form.current_country} onChange={(event) => update("current_country", event.target.value)} /></div>
           <div className="field"><label htmlFor="target_country">Target country</label><input id="target_country" value={form.target_country} onChange={(event) => updateTargetCountry(event.target.value)} /></div>
           <div className="field"><label htmlFor="main_goal">Main goal</label><select id="main_goal" value={form.main_goal} onChange={(event) => update("main_goal", event.target.value)}>{goalOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></div>
-          <div className="field"><label htmlFor="route_category">Route category</label><select id="route_category" value={form.route_category} onChange={(event) => updateRouteCategory(event.target.value)}>{routeOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></div>
-          <div className="field"><label htmlFor="notes">Notes</label><input id="notes" value={form.notes} onChange={(event) => update("notes", event.target.value)} placeholder="Why this route matters" /></div>
+          <div className="field"><label htmlFor="route_category">Route type</label><select id="route_category" value={form.route_category} onChange={(event) => updateRouteCategory(event.target.value)}>{routeOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></div>
+          <div className="field"><label htmlFor="notes">Why save this?</label><input id="notes" value={form.notes} onChange={(event) => update("notes", event.target.value)} placeholder="Example: Good option for my startup plan" /></div>
         </div>
 
-        <label className="checkbox-field"><input type="checkbox" checked={notifyOnChanges} onChange={(event) => setNotifyOnChanges(event.target.checked)} /><span>Create alert option for important changes</span></label>
-        <label className="checkbox-field"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I agree that MoveReady may contact me about this saved route.</span></label>
+        <label className="checkbox-field"><input type="checkbox" checked={notifyOnChanges} onChange={(event) => setNotifyOnChanges(event.target.checked)} /><span>Create alert option for important changes.</span></label>
+        <label className="checkbox-field"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I agree that MoveReady may save and contact me about this route.</span></label>
         <button className="btn primary full" type="submit" disabled={loading}>{loading ? "Saving..." : "Save route"}</button>
         <p className="form-status">{message}</p>
       </form>
@@ -388,14 +423,14 @@ export default function SavedRoutesManager() {
               <article className="result-block" key={route.id}>
                 <div className="panel-heading">
                   <div>
-                    <p className="overline">{readable(route.save_type)}</p>
+                    <p className="overline">{readableLabel(route.save_type)}</p>
                     <h2>{route.saved_title}</h2>
                   </div>
-                  <span className="status-dot">{route.status || "active"}</span>
+                  <span className="status-dot">{readableLabel(route.status || "active")}</span>
                 </div>
                 <div className="badge-row">
                   {route.target_country ? <span className="badge">Target: {route.target_country}</span> : null}
-                  {route.route_category ? <span className="badge">Route: {readable(route.route_category)}</span> : null}
+                  {route.route_category ? <span className="badge">Route: {readableLabel(route.route_category)}</span> : null}
                   {route.country_code ? <span className="badge">{route.country_code}</span> : null}
                   {route.notify_on_changes ? <span className="badge">Alert requested</span> : null}
                   <span className="badge">{formatDate(route.created_at)}</span>
