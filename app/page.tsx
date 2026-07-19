@@ -10,7 +10,7 @@ const quickStart = [
   {
     title: "2. Compare options",
     href: "/compare",
-    text: "Compare route families before spending money on documents, applications, bookings, or providers.",
+    text: "Compare route families before spending money on documents, applications, bookings, or support providers.",
   },
   {
     title: "3. Save what matters",
@@ -23,7 +23,7 @@ const publicTools = [
   {
     title: "Decision Center",
     href: "/decision-center",
-    text: "Choose what to do next when you are not sure whether to study, work, start a business, apply for a ballot, or wait.",
+    text: "Choose what to do next when you are not sure whether to study, work, start a business, apply for an opportunity, or wait.",
   },
   {
     title: "Compare countries",
@@ -58,7 +58,7 @@ const publicTools = [
   {
     title: "My reports",
     href: "/my-reports",
-    text: "Find readiness reports by verified account, report reference, email, or phone.",
+    text: "Find readiness reports by signed-in account, report reference, email, or phone.",
   },
   {
     title: "Trust and safety",
@@ -112,6 +112,7 @@ export default function Home() {
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Generate starter plan</a>
+            <a className="btn" href="/start">Open start guide</a>
           </div>
         </aside>
       </section>
@@ -149,7 +150,7 @@ export default function Home() {
       <section className="section" id="tools">
         <h2>Main tools</h2>
         <p className="section-intro">
-          These are the public surfaces a normal user should understand first. Internal review, admin, source-management, and launch-check pages stay outside the main user journey.
+          Start with the tools below. They guide a user from route discovery to account records, reports, alerts, timelines, and support requests.
         </p>
         <div className="grid">
           {publicTools.map((route) => (
