@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { plainRiskLabel, readableLabel, sourceStatusLabel } from "@/lib/labels";
 
 type ReportSection = {
   title?: string;
@@ -71,16 +72,16 @@ function sectionBody(section: ReportSection) {
 
 function compactList(items?: string[], fallback = "Not recorded") {
   if (!items?.length) return fallback;
-  return items.slice(0, 8).join(", ");
+  return items.slice(0, 8).map((item) => readableLabel(item)).join(", ");
 }
 
 function scoreLabel(report: ReportRow) {
   const payload = report.report_payload || {};
   const score = payload.readiness_score;
   const level = payload.readiness_level;
-  if (typeof score === "number" && level) return `${score}/100 · ${level}`;
+  if (typeof score === "number" && level) return `${score}/100 · ${readableLabel(level)}`;
   if (typeof score === "number") return `${score}/100`;
-  return level || "Not scored";
+  return readableLabel(level, "Not scored");
 }
 
 export default function ReportDetail({ reportRef }: { reportRef: string }) {
@@ -141,19 +142,20 @@ export default function ReportDetail({ reportRef }: { reportRef: string }) {
             <span className="status-dot">{scoreLabel(report)}</span>
           </div>
           <p className="section-intro">
-            This report is advisory. It should remain tied to official sources, source confidence, risk labels, and the generated date. It must not be treated as a visa, admission, lottery, ballot, job, or provider approval.
+            This report is advisory. It helps you prepare, but it is not visa, admission, lottery, ballot, job, or provider approval.
           </p>
           <div className="mini-list">
             <div><strong>Title</strong><span>{report.report_title || "Relocation readiness report"}</span></div>
-            <div><strong>Risk</strong><span>{report.risk_level || "Not labelled"}</span></div>
+            <div><strong>Risk</strong><span>{plainRiskLabel(report.risk_level)}</span></div>
             <div><strong>Generated</strong><span>{formatDate(report.created_at || report.generated_at)}</span></div>
-            <div><strong>Source status</strong><span>{payload.source_status || "starter_rules_pending_official_review"}</span></div>
-            <div><strong>Source confidence</strong><span>{payload.source_confidence || "starter"}</span></div>
+            <div><strong>Source status</strong><span>{sourceStatusLabel(payload.source_status)}</span></div>
+            <div><strong>Source confidence</strong><span>{readableLabel(payload.source_confidence || "starter")}</span></div>
             <div><strong>Missing documents</strong><span>{compactList(payload.missing_documents, "No document gaps shown")}</span></div>
           </div>
           <div className="actions">
             <button className="btn primary" type="button" onClick={() => window.print()}>Print report</button>
             <a className="btn" href="/my-reports">Back to My Reports</a>
+            <a className="btn" href="/route-checker">Generate updated report</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
           </div>
           <p className="form-status">{message}</p>
@@ -162,9 +164,9 @@ export default function ReportDetail({ reportRef }: { reportRef: string }) {
         <section className="result-panel">
           <article className="result-block featured">
             <p className="overline">Profile snapshot</p>
-            <h2>{report.target_country || "Target country"} · {report.route_category || report.goal || "route"}</h2>
+            <h2>{report.target_country || "Target country"} · {readableLabel(report.route_category || report.goal || "route")}</h2>
             <div className="mini-list">
-              <div><strong>Goal</strong><span>{report.goal || "Not recorded"}</span></div>
+              <div><strong>Goal</strong><span>{readableLabel(report.goal)}</span></div>
               <div><strong>Current country</strong><span>{report.current_country || "Not recorded"}</span></div>
               <div><strong>Funds</strong><span>{report.available_funds_currency || ""} {(report.available_funds_amount || 0).toLocaleString()}</span></div>
               <div><strong>Family members</strong><span>{report.family_members_count || 0}</span></div>
@@ -191,7 +193,7 @@ export default function ReportDetail({ reportRef }: { reportRef: string }) {
               <h2>Action plan</h2>
               <div className="mini-list">
                 {payload.action_items.slice(0, 6).map((item, index) => (
-                  <div key={`${item.title || "action"}-${index}`}><strong>{item.priority || "medium"}</strong><span>{item.title}: {item.detail}</span></div>
+                  <div key={`${item.title || "action"}-${index}`}><strong>{readableLabel(item.priority || "medium")}</strong><span>{item.title}: {item.detail}</span></div>
                 ))}
               </div>
             </article>
