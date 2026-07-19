@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
 
@@ -48,6 +49,19 @@ function sourcePage() {
   }
 }
 
+function safeRedirectTarget() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next") || params.get("redirect") || "";
+    if (next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/api/")) {
+      return next;
+    }
+  } catch {
+    // Fall through to the default account center.
+  }
+  return "/dashboard";
+}
+
 function formatDate(value?: string) {
   if (!value) return "Not set";
   try {
@@ -58,6 +72,7 @@ function formatDate(value?: string) {
 }
 
 export default function AccountLogin() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [session, setSession] = useState<Session | null>(null);
@@ -126,7 +141,11 @@ export default function AccountLogin() {
       });
       storeSessionToken(data.session_token);
       setSession(data.session);
-      setMessage("Login successful. This device now has an active MoveReady session.");
+      const target = safeRedirectTarget();
+      setMessage(target === "/dashboard" ? "Login successful. Opening Account Center..." : "Login successful. Continuing to the requested page...");
+      window.setTimeout(() => {
+        router.replace(target);
+      }, 350);
     } catch (error) {
       const apiError = error as ApiError;
       const attempts = apiError?.data?.attempts_remaining;
