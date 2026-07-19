@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
+import { clearActiveProfile } from "@/lib/profileStorage";
 
 type RequestCodeResponse = {
   ok: boolean;
@@ -125,7 +126,7 @@ export default function AccountLogin() {
         setCode(data.dev_code);
         setMessage(`Development login code received. Code expires at ${formatDate(data.expires_at)}.`);
       } else if (data.delivery_status === "email_delivery_not_configured") {
-        setMessage("Login code was created, but email delivery is not configured yet. Run the backend SQL and connect an approved email provider before public login.");
+        setMessage("Login code was created, but email delivery is not configured yet. Connect an approved email provider before public login.");
       } else {
         setMessage(`Login code requested. Check your email. Code expires at ${formatDate(data.expires_at)}.`);
       }
@@ -173,6 +174,7 @@ export default function AccountLogin() {
       // Still clear local token.
     } finally {
       clearStoredAuthToken();
+      clearActiveProfile();
       try {
         localStorage.removeItem("moveready_session_token");
       } catch {
@@ -190,7 +192,7 @@ export default function AccountLogin() {
       <section className="workflow-panel live-form">
         <div className="panel-heading">
           <div>
-            <p className="overline">Email OTP login</p>
+            <p className="overline">Email login</p>
             <h2>Sign in to MoveReady</h2>
           </div>
           <span className="status-dot">Available now</span>
@@ -221,7 +223,7 @@ export default function AccountLogin() {
             <p className="overline">Session status</p>
             <h2>{session ? "Signed in" : "Not signed in yet"}</h2>
             <p>
-              Login is designed to join profiles, saved routes, reports, watchlist alerts, timeline events, and service requests under one verified account.
+              Login connects profiles, saved routes, reports, alerts, timeline events, and service requests under one verified account.
             </p>
             {session ? (
               <div className="mini-list">
