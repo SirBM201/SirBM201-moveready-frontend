@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
 
@@ -72,7 +71,6 @@ function formatDate(value?: string) {
 }
 
 export default function AccountLogin() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [session, setSession] = useState<Session | null>(null);
@@ -144,7 +142,7 @@ export default function AccountLogin() {
       const target = safeRedirectTarget();
       setMessage(target === "/dashboard" ? "Login successful. Opening Account Center..." : "Login successful. Continuing to the requested page...");
       window.setTimeout(() => {
-        router.replace(target);
+        window.location.assign(target);
       }, 350);
     } catch (error) {
       const apiError = error as ApiError;
