@@ -61,7 +61,7 @@ type AccountSummaryResponse = {
 };
 
 const summaryTiles = [
-  { key: "profiles", label: "Profiles", helper: "People/plans saved", href: "#active-profile" },
+  { key: "profiles", label: "Profiles", helper: "People/plans saved", href: "#profile-chooser" },
   { key: "saved_routes", label: "Saved routes", helper: "Routes to revisit", href: "/saved-routes" },
   { key: "watchlist", label: "Watchlist", helper: "Alerts you asked for", href: "/watchlist" },
   { key: "timeline", label: "Timeline", helper: "Dated actions", href: "/timeline" },
@@ -73,6 +73,15 @@ function formatDate(value?: string) {
   if (!value) return "Not set";
   try {
     return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function formatDateTime(value?: string) {
+  if (!value) return "Unknown date";
+  try {
+    return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
   } catch {
     return value;
   }
@@ -90,6 +99,14 @@ function usableProfiles(summary: AccountSummaryResponse | null) {
   return (summary?.sections?.profiles?.rows || []).filter((profile) => profile.status !== "closed");
 }
 
+function profileRouteLine(profile?: AccountProfile | null) {
+  if (!profile) return "No profile selected yet";
+  const target = profile.target_country || "Target country not set";
+  const route = readableLabel(profile.route_category || profileGoal(profile));
+  const created = profile.created_at ? ` · Saved ${formatDateTime(profile.created_at)}` : "";
+  return `${target} · ${route}${created}`;
+}
+
 export default function AccountSummary() {
   const [summary, setSummary] = useState<AccountSummaryResponse | null>(null);
   const [activeProfileId, setActiveProfileId] = useState("");
@@ -104,7 +121,7 @@ export default function AccountSummary() {
       const data = await apiJson<AccountSummaryResponse>("account/summary", { timeoutMs: 15000 });
       const profiles = usableProfiles(data);
       const storedActiveId = getActiveProfileId();
-      const chosenProfile = profiles.find((item) => item.id === storedActiveId) || profiles[0] || null;
+      const chosenProfile = profiles.find((item) => item.id === storedActiveId) || profiles[0] || data.latest_profile || null;
       if (chosenProfile?.id) {
         setActiveProfile(chosenProfile.id, profileName(chosenProfile));
         setActiveProfileId(chosenProfile.id);
@@ -164,6 +181,7 @@ export default function AccountSummary() {
 
   const counts = summary?.counts || {};
   const profiles = usableProfiles(summary);
+  const profileCount = counts.profiles ?? summary?.sections?.profiles?.count ?? profiles.length;
   const activeProfile = profiles.find((item) => item.id === activeProfileId) || profiles[0] || summary?.latest_profile || null;
   const snapshot = activeProfile?.readiness_snapshot || {};
 
@@ -194,19 +212,19 @@ export default function AccountSummary() {
             ))}
           </div>
 
-          <div className="mini-list">
-            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
-            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
-            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
-            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
-            <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
-          </div>
+          <article className="result-block soft" id="profile-chooser">
+            <div className="panel-heading">
+              <div>
+                <p className="overline">Choose active profile</p>
+                <h3>Choose active profile</h3>
+              </div>
+              <span className="status-dot">{activeProfile ? "Profile selected" : "Select profile"}</span>
+            </div>
+            <p className="form-status">
+              This is the profile MoveReady will use for Route Checker, Saved Routes, Reports, Watchlist, Timeline, and Support. Use this button whenever you have more than one saved test profile.
+            </p>
 
-          {profiles.length > 1 ? (
-            <article className="result-block soft">
-              <p className="overline">Choose active profile</p>
-              <h3>Which profile should MoveReady use now?</h3>
-              <p className="form-status">You have more than one saved profile. Choose the correct one so reports and saved routes do not use old test details.</p>
+            {profiles.length ? (
               <div className="mini-list">
                 {profiles.map((item) => {
                   const isActive = item.id === activeProfile?.id;
@@ -214,8 +232,8 @@ export default function AccountSummary() {
                   return (
                     <div key={item.id}>
                       <strong>{isActive ? "Active now: " : "Saved profile: "}{profileName(item)}</strong>
-                      <span>{item.target_country || "Target country not set"} · {readableLabel(item.route_category || profileGoal(item))} · {itemSnapshot.readiness_score ?? 0}/100</span>
-                      <div className="actions">
+                      <span>{profileRouteLine(item)} · {itemSnapshot.readiness_score ?? 0}/100</span>
+                      <div className="actions compact-actions">
                         <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={isActive}>{isActive ? "Using this profile" : "Use this profile"}</button>
                         {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
                       </div>
@@ -223,14 +241,34 @@ export default function AccountSummary() {
                   );
                 })}
               </div>
-            </article>
-          ) : null}
+            ) : (
+              <article className="result-block soft">
+                <h3>No profile list is visible yet</h3>
+                <p>
+                  Your account says it has {profileCount} profile{profileCount === 1 ? "" : "s"}, but the profile list did not load into the page. Click Refresh summary. If it still does not appear, open “Create or update profile” and save the correct current profile again.
+                </p>
+                <div className="actions">
+                  <button className="btn primary" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button>
+                  <a className="btn" href="#profile-dashboard">Create or update profile</a>
+                </div>
+              </article>
+            )}
+          </article>
+
+          <div className="mini-list">
+            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
+            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
+            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
+            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
+            <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
+          </div>
         </>
       ) : null}
 
       <p className="form-status">{message}</p>
       <div className="actions">
         {summary ? <button className="btn" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button> : <a className="btn primary" href="/login">Sign in with email</a>}
+        {summary ? <a className="btn primary" href="#profile-chooser">Choose active profile</a> : null}
         <a className="btn primary" href="/route-checker">Check my route</a>
         <a className="btn" href="#profile-dashboard">Create or update profile</a>
         <a className="btn" href="/my-reports">My reports</a>
