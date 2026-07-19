@@ -1,3 +1,5 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const trustSections = [
   {
     title: "Source-backed route information",
@@ -27,7 +29,7 @@ const trustSections = [
   {
     title: "Sensitive document handling",
     status: "Required",
-    summary: "Passport, certificate, notarization, apostille, and legalization support should be treated as premium trusted services with tracking, insurance, and clear responsibility boundaries.",
+    summary: "Document support should have clear tracking, responsibility boundaries, and user consent before any handoff.",
   },
 ];
 
@@ -39,34 +41,37 @@ const userRules = [
   "Request human review when a refusal, family case, business route, or sensitive document shipment is involved.",
 ];
 
+const reportRules = [
+  {
+    title: "Reports are advisory",
+    detail: "A readiness report is a planning guide. It should not be treated as legal advice, admission advice, visa approval, or proof that a route will succeed.",
+  },
+  {
+    title: "Dates matter",
+    detail: "Users should refresh reports when rules, fees, deadlines, or personal circumstances change.",
+  },
+  {
+    title: "Risk labels stay visible",
+    detail: "Risk level, source status, generated date, and route context should remain visible on saved and printed reports.",
+  },
+];
+
 export default function TrustPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Trust center</span>
-        </a>
-        <nav className="nav">
-          <a href="/">Home</a>
-          <a href="/safety">Safety</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
-          <a href="/contact">Contact</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Trust center" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
           <span className="eyebrow">Trust and compliance</span>
-          <h1>MoveReady should help users prepare without creating false confidence.</h1>
+          <h1>MoveReady helps users prepare without creating false confidence.</h1>
           <p className="lede">
             The platform is built around reviewed sources, clear status labels, user consent, partner screening, and honest risk language.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Use route checker</a>
             <a className="btn" href="/opportunities">View opportunities</a>
-            <a className="btn" href="/partners/apply">Provider apply</a>
+            <a className="btn" href="/services">Request support</a>
           </div>
         </div>
       </section>
@@ -74,10 +79,11 @@ export default function TrustPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
-            <h2>Platform Rules</h2>
-            <p className="section-intro">These rules apply to public pages, reports, service requests, provider screening, and admin review.</p>
+            <p className="overline">Platform rules</p>
+            <h2>Trust rules that guide every page</h2>
+            <p className="section-intro">These rules apply to public pages, reports, service requests, provider screening, and review workflows.</p>
           </div>
-          <span className="status-dot">Launch standard</span>
+          <span className="status-dot">Required</span>
         </div>
         <div className="module-preview-grid">
           {trustSections.map((item) => (
@@ -91,8 +97,27 @@ export default function TrustPage() {
       </section>
 
       <section className="section">
-        <h2>User Safety Checklist</h2>
-        <p className="section-intro">This copy can be reused in route reports, opportunity pages, and service request confirmations.</p>
+        <div className="section-heading-row">
+          <div>
+            <p className="overline">Readiness reports</p>
+            <h2>How users should read reports</h2>
+            <p className="section-intro">Reports should help users organize the next action, not make them overconfident.</p>
+          </div>
+          <span className="status-dot">Advisory</span>
+        </div>
+        <div className="grid">
+          {reportRules.map((item) => (
+            <article className="card" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <h2>User safety checklist</h2>
+        <p className="section-intro">Use these checks before paying, booking, uploading sensitive documents, or submitting applications.</p>
         <div className="mini-list">
           {userRules.map((rule) => (
             <div key={rule}>
