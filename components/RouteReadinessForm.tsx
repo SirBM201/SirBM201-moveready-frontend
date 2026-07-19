@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 
@@ -38,11 +38,35 @@ type ResultState = {
     report_title: string;
     risk_level: string;
     source_status: string;
+    source_confidence?: string;
     stored?: boolean;
     storage_note?: string;
+    readiness_score?: number;
+    readiness_level?: string;
     readiness_flags?: string[];
     sections: ReportSection[];
   };
+};
+
+type AccountSummary = {
+  ok: boolean;
+  session?: {
+    email?: string;
+  };
+  latest_profile?: {
+    full_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    current_country?: string | null;
+    target_country?: string | null;
+    main_goal?: string | null;
+    route_category?: string | null;
+    available_funds_amount?: number | null;
+    available_funds_currency?: string | null;
+    family_members_count?: number | null;
+    timeline_months?: number | null;
+    has_previous_refusal?: boolean | null;
+  } | null;
 };
 
 const defaultForm = {
@@ -51,7 +75,7 @@ const defaultForm = {
   phone: "",
   preferred_contact_channel: "email",
   consent_to_contact: "false",
-  goal: "business",
+  goal: "startup",
   route_category: "startup",
   current_country: "Kuwait",
   target_country: "Estonia",
@@ -59,7 +83,39 @@ const defaultForm = {
   available_funds_currency: "EUR",
   family_members_count: "0",
   timeline_months: "6",
+  has_previous_refusal: "false",
 };
+
+const goalToRouteCategory: Record<string, string> = {
+  startup: "startup",
+  business: "startup",
+  study: "study",
+  scholarship: "study",
+  work: "work",
+  family: "family",
+  visit: "visit",
+  digital_nomad: "digital_nomad",
+  relocation: "relocation",
+};
+
+function readable(value?: string | null, fallback = "Not recorded") {
+  if (!value) return fallback;
+  return String(value).replace(/_/g, " ");
+}
+
+function sourceStatusLabel(value?: string) {
+  if (!value) return "Source check needed";
+  if (value.includes("starter_rules") || value.includes("pending_official")) return "Starter rules · official source review needed";
+  if (value === "database_backed") return "Database-backed";
+  return readable(value, "Source check needed");
+}
+
+function scoreLabel(report?: ResultState["report"]) {
+  if (!report) return "Not scored";
+  if (typeof report.readiness_score === "number" && report.readiness_level) return `${report.readiness_score}/100 · ${readable(report.readiness_level)}`;
+  if (typeof report.readiness_score === "number") return `${report.readiness_score}/100`;
+  return readable(report.readiness_level, "Starter report");
+}
 
 export default function RouteReadinessForm() {
   const [form, setForm] = useState(defaultForm);
@@ -67,10 +123,47 @@ export default function RouteReadinessForm() {
   const [status, setStatus] = useState("Ready to generate a starter readiness plan.");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
 
   function updateField(name: string, value: string) {
-    setForm((current) => ({ ...current, [name]: value }));
+    setForm((current) => {
+      if (name === "goal") {
+        return { ...current, goal: value, route_category: goalToRouteCategory[value] || current.route_category };
+      }
+      return { ...current, [name]: value };
+    });
   }
+
+  useEffect(() => {
+    async function loadAccountDefaults() {
+      try {
+        const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 10000 });
+        const email = data.session?.email || data.latest_profile?.email || "";
+        const profile = data.latest_profile || null;
+        setAccountEmail(email);
+        setForm((current) => ({
+          ...current,
+          full_name: profile?.full_name || current.full_name,
+          email: email || current.email,
+          phone: profile?.phone || current.phone,
+          current_country: profile?.current_country || current.current_country,
+          target_country: profile?.target_country || current.target_country,
+          goal: profile?.main_goal || current.goal,
+          route_category: profile?.route_category || goalToRouteCategory[profile?.main_goal || ""] || current.route_category,
+          available_funds_amount: profile?.available_funds_amount ? String(profile.available_funds_amount) : current.available_funds_amount,
+          available_funds_currency: profile?.available_funds_currency || current.available_funds_currency,
+          family_members_count: profile?.family_members_count !== undefined && profile?.family_members_count !== null ? String(profile.family_members_count) : current.family_members_count,
+          timeline_months: profile?.timeline_months !== undefined && profile?.timeline_months !== null ? String(profile.timeline_months) : current.timeline_months,
+          has_previous_refusal: profile?.has_previous_refusal ? "true" : current.has_previous_refusal,
+          consent_to_contact: email ? "true" : current.consent_to_contact,
+        }));
+        if (email) setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
+      } catch {
+        // Route checker still works without login.
+      }
+    }
+    loadAccountDefaults();
+  }, []);
 
   function downloadReport() {
     if (!result?.report) return;
@@ -115,6 +208,7 @@ export default function RouteReadinessForm() {
       available_funds_amount: Number(form.available_funds_amount || 0),
       family_members_count: Number(form.family_members_count || 0),
       timeline_months: Number(form.timeline_months || 0),
+      has_previous_refusal: form.has_previous_refusal === "true",
     };
 
     try {
@@ -129,7 +223,11 @@ export default function RouteReadinessForm() {
         budget: budgetResponse,
         report: reportResponse.report,
       });
-      setStatus(reportResponse.report?.stored ? "Readiness report generated and saved." : "Readiness report generated. Storage needs backend Supabase env if not saved.");
+      if (reportResponse.report?.stored) {
+        setStatus(`Readiness report generated and saved. Reference: ${reportResponse.report.report_ref}.`);
+      } else {
+        setStatus(`Readiness report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}.`);
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError(`${err.message} (${err.status})`);
@@ -138,22 +236,26 @@ export default function RouteReadinessForm() {
       } else {
         setError("Unable to generate readiness plan.");
       }
-      setStatus("Generation failed. Check backend URL and environment settings.");
+      setStatus("Generation failed. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
   }
+
+  const reportRef = result?.report?.report_ref || "";
 
   return (
     <div className="live-workspace">
       <form className="workflow-panel live-form" onSubmit={onSubmit}>
         <div className="panel-heading">
           <div>
-            <p className="overline">Live MVP flow</p>
-            <h2>Route readiness inputs</h2>
+            <p className="overline">Route checker</p>
+            <h2>Enter your route details</h2>
           </div>
-          <span className="status-dot">{loading ? "Working" : "Ready"}</span>
+          <span className="status-dot">{accountEmail ? "Signed in" : loading ? "Working" : "Ready"}</span>
         </div>
+
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. Reports can be saved to your account when the checkbox below is selected.</p> : null}
 
         <div className="form-grid two-col">
           <div className="field">
@@ -184,8 +286,10 @@ export default function RouteReadinessForm() {
           <div className="field">
             <label htmlFor="goal">Main goal</label>
             <select id="goal" value={form.goal} onChange={(event) => updateField("goal", event.target.value)}>
-              <option value="study">Study or scholarship</option>
-              <option value="business">Startup or business</option>
+              <option value="startup">Startup founder</option>
+              <option value="business">Business or entrepreneur</option>
+              <option value="study">Study</option>
+              <option value="scholarship">Scholarship</option>
               <option value="work">Work abroad</option>
               <option value="family">Family relocation</option>
               <option value="visit">Visitor route</option>
@@ -196,12 +300,13 @@ export default function RouteReadinessForm() {
           <div className="field">
             <label htmlFor="route_category">Route category</label>
             <select id="route_category" value={form.route_category} onChange={(event) => updateField("route_category", event.target.value)}>
-              <option value="startup">Startup</option>
-              <option value="study">Study</option>
+              <option value="startup">Startup / entrepreneur</option>
+              <option value="study">Study / scholarship</option>
               <option value="work">Work</option>
               <option value="family">Family</option>
               <option value="visit">Visit</option>
               <option value="digital_nomad">Digital nomad</option>
+              <option value="relocation">General relocation</option>
             </select>
           </div>
 
@@ -242,13 +347,18 @@ export default function RouteReadinessForm() {
           </div>
         </div>
 
+        <label className="checkbox-field" htmlFor="has_previous_refusal">
+          <input id="has_previous_refusal" type="checkbox" checked={form.has_previous_refusal === "true"} onChange={(event) => updateField("has_previous_refusal", event.target.checked ? "true" : "false")} />
+          <span>I have had a previous refusal or serious immigration issue.</span>
+        </label>
+
         <label className="checkbox-field" htmlFor="report_contact_consent">
           <input id="report_contact_consent" type="checkbox" checked={form.consent_to_contact === "true"} onChange={(event) => updateField("consent_to_contact", event.target.checked ? "true" : "false")} />
           <span>Save my contact details with this report so I can retrieve it later and receive follow-up about this route.</span>
         </label>
 
         <button className="btn primary full" type="submit" disabled={loading}>
-          {loading ? "Generating..." : "Generate readiness plan"}
+          {loading ? "Generating..." : "Generate readiness report"}
         </button>
         <p className="form-status">{status}</p>
         {error ? <p className="form-error">{error}</p> : null}
@@ -270,14 +380,17 @@ export default function RouteReadinessForm() {
                     <p className="overline">Readiness report</p>
                     <h2>{result.report.report_title}</h2>
                   </div>
-                  <span className="status-dot">{result.report.report_ref}</span>
+                  <span className="status-dot">{scoreLabel(result.report)}</span>
                 </div>
                 <div className="badge-row">
-                  <span className="badge">Risk: {result.report.risk_level}</span>
-                  <span className="badge">Stored: {result.report.stored ? "yes" : "not yet"}</span>
-                  <span className="badge">{result.report.source_status}</span>
+                  <span className="badge">Reference: {result.report.report_ref}</span>
+                  <span className="badge">Risk: {readable(result.report.risk_level)}</span>
+                  <span className="badge">Saved: {result.report.stored ? "yes" : "reference only"}</span>
+                  <span className="badge">{sourceStatusLabel(result.report.source_status)}</span>
                 </div>
                 <div className="actions report-actions">
+                  {reportRef ? <a className="btn primary" href={`/report-detail?ref=${encodeURIComponent(reportRef)}`}>Open report</a> : null}
+                  <a className="btn" href="/my-reports">My reports</a>
                   <button className="btn" type="button" onClick={downloadReport}>Download JSON</button>
                   <button className="btn" type="button" onClick={printReport}>Print report</button>
                 </div>
@@ -310,7 +423,7 @@ export default function RouteReadinessForm() {
                   {result.checklist.map((item) => (
                     <div key={item.document_name}>
                       <strong>{item.document_name}</strong>
-                      <span>{item.requirement_level}: {item.details}</span>
+                      <span>{readable(item.requirement_level)}: {item.details}</span>
                     </div>
                   ))}
                 </div>
