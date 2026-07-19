@@ -3,6 +3,8 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { getActiveProfileId } from "@/lib/profileStorage";
+import { readableLabel, sourceStatusLabel } from "@/lib/labels";
 
 type ChecklistItem = {
   document_name: string;
@@ -48,25 +50,37 @@ type ResultState = {
   };
 };
 
+type AccountProfile = {
+  id?: string;
+  full_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  current_country?: string | null;
+  target_country?: string | null;
+  main_goal?: string | null;
+  goal?: string | null;
+  route_category?: string | null;
+  available_funds_amount?: number | null;
+  available_funds_currency?: string | null;
+  family_members_count?: number | null;
+  timeline_months?: number | null;
+  has_previous_refusal?: boolean | null;
+  preferred_contact_channel?: string | null;
+  status?: string | null;
+};
+
 type AccountSummary = {
   ok: boolean;
   session?: {
     email?: string;
   };
-  latest_profile?: {
-    full_name?: string | null;
-    email?: string | null;
-    phone?: string | null;
-    current_country?: string | null;
-    target_country?: string | null;
-    main_goal?: string | null;
-    route_category?: string | null;
-    available_funds_amount?: number | null;
-    available_funds_currency?: string | null;
-    family_members_count?: number | null;
-    timeline_months?: number | null;
-    has_previous_refusal?: boolean | null;
-  } | null;
+  latest_profile?: AccountProfile | null;
+  sections?: {
+    profiles?: {
+      rows?: AccountProfile[];
+      count?: number;
+    };
+  };
 };
 
 const defaultForm = {
@@ -98,32 +112,44 @@ const goalToRouteCategory: Record<string, string> = {
   relocation: "relocation",
 };
 
-function readable(value?: string | null, fallback = "Not recorded") {
-  if (!value) return fallback;
-  return String(value).replace(/_/g, " ");
-}
-
-function sourceStatusLabel(value?: string) {
-  if (!value) return "Source check needed";
-  if (value.includes("starter_rules") || value.includes("pending_official")) return "Starter rules · official source review needed";
-  if (value === "database_backed") return "Database-backed";
-  return readable(value, "Source check needed");
+function sourcePage() {
+  try {
+    return typeof window !== "undefined" ? window.location.pathname : "/route-checker";
+  } catch {
+    return "/route-checker";
+  }
 }
 
 function scoreLabel(report?: ResultState["report"]) {
   if (!report) return "Not scored";
-  if (typeof report.readiness_score === "number" && report.readiness_level) return `${report.readiness_score}/100 · ${readable(report.readiness_level)}`;
+  if (typeof report.readiness_score === "number" && report.readiness_level) return `${report.readiness_score}/100 · ${readableLabel(report.readiness_level)}`;
   if (typeof report.readiness_score === "number") return `${report.readiness_score}/100`;
-  return readable(report.readiness_level, "Starter report");
+  return readableLabel(report.readiness_level, "Starter report");
+}
+
+function profileName(profile?: AccountProfile | null) {
+  return profile?.full_name || profile?.email || profile?.phone || "Account profile";
+}
+
+function profileGoal(profile?: AccountProfile | null) {
+  return profile?.main_goal || profile?.goal || profile?.route_category || "relocation";
+}
+
+function chooseAccountProfile(data: AccountSummary) {
+  const profiles = (data.sections?.profiles?.rows || []).filter((item) => item.status !== "closed");
+  const activeId = getActiveProfileId();
+  return profiles.find((item) => item.id === activeId) || profiles[0] || data.latest_profile || null;
 }
 
 export default function RouteReadinessForm() {
   const [form, setForm] = useState(defaultForm);
   const [result, setResult] = useState<ResultState | null>(null);
-  const [status, setStatus] = useState("Ready to generate a starter readiness plan.");
+  const [status, setStatus] = useState("Step 1: check the details on the left. Step 2: tick the save box. Step 3: generate your report.");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [accountEmail, setAccountEmail] = useState("");
+  const [activeProfileId, setActiveProfileId] = useState("");
+  const [activeProfileName, setActiveProfileName] = useState("");
 
   function updateField(name: string, value: string) {
     setForm((current) => {
@@ -134,30 +160,43 @@ export default function RouteReadinessForm() {
     });
   }
 
+  function applyProfile(profile: AccountProfile | null, emailFromSession = "") {
+    if (!profile && !emailFromSession) return;
+    const goal = profileGoal(profile);
+    setActiveProfileId(profile?.id || "");
+    setActiveProfileName(profile ? profileName(profile) : "");
+    setForm((current) => ({
+      ...current,
+      full_name: profile?.full_name || current.full_name,
+      email: emailFromSession || profile?.email || current.email,
+      phone: profile?.phone || current.phone,
+      preferred_contact_channel: profile?.preferred_contact_channel || current.preferred_contact_channel,
+      current_country: profile?.current_country || current.current_country,
+      target_country: profile?.target_country || current.target_country,
+      goal: goal || current.goal,
+      route_category: profile?.route_category || goalToRouteCategory[goal] || current.route_category,
+      available_funds_amount: profile?.available_funds_amount !== undefined && profile?.available_funds_amount !== null ? String(profile.available_funds_amount) : current.available_funds_amount,
+      available_funds_currency: profile?.available_funds_currency || current.available_funds_currency,
+      family_members_count: profile?.family_members_count !== undefined && profile?.family_members_count !== null ? String(profile.family_members_count) : current.family_members_count,
+      timeline_months: profile?.timeline_months !== undefined && profile?.timeline_months !== null ? String(profile.timeline_months) : current.timeline_months,
+      has_previous_refusal: profile?.has_previous_refusal ? "true" : current.has_previous_refusal,
+      consent_to_contact: emailFromSession || profile?.email || profile?.phone ? "true" : current.consent_to_contact,
+    }));
+  }
+
   useEffect(() => {
     async function loadAccountDefaults() {
       try {
         const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 10000 });
         const email = data.session?.email || data.latest_profile?.email || "";
-        const profile = data.latest_profile || null;
+        const profile = chooseAccountProfile(data);
         setAccountEmail(email);
-        setForm((current) => ({
-          ...current,
-          full_name: profile?.full_name || current.full_name,
-          email: email || current.email,
-          phone: profile?.phone || current.phone,
-          current_country: profile?.current_country || current.current_country,
-          target_country: profile?.target_country || current.target_country,
-          goal: profile?.main_goal || current.goal,
-          route_category: profile?.route_category || goalToRouteCategory[profile?.main_goal || ""] || current.route_category,
-          available_funds_amount: profile?.available_funds_amount ? String(profile.available_funds_amount) : current.available_funds_amount,
-          available_funds_currency: profile?.available_funds_currency || current.available_funds_currency,
-          family_members_count: profile?.family_members_count !== undefined && profile?.family_members_count !== null ? String(profile.family_members_count) : current.family_members_count,
-          timeline_months: profile?.timeline_months !== undefined && profile?.timeline_months !== null ? String(profile.timeline_months) : current.timeline_months,
-          has_previous_refusal: profile?.has_previous_refusal ? "true" : current.has_previous_refusal,
-          consent_to_contact: email ? "true" : current.consent_to_contact,
-        }));
-        if (email) setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
+        applyProfile(profile, email);
+        if (profile) {
+          setStatus(`Using active profile: ${profileName(profile)}. Check the details, then generate a report.`);
+        } else if (email) {
+          setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
+        }
       } catch {
         // Route checker still works without login.
       }
@@ -186,9 +225,7 @@ export default function RouteReadinessForm() {
   }
 
   function printReport() {
-    if (typeof window !== "undefined") {
-      window.print();
-    }
+    if (typeof window !== "undefined") window.print();
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -209,6 +246,12 @@ export default function RouteReadinessForm() {
       family_members_count: Number(form.family_members_count || 0),
       timeline_months: Number(form.timeline_months || 0),
       has_previous_refusal: form.has_previous_refusal === "true",
+      source_page: sourcePage(),
+      metadata: {
+        active_profile_id: activeProfileId || undefined,
+        active_profile_name: activeProfileName || undefined,
+        generated_from: "route_checker_active_profile",
+      },
     };
 
     try {
@@ -224,9 +267,9 @@ export default function RouteReadinessForm() {
         report: reportResponse.report,
       });
       if (reportResponse.report?.stored) {
-        setStatus(`Readiness report generated and saved. Reference: ${reportResponse.report.report_ref}.`);
+        setStatus(`Report generated and saved. Reference: ${reportResponse.report.report_ref}.`);
       } else {
-        setStatus(`Readiness report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}.`);
+        setStatus(`Report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}.`);
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -250,21 +293,22 @@ export default function RouteReadinessForm() {
         <div className="panel-heading">
           <div>
             <p className="overline">Route checker</p>
-            <h2>Enter your route details</h2>
+            <h2>Check this route</h2>
           </div>
           <span className="status-dot">{accountEmail ? "Signed in" : loading ? "Working" : "Ready"}</span>
         </div>
 
-        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. Reports can be saved to your account when the checkbox below is selected.</p> : null}
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. {activeProfileName ? `Using active profile: ${activeProfileName}.` : "Reports can be saved to your account when the checkbox below is selected."}</p> : null}
+        <p className="form-status">Simple guide: choose your goal, country, funds, family count, then click the green button.</p>
 
         <div className="form-grid two-col">
           <div className="field">
-            <label htmlFor="full_name">Full name</label>
+            <label htmlFor="full_name">Your name</label>
             <input id="full_name" value={form.full_name} onChange={(event) => updateField("full_name", event.target.value)} placeholder="Optional" />
           </div>
 
           <div className="field">
-            <label htmlFor="email">Email for report lookup</label>
+            <label htmlFor="email">Email to find this report later</label>
             <input id="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Optional" type="email" />
           </div>
 
@@ -274,7 +318,7 @@ export default function RouteReadinessForm() {
           </div>
 
           <div className="field">
-            <label htmlFor="preferred_contact_channel">Preferred contact</label>
+            <label htmlFor="preferred_contact_channel">Best way to contact you</label>
             <select id="preferred_contact_channel" value={form.preferred_contact_channel} onChange={(event) => updateField("preferred_contact_channel", event.target.value)}>
               <option value="email">Email</option>
               <option value="whatsapp">WhatsApp</option>
@@ -284,7 +328,7 @@ export default function RouteReadinessForm() {
           </div>
 
           <div className="field">
-            <label htmlFor="goal">Main goal</label>
+            <label htmlFor="goal">Why do you want to move?</label>
             <select id="goal" value={form.goal} onChange={(event) => updateField("goal", event.target.value)}>
               <option value="startup">Startup founder</option>
               <option value="business">Business or entrepreneur</option>
@@ -293,12 +337,12 @@ export default function RouteReadinessForm() {
               <option value="work">Work abroad</option>
               <option value="family">Family relocation</option>
               <option value="visit">Visitor route</option>
-              <option value="digital_nomad">Digital nomad</option>
+              <option value="digital_nomad">Digital nomad / remote work</option>
             </select>
           </div>
 
           <div className="field">
-            <label htmlFor="route_category">Route category</label>
+            <label htmlFor="route_category">Route type</label>
             <select id="route_category" value={form.route_category} onChange={(event) => updateField("route_category", event.target.value)}>
               <option value="startup">Startup / entrepreneur</option>
               <option value="study">Study / scholarship</option>
@@ -311,17 +355,17 @@ export default function RouteReadinessForm() {
           </div>
 
           <div className="field">
-            <label htmlFor="current_country">Current country</label>
+            <label htmlFor="current_country">Where are you now?</label>
             <input id="current_country" value={form.current_country} onChange={(event) => updateField("current_country", event.target.value)} />
           </div>
 
           <div className="field">
-            <label htmlFor="target_country">Target country</label>
+            <label htmlFor="target_country">Where do you want to move?</label>
             <input id="target_country" value={form.target_country} onChange={(event) => updateField("target_country", event.target.value)} />
           </div>
 
           <div className="field">
-            <label htmlFor="available_funds_amount">Available funds</label>
+            <label htmlFor="available_funds_amount">Money available for the move</label>
             <input id="available_funds_amount" inputMode="decimal" value={form.available_funds_amount} onChange={(event) => updateField("available_funds_amount", event.target.value)} />
           </div>
 
@@ -337,12 +381,12 @@ export default function RouteReadinessForm() {
           </div>
 
           <div className="field">
-            <label htmlFor="family_members_count">Family members joining</label>
+            <label htmlFor="family_members_count">How many family members will join?</label>
             <input id="family_members_count" inputMode="numeric" value={form.family_members_count} onChange={(event) => updateField("family_members_count", event.target.value)} />
           </div>
 
           <div className="field">
-            <label htmlFor="timeline_months">Target timeline in months</label>
+            <label htmlFor="timeline_months">When do you want to move? (months)</label>
             <input id="timeline_months" inputMode="numeric" value={form.timeline_months} onChange={(event) => updateField("timeline_months", event.target.value)} />
           </div>
         </div>
@@ -354,11 +398,11 @@ export default function RouteReadinessForm() {
 
         <label className="checkbox-field" htmlFor="report_contact_consent">
           <input id="report_contact_consent" type="checkbox" checked={form.consent_to_contact === "true"} onChange={(event) => updateField("consent_to_contact", event.target.checked ? "true" : "false")} />
-          <span>Save my contact details with this report so I can retrieve it later and receive follow-up about this route.</span>
+          <span>Save my contact details with this report so I can find it later.</span>
         </label>
 
         <button className="btn primary full" type="submit" disabled={loading}>
-          {loading ? "Generating..." : "Generate readiness report"}
+          {loading ? "Generating..." : "Check my route and save report"}
         </button>
         <p className="form-status">{status}</p>
         {error ? <p className="form-error">{error}</p> : null}
@@ -367,9 +411,9 @@ export default function RouteReadinessForm() {
       <section className="result-panel" aria-live="polite">
         {!result ? (
           <div className="empty-result">
-            <p className="overline">Output preview</p>
-            <h2>Checklist, budget, and report will appear here.</h2>
-            <p>Once generated, the result shows document readiness, estimated budget range, report reference, risk level, and source status.</p>
+            <p className="overline">What you will get</p>
+            <h2>Your checklist, budget, and report will appear here.</h2>
+            <p>MoveReady will show the documents to prepare, a starter budget range, risk level, report reference, and whether official source review is still needed.</p>
           </div>
         ) : (
           <div className="result-stack">
@@ -384,15 +428,15 @@ export default function RouteReadinessForm() {
                 </div>
                 <div className="badge-row">
                   <span className="badge">Reference: {result.report.report_ref}</span>
-                  <span className="badge">Risk: {readable(result.report.risk_level)}</span>
+                  <span className="badge">Risk: {readableLabel(result.report.risk_level)}</span>
                   <span className="badge">Saved: {result.report.stored ? "yes" : "reference only"}</span>
                   <span className="badge">{sourceStatusLabel(result.report.source_status)}</span>
                 </div>
                 <div className="actions report-actions">
                   {reportRef ? <a className="btn primary" href={`/report-detail?ref=${encodeURIComponent(reportRef)}`}>Open report</a> : null}
                   <a className="btn" href="/my-reports">My reports</a>
-                  <button className="btn" type="button" onClick={downloadReport}>Download JSON</button>
                   <button className="btn" type="button" onClick={printReport}>Print report</button>
+                  <button className="btn" type="button" onClick={downloadReport}>Download report data</button>
                 </div>
                 {result.report.storage_note ? <p className="note">{result.report.storage_note}</p> : null}
                 <div className="mini-list">
@@ -423,7 +467,7 @@ export default function RouteReadinessForm() {
                   {result.checklist.map((item) => (
                     <div key={item.document_name}>
                       <strong>{item.document_name}</strong>
-                      <span>{readable(item.requirement_level)}: {item.details}</span>
+                      <span>{readableLabel(item.requirement_level)}: {item.details}</span>
                     </div>
                   ))}
                 </div>
