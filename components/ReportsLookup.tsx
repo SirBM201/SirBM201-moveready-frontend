@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { plainRiskLabel, readableLabel, sourceStatusLabel } from "@/lib/labels";
 
 type ReportSection = {
   title?: string;
@@ -83,16 +84,16 @@ function sectionBody(section: ReportSection) {
 
 function compactList(items?: string[], fallback = "Not recorded") {
   if (!items?.length) return fallback;
-  return items.slice(0, 6).join(", ");
+  return items.slice(0, 6).map((item) => readableLabel(item)).join(", ");
 }
 
 function scoreLabel(report: ReportRow) {
   const payload = report.report_payload || {};
   const score = payload.readiness_score;
   const level = payload.readiness_level;
-  if (typeof score === "number" && level) return `${score}/100 · ${level}`;
+  if (typeof score === "number" && level) return `${score}/100 · ${readableLabel(level)}`;
   if (typeof score === "number") return `${score}/100`;
-  return level || "Not scored";
+  return readableLabel(level, "Not scored");
 }
 
 function reportDetailHref(report: ReportRow) {
@@ -104,14 +105,14 @@ export default function ReportsLookup() {
   const [reportRef, setReportRef] = useState("");
   const [contact, setContact] = useState("");
   const [reports, setReports] = useState<ReportRow[]>([]);
-  const [message, setMessage] = useState("Loading verified account reports if you are signed in...");
+  const [message, setMessage] = useState("Loading account reports if you are signed in...");
   const [loading, setLoading] = useState(false);
   const [accountEmail, setAccountEmail] = useState("");
 
   async function loadVerifiedReports(silent = false) {
     if (!silent) {
       setLoading(true);
-      setMessage("Loading reports from your verified account...");
+      setMessage("Loading reports from your account...");
     }
     try {
       const data = await apiJson<AccountSummary>("account/summary", {
@@ -120,7 +121,7 @@ export default function ReportsLookup() {
       const rows = data.sections?.reports?.rows || [];
       setReports(rows);
       setAccountEmail(data.session?.email || "");
-      setMessage(rows.length ? "Verified account reports loaded." : "No reports are connected to this verified account yet.");
+      setMessage(rows.length ? "Account reports loaded." : "No reports are connected to this account yet.");
     } catch {
       if (!silent) setMessage("Sign in first, or use report reference/email/phone lookup below.");
       if (silent) setMessage("Enter a report reference, email, or phone to load saved reports.");
@@ -173,16 +174,17 @@ export default function ReportsLookup() {
             <p className="overline">Saved reports</p>
             <h2>Find a readiness report</h2>
           </div>
-          <span className="status-dot">{accountEmail ? "Verified" : "Lookup"}</span>
+          <span className="status-dot">{accountEmail ? "Signed in" : "Lookup"}</span>
         </div>
-        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. Reports below are loaded from the verified account when available.</p> : null}
+        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. Reports below are loaded from your account when available.</p> : null}
         <div className="form-grid two-col">
           <div className="field"><label htmlFor="report_ref">Report reference</label><input id="report_ref" value={reportRef} onChange={(event) => setReportRef(event.target.value)} placeholder="MRR-..." /></div>
           <div className="field"><label htmlFor="report_contact">Email or phone</label><input id="report_contact" value={contact} onChange={(event) => setContact(event.target.value)} placeholder="you@example.com or +965..." /></div>
         </div>
         <div className="actions">
           <button className="btn primary" type="button" disabled={loading} onClick={loadReports}>{loading ? "Loading..." : "Load reports"}</button>
-          <button className="btn" type="button" disabled={loading} onClick={() => loadVerifiedReports(false)}>Load my verified reports</button>
+          <button className="btn" type="button" disabled={loading} onClick={() => loadVerifiedReports(false)}>Load my account reports</button>
+          <a className="btn" href="/route-checker">Generate new report</a>
         </div>
         <p className="form-status">{message}</p>
       </section>
@@ -203,22 +205,22 @@ export default function ReportsLookup() {
                     <span className="status-dot">{scoreLabel(report)}</span>
                   </div>
                   <div className="badge-row">
-                    {report.risk_level ? <span className="badge">Risk: {report.risk_level}</span> : null}
+                    {report.risk_level ? <span className="badge">Risk: {plainRiskLabel(report.risk_level)}</span> : null}
                     {report.target_country ? <span className="badge">Target: {report.target_country}</span> : null}
-                    {report.route_category ? <span className="badge">Route: {report.route_category}</span> : null}
+                    {report.route_category ? <span className="badge">Route: {readableLabel(report.route_category)}</span> : null}
                     <span className="badge">{formatDate(report.created_at || report.generated_at)}</span>
                   </div>
                   <div className="mini-list">
-                    <div><strong>Goal</strong><span>{report.goal || "Not recorded"}</span></div>
+                    <div><strong>Goal</strong><span>{readableLabel(report.goal)}</span></div>
                     <div><strong>Current country</strong><span>{report.current_country || "Not recorded"}</span></div>
                     <div><strong>Funds</strong><span>{report.available_funds_currency || ""} {(report.available_funds_amount || 0).toLocaleString()}</span></div>
                     <div><strong>Family members</strong><span>{report.family_members_count || 0}</span></div>
                     <div><strong>Missing documents</strong><span>{compactList(payload.missing_documents, "No document gaps shown")}</span></div>
-                    <div><strong>Source status</strong><span>{payload.source_status || "starter_rules_pending_official_review"}</span></div>
+                    <div><strong>Source status</strong><span>{sourceStatusLabel(payload.source_status)}</span></div>
                   </div>
                   {sections.length ? (
                     <div className="result-stack compact-stack">
-                      {sections.map((section, index) => {
+                      {sections.slice(0, 3).map((section, index) => {
                         const title = sectionTitle(section);
                         return (
                           <div className="result-block soft" key={`${section.section_key || title}-${index}`}>
@@ -231,17 +233,17 @@ export default function ReportsLookup() {
                   ) : null}
                   {payload.action_items?.length ? (
                     <div className="result-block soft">
-                      <h3>Action items</h3>
+                      <h3>Next actions</h3>
                       <div className="mini-list">
                         {payload.action_items.slice(0, 4).map((item, index) => (
-                          <div key={`${item.title || "action"}-${index}`}><strong>{item.priority || "medium"}</strong><span>{item.title}: {item.detail}</span></div>
+                          <div key={`${item.title || "action"}-${index}`}><strong>{readableLabel(item.priority || "medium")}</strong><span>{item.title}: {item.detail}</span></div>
                         ))}
                       </div>
                     </div>
                   ) : null}
                   <div className="actions">
                     <a className="btn primary" href={reportDetailHref(report)}>Open report</a>
-                    <a className="btn" href="/dashboard">Generate updated report</a>
+                    <a className="btn" href="/route-checker">Generate updated report</a>
                     <button className="btn" type="button" onClick={() => window.print()}>Print</button>
                   </div>
                 </article>
