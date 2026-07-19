@@ -103,8 +103,8 @@ function profileRouteLine(profile?: AccountProfile | null) {
   if (!profile) return "No profile selected yet";
   const target = profile.target_country || "Target country not set";
   const route = readableLabel(profile.route_category || profileGoal(profile));
-  const created = profile.created_at ? ` · Saved ${formatDateTime(profile.created_at)}` : "";
-  return `${target} · ${route}${created}`;
+  const created = profile.created_at ? `Saved ${formatDateTime(profile.created_at)}` : "Saved date not shown";
+  return `${target} · ${route} · ${created}`;
 }
 
 export default function AccountSummary() {
@@ -212,27 +212,35 @@ export default function AccountSummary() {
             ))}
           </div>
 
-          <article className="result-block soft" id="profile-chooser">
+          <div className="mini-list active-profile-summary">
+            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
+            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
+            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
+            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
+            <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
+          </div>
+
+          <article className="result-block soft profile-chooser-panel" id="profile-chooser">
             <div className="panel-heading">
               <div>
-                <p className="overline">Choose active profile</p>
-                <h3>Choose active profile</h3>
+                <p className="overline">Profile cleanup</p>
+                <h3>Choose or hide saved profiles</h3>
               </div>
-              <span className="status-dot">{activeProfile ? "Profile selected" : "Select profile"}</span>
+              <span className="status-dot">{profileCount} saved</span>
             </div>
             <p className="form-status">
-              This is the profile MoveReady will use for Route Checker, Saved Routes, Reports, Watchlist, Timeline, and Support. Use this button whenever you have more than one saved test profile.
+              Keep only the correct current profile visible. Click <strong>Use this profile</strong> for the profile you want MoveReady to use. Click <strong>Hide old profile</strong> for old test profiles.
             </p>
 
             {profiles.length ? (
-              <div className="mini-list">
-                {profiles.map((item) => {
+              <div className="mini-list profile-list">
+                {profiles.map((item, index) => {
                   const isActive = item.id === activeProfile?.id;
                   const itemSnapshot = item.readiness_snapshot || {};
                   return (
-                    <div key={item.id}>
-                      <strong>{isActive ? "Active now: " : "Saved profile: "}{profileName(item)}</strong>
-                      <span>{profileRouteLine(item)} · {itemSnapshot.readiness_score ?? 0}/100</span>
+                    <div className={isActive ? "active-profile-row" : ""} key={item.id}>
+                      <strong>{isActive ? "Active now: " : `Profile ${index + 1}: `}{profileName(item)}</strong>
+                      <span>{profileRouteLine(item)} · Readiness {itemSnapshot.readiness_score ?? 0}/100</span>
                       <div className="actions compact-actions">
                         <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={isActive}>{isActive ? "Using this profile" : "Use this profile"}</button>
                         {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
@@ -245,7 +253,7 @@ export default function AccountSummary() {
               <article className="result-block soft">
                 <h3>No profile list is visible yet</h3>
                 <p>
-                  Your account says it has {profileCount} profile{profileCount === 1 ? "" : "s"}, but the profile list did not load into the page. Click Refresh summary. If it still does not appear, open “Create or update profile” and save the correct current profile again.
+                  Your account says it has {profileCount} profile{profileCount === 1 ? "" : "s"}, but the profile list did not load into the page. Click Refresh summary. If it still does not appear, save the correct current profile again.
                 </p>
                 <div className="actions">
                   <button className="btn primary" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button>
@@ -254,21 +262,13 @@ export default function AccountSummary() {
               </article>
             )}
           </article>
-
-          <div className="mini-list">
-            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
-            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
-            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
-            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
-            <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
-          </div>
         </>
       ) : null}
 
       <p className="form-status">{message}</p>
       <div className="actions">
         {summary ? <button className="btn" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button> : <a className="btn primary" href="/login">Sign in with email</a>}
-        {summary ? <a className="btn primary" href="#profile-chooser">Choose active profile</a> : null}
+        {summary ? <a className="btn primary" href="#profile-chooser">Choose or hide profiles</a> : null}
         <a className="btn primary" href="/route-checker">Check my route</a>
         <a className="btn" href="#profile-dashboard">Create or update profile</a>
         <a className="btn" href="/my-reports">My reports</a>
