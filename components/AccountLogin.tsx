@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
 
@@ -52,7 +52,7 @@ function safeRedirectTarget() {
   try {
     const params = new URLSearchParams(window.location.search);
     const next = params.get("next") || params.get("redirect") || "";
-    if (next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/api/")) {
+    if (next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/api/") && !next.startsWith("/login")) {
       return next;
     }
   } catch {
@@ -76,6 +76,21 @@ export default function AccountLogin() {
   const [session, setSession] = useState<Session | null>(null);
   const [message, setMessage] = useState("Enter your email to request a secure login code.");
   const [loading, setLoading] = useState(false);
+  const redirectStarted = useRef(false);
+
+  function redirectAfterLogin(reason: "verified" | "existing") {
+    if (redirectStarted.current) return;
+    redirectStarted.current = true;
+    const target = safeRedirectTarget();
+    if (reason === "existing") {
+      setMessage(target === "/dashboard" ? "You are already signed in. Opening Account Center..." : "You are already signed in. Continuing to the requested page...");
+    } else {
+      setMessage(target === "/dashboard" ? "Login successful. Opening Account Center..." : "Login successful. Continuing to the requested page...");
+    }
+    window.setTimeout(() => {
+      window.location.assign(target);
+    }, 350);
+  }
 
   useEffect(() => {
     async function loadSession() {
@@ -83,7 +98,7 @@ export default function AccountLogin() {
         const data = await apiJson<MeResponse>("auth/me", { timeoutMs: 10000 });
         setSession(data.session);
         setEmail(data.session.email || "");
-        setMessage("You are signed in on this device.");
+        redirectAfterLogin("existing");
       } catch {
         // No active session yet.
       }
@@ -139,11 +154,7 @@ export default function AccountLogin() {
       });
       storeSessionToken(data.session_token);
       setSession(data.session);
-      const target = safeRedirectTarget();
-      setMessage(target === "/dashboard" ? "Login successful. Opening Account Center..." : "Login successful. Continuing to the requested page...");
-      window.setTimeout(() => {
-        window.location.assign(target);
-      }, 350);
+      redirectAfterLogin("verified");
     } catch (error) {
       const apiError = error as ApiError;
       const attempts = apiError?.data?.attempts_remaining;
@@ -154,6 +165,7 @@ export default function AccountLogin() {
   }
 
   async function logout() {
+    redirectStarted.current = false;
     setLoading(true);
     try {
       await apiJson("auth/logout", { method: "POST", timeoutMs: 10000 });
