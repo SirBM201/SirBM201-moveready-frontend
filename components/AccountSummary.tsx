@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { getActiveProfileId, setActiveProfile } from "@/lib/profileStorage";
+import { readableLabel } from "@/lib/labels";
 
 type AccountCounts = {
   profiles?: number;
@@ -13,6 +15,32 @@ type AccountCounts = {
   service_requests?: number;
 };
 
+type AccountProfile = {
+  id: string;
+  full_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  current_country?: string | null;
+  residence_country?: string | null;
+  nationality?: string | null;
+  target_country?: string | null;
+  target_city?: string | null;
+  main_goal?: string | null;
+  goal?: string | null;
+  route_category?: string | null;
+  available_funds_amount?: number | null;
+  available_funds_currency?: string | null;
+  family_members_count?: number | null;
+  timeline_months?: number | null;
+  status?: string | null;
+  created_at?: string;
+  readiness_snapshot?: {
+    readiness_score?: number;
+    readiness_level?: string;
+    risk_flags?: string[];
+  };
+};
+
 type AccountSummaryResponse = {
   ok: boolean;
   session?: {
@@ -21,25 +49,24 @@ type AccountSummaryResponse = {
     expires_at?: string;
   };
   counts?: AccountCounts;
-  latest_profile?: {
-    full_name?: string | null;
-    target_country?: string | null;
-    main_goal?: string | null;
-    readiness_snapshot?: {
-      readiness_score?: number;
-      readiness_level?: string;
+  latest_profile?: AccountProfile | null;
+  sections?: {
+    profiles?: {
+      ok?: boolean;
+      count?: number;
+      rows?: AccountProfile[];
     };
-  } | null;
+  };
   next_actions?: string[];
 };
 
 const summaryTiles = [
-  { key: "profiles", label: "Profiles", href: "#profile-dashboard" },
-  { key: "saved_routes", label: "Saved routes", href: "/saved-routes" },
-  { key: "watchlist", label: "Watchlist", href: "/watchlist" },
-  { key: "timeline", label: "Timeline", href: "/timeline" },
-  { key: "reports", label: "Reports", href: "/my-reports" },
-  { key: "service_requests", label: "Service requests", href: "/service-requests" },
+  { key: "profiles", label: "Profiles", helper: "People/plans saved", href: "#active-profile" },
+  { key: "saved_routes", label: "Saved routes", helper: "Routes to revisit", href: "/saved-routes" },
+  { key: "watchlist", label: "Watchlist", helper: "Alerts you asked for", href: "/watchlist" },
+  { key: "timeline", label: "Timeline", helper: "Dated actions", href: "/timeline" },
+  { key: "reports", label: "Reports", helper: "Readiness reports", href: "/my-reports" },
+  { key: "service_requests", label: "Support requests", helper: "Private help requests", href: "/service-requests" },
 ] as const;
 
 function formatDate(value?: string) {
@@ -51,20 +78,39 @@ function formatDate(value?: string) {
   }
 }
 
-function readable(value?: string | null) {
-  return (value || "").replace(/_/g, " ") || "Not set";
+function profileName(profile?: AccountProfile | null) {
+  return profile?.full_name || profile?.email || profile?.phone || profile?.target_country || "Saved profile";
+}
+
+function profileGoal(profile?: AccountProfile | null) {
+  return profile?.main_goal || profile?.goal || profile?.route_category || "relocation";
+}
+
+function usableProfiles(summary: AccountSummaryResponse | null) {
+  return (summary?.sections?.profiles?.rows || []).filter((profile) => profile.status !== "closed");
 }
 
 export default function AccountSummary() {
   const [summary, setSummary] = useState<AccountSummaryResponse | null>(null);
+  const [activeProfileId, setActiveProfileId] = useState("");
   const [message, setMessage] = useState("Checking for a signed-in session...");
   const [loading, setLoading] = useState(true);
+  const [archivingId, setArchivingId] = useState("");
 
   async function loadSummary() {
     setLoading(true);
     setMessage("Loading account summary...");
     try {
       const data = await apiJson<AccountSummaryResponse>("account/summary", { timeoutMs: 15000 });
+      const profiles = usableProfiles(data);
+      const storedActiveId = getActiveProfileId();
+      const chosenProfile = profiles.find((item) => item.id === storedActiveId) || profiles[0] || null;
+      if (chosenProfile?.id) {
+        setActiveProfile(chosenProfile.id, profileName(chosenProfile));
+        setActiveProfileId(chosenProfile.id);
+      } else {
+        setActiveProfileId("");
+      }
       setSummary(data);
       setMessage("Account summary loaded.");
     } catch (error) {
@@ -84,12 +130,45 @@ export default function AccountSummary() {
     loadSummary();
   }, []);
 
+  function chooseProfile(profile: AccountProfile) {
+    setActiveProfile(profile.id, profileName(profile));
+    setActiveProfileId(profile.id);
+    setMessage(`${profileName(profile)} is now your active profile. Route Checker and Saved Routes will use this profile first.`);
+  }
+
+  async function hideProfile(profile: AccountProfile) {
+    const email = summary?.session?.email || profile.email || "";
+    const phone = profile.phone || "";
+    if (!email && !phone) {
+      setMessage("This profile cannot be hidden because no matching email or phone was found.");
+      return;
+    }
+    setArchivingId(profile.id);
+    setMessage("Hiding old profile...");
+    try {
+      await apiJson(`profiles/${profile.id}`, {
+        method: "PATCH",
+        body: { status: "closed", email: email || undefined, phone: !email ? phone : undefined },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setMessage("Old profile hidden. Your account summary has been refreshed.");
+      await loadSummary();
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to hide profile: ${apiError.data.error}` : "Unable to hide profile right now.");
+    } finally {
+      setArchivingId("");
+    }
+  }
+
   const counts = summary?.counts || {};
-  const profile = summary?.latest_profile || null;
-  const snapshot = profile?.readiness_snapshot || {};
+  const profiles = usableProfiles(summary);
+  const activeProfile = profiles.find((item) => item.id === activeProfileId) || profiles[0] || summary?.latest_profile || null;
+  const snapshot = activeProfile?.readiness_snapshot || {};
 
   return (
-    <section className="result-block featured">
+    <section className="result-block featured" id="active-profile">
       <div className="panel-heading">
         <div>
           <p className="overline">Account summary</p>
@@ -100,7 +179,7 @@ export default function AccountSummary() {
 
       <p>
         {summary
-          ? "These are the MoveReady records currently connected to your signed-in email session."
+          ? "This is your account home. Pick one active profile first, then use it for route checks, reports, saved routes, alerts, timeline, and support requests."
           : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, and service requests under one account."}
       </p>
 
@@ -110,26 +189,52 @@ export default function AccountSummary() {
             {summaryTiles.map((tile) => (
               <a className="card" href={tile.href} key={tile.key}>
                 <h3>{counts[tile.key] ?? 0}</h3>
-                <p>{tile.label}</p>
+                <p><strong>{tile.label}</strong><br />{tile.helper}</p>
               </a>
             ))}
           </div>
 
           <div className="mini-list">
-            <div><strong>Latest profile</strong><span>{profile?.full_name || profile?.target_country || "No profile connected yet"}</span></div>
-            <div><strong>Goal</strong><span>{readable(profile?.main_goal)}</span></div>
-            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readable(snapshot.readiness_level || "Not calculated")}</span></div>
+            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
+            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
+            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
+            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
             <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
           </div>
+
+          {profiles.length > 1 ? (
+            <article className="result-block soft">
+              <p className="overline">Choose active profile</p>
+              <h3>Which profile should MoveReady use now?</h3>
+              <p className="form-status">You have more than one saved profile. Choose the correct one so reports and saved routes do not use old test details.</p>
+              <div className="mini-list">
+                {profiles.map((item) => {
+                  const isActive = item.id === activeProfile?.id;
+                  const itemSnapshot = item.readiness_snapshot || {};
+                  return (
+                    <div key={item.id}>
+                      <strong>{isActive ? "Active now: " : "Saved profile: "}{profileName(item)}</strong>
+                      <span>{item.target_country || "Target country not set"} · {readableLabel(item.route_category || profileGoal(item))} · {itemSnapshot.readiness_score ?? 0}/100</span>
+                      <div className="actions">
+                        <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={isActive}>{isActive ? "Using this profile" : "Use this profile"}</button>
+                        {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
+          ) : null}
         </>
       ) : null}
 
       <p className="form-status">{message}</p>
       <div className="actions">
         {summary ? <button className="btn" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Refreshing..." : "Refresh summary"}</button> : <a className="btn primary" href="/login">Sign in with email</a>}
+        <a className="btn primary" href="/route-checker">Check my route</a>
         <a className="btn" href="#profile-dashboard">Create or update profile</a>
-        <a className="btn" href="/saved-routes">Saved routes</a>
         <a className="btn" href="/my-reports">My reports</a>
+        <a className="btn" href="/saved-routes">Saved routes</a>
       </div>
     </section>
   );
