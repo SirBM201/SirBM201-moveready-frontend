@@ -7,8 +7,8 @@ const featureBenefits = [
     text: "A user may already hold a strong visa that can reduce or remove visa requirements for selected third countries.",
   },
   {
-    title: "Plan before paying agents",
-    text: "The tool helps users check whether an existing visa creates a safer short-trip, conference, tourism, or exploratory route.",
+    title: "Combine passport and visa power",
+    text: "The tool checks the user's passport baseline and then adds the extra benefit of Canada, U.S., UK, Schengen, Australia, or Japan visas.",
   },
   {
     title: "Keep the source trail visible",
@@ -41,8 +41,15 @@ export default function VisaPowerPage() {
             </div>
             <span className="status-dot">Premium feature</span>
           </div>
+          <div className="badge-row" style={{ marginTop: 10 }}>
+            <span className="badge">1. Choose passport</span>
+            <span className="badge">2. Tick visas held</span>
+            <span className="badge">3. Review conditions</span>
+            <span className="badge">4. Check official source</span>
+          </div>
           <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#visa-power-tool">Open tool</a>
+            <a className="btn" href="/passport-index">Passport index only</a>
             <a className="btn" href="/route-checker">Check relocation route</a>
             <a className="btn" href="/watchlist">Create alert</a>
           </div>
