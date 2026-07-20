@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { ApiError, apiJson } from "@/lib/api";
-import { getActiveProfileId, setActiveProfile } from "@/lib/profileStorage";
+import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
+import { clearActiveProfile, getActiveProfileId, setActiveProfile } from "@/lib/profileStorage";
 import { readableLabel } from "@/lib/labels";
 
 type AccountCounts = {
@@ -153,6 +153,15 @@ export default function AccountSummary() {
     setMessage(`${profileName(profile)} is now your active profile. Route Checker and Saved Routes will use this profile first.`);
   }
 
+  function switchAccount() {
+    clearStoredAuthToken();
+    clearActiveProfile();
+    setSummary(null);
+    setActiveProfileId("");
+    setMessage("Signed out on this browser. Opening login so you can use another email.");
+    window.location.assign("/login");
+  }
+
   async function hideProfile(profile: AccountProfile) {
     const email = summary?.session?.email || profile.email || "";
     const phone = profile.phone || "";
@@ -184,6 +193,7 @@ export default function AccountSummary() {
   const profileCount = counts.profiles ?? summary?.sections?.profiles?.count ?? profiles.length;
   const activeProfile = profiles.find((item) => item.id === activeProfileId) || profiles[0] || summary?.latest_profile || null;
   const snapshot = activeProfile?.readiness_snapshot || {};
+  const sessionEmail = summary?.session?.email || "Not signed in";
 
   return (
     <section className="result-block featured" id="active-profile">
@@ -213,6 +223,7 @@ export default function AccountSummary() {
           </div>
 
           <div className="mini-list active-profile-summary">
+            <div><strong>Signed-in email</strong><span>{sessionEmail}</span></div>
             <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
             <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
             <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
@@ -229,11 +240,24 @@ export default function AccountSummary() {
               <span className="status-dot">{profileCount} saved</span>
             </div>
             <p className="form-status">
-              Keep only the correct current profile visible. Click <strong>Use this profile</strong> for the profile you want MoveReady to use. Click <strong>Hide old profile</strong> for old test profiles.
+              This list only shows profiles saved under <strong>{sessionEmail}</strong>. If PowerShell, another browser, or another tab is signed in with a different email, it will show a different profile count.
+            </p>
+            <p className="form-status">
+              Keep only the correct current profile visible. Click <strong>Use this profile</strong> for the profile you want MoveReady to use. Click <strong>Hide old profile</strong> only when another old profile appears in this same list.
             </p>
 
             {profiles.length ? (
               <div className="mini-list profile-list">
+                {profiles.length === 1 ? (
+                  <div>
+                    <strong>Only one profile is visible for this signed-in email.</strong>
+                    <span>There is no old profile to hide on this browser account. To hide the 5 profiles from PowerShell, sign in here with the same email used in PowerShell.</span>
+                    <div className="actions compact-actions">
+                      <button className="btn primary" type="button" onClick={() => chooseProfile(profiles[0])}>Use this profile</button>
+                      <button className="btn" type="button" onClick={switchAccount}>Switch email account</button>
+                    </div>
+                  </div>
+                ) : null}
                 {profiles.map((item, index) => {
                   const isActive = item.id === activeProfile?.id;
                   const itemSnapshot = item.readiness_snapshot || {};
@@ -273,6 +297,7 @@ export default function AccountSummary() {
         <a className="btn" href="#profile-dashboard">Create or update profile</a>
         <a className="btn" href="/my-reports">My reports</a>
         <a className="btn" href="/saved-routes">Saved routes</a>
+        {summary ? <button className="btn" type="button" onClick={switchAccount}>Switch email account</button> : null}
       </div>
     </section>
   );
