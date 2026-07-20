@@ -15,8 +15,8 @@ const simpleSteps = [
   },
   {
     title: "3. Save one profile",
-    text: "Create one clear profile in My Account. This keeps your reports, saved routes, alerts, timeline, and support requests together.",
-    action: "Open My Account",
+    text: "Create one clear profile in Account. This keeps your reports, saved routes, alerts, timeline, and support requests together.",
+    action: "Open Account",
     href: "/dashboard",
   },
   {
@@ -28,7 +28,7 @@ const simpleSteps = [
   {
     title: "5. Watch important changes",
     text: "Create alerts only for routes or opportunities you truly care about, such as openings, closing dates, document changes, or source updates.",
-    action: "Open Watchlist",
+    action: "Create alerts",
     href: "/watchlist",
   },
   {
@@ -49,23 +49,46 @@ const plainRules = [
 const whoNeedsWhat = [
   {
     title: "I do not know where to go",
-    text: "Use Decision Center and Compare Countries first.",
+    text: "Use Decide and Countries first.",
     href: "/decision-center",
   },
   {
     title: "I already know the country",
-    text: "Use Route Checker, then generate a readiness report.",
+    text: "Use Check Route, then generate a readiness report.",
     href: "/route-checker",
   },
   {
     title: "I want to track openings",
-    text: "Use Opportunities and Watchlist alerts.",
-    href: "/opportunities",
+    text: "Use Alerts to watch route openings, closing dates, and document changes.",
+    href: "/watchlist",
   },
   {
     title: "I need practical help",
     text: "Use Services, but only after you understand the route and risk.",
     href: "/services",
+  },
+];
+
+const nextActions = [
+  {
+    title: "New user",
+    text: "Open Account and save your details once.",
+    href: "/dashboard",
+  },
+  {
+    title: "Returning user",
+    text: "Open Check Route. It should load your active profile automatically.",
+    href: "/route-checker",
+  },
+  {
+    title: "Already generated a report",
+    text: "Open Reports to review your risk label and next steps.",
+    href: "/my-reports",
+  },
+  {
+    title: "Need updates later",
+    text: "Open Alerts and choose only the routes you truly care about.",
+    href: "/watchlist",
   },
 ];
 
@@ -82,9 +105,9 @@ export default function StartPage() {
             This page explains what to do first, what to do next, and what not to treat as guaranteed. It is written for everyday users, not immigration experts.
           </p>
           <div className="actions">
-            <a className="btn primary" href="/route-checker">Start with route checker</a>
-            <a className="btn" href="/dashboard">Open My Account</a>
-            <a className="btn" href="/decision-center">I need help deciding</a>
+            <a className="btn primary" href="/route-checker">Check my route</a>
+            <a className="btn" href="/dashboard">Open Account</a>
+            <a className="btn" href="/decision-center">Help me decide</a>
           </div>
         </div>
 
@@ -92,7 +115,7 @@ export default function StartPage() {
           <h2>Best simple order</h2>
           <div className="mini-list">
             <div><strong>First</strong><span>Check or compare your route.</span></div>
-            <div><strong>Second</strong><span>Save one profile in My Account.</span></div>
+            <div><strong>Second</strong><span>Save one profile in Account.</span></div>
             <div><strong>Third</strong><span>Generate a readiness report.</span></div>
             <div><strong>Fourth</strong><span>Set alerts or request support only when needed.</span></div>
           </div>
@@ -100,6 +123,27 @@ export default function StartPage() {
       </section>
 
       <section className="section no-top-pad">
+        <div className="section-heading-row">
+          <div>
+            <p className="overline">What to do next</p>
+            <h2>Pick the box that matches you</h2>
+            <p className="section-intro">
+              This is the fastest way to choose the right page without understanding every feature.
+            </p>
+          </div>
+          <span className="status-dot">Plain language</span>
+        </div>
+        <div className="grid">
+          {nextActions.map((item) => (
+            <a className="card" href={item.href} key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Simple steps</p>
@@ -155,7 +199,7 @@ export default function StartPage() {
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Check my route</a>
-            <a className="btn" href="/dashboard">Go to My Account</a>
+            <a className="btn" href="/dashboard">Go to Account</a>
             <a className="btn" href="/trust">Read trust and safety</a>
           </div>
         </div>
