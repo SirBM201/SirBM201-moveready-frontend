@@ -305,6 +305,7 @@ export default function RouteReadinessForm() {
   }
 
   const reportRef = result?.report?.report_ref || "";
+  const quickGenerateLabel = activeProfileName ? "Use active profile and generate report" : "Check my route and save report";
 
   return (
     <div className="live-workspace">
@@ -331,6 +332,16 @@ export default function RouteReadinessForm() {
             {profileLoading ? "Loading profile..." : "Load my active profile"}
           </button>
           <a className="btn" href="/dashboard#profile-chooser">Choose profile in My Account</a>
+        </div>
+
+        <div className="result-block soft" style={{ marginTop: 14, padding: 14 }}>
+          <strong>Fast option</strong>
+          <p className="form-status" style={{ marginTop: 6 }}>
+            If the active profile above is correct, click the green button now. You can still edit the details below before generating.
+          </p>
+          <button className="btn primary full" type="submit" disabled={loading} style={{ marginTop: 12 }}>
+            {loading ? "Generating..." : quickGenerateLabel}
+          </button>
         </div>
 
         <p className="form-status">Simple guide: choose your goal, country, funds, family count, then click the green button.</p>
@@ -436,7 +447,7 @@ export default function RouteReadinessForm() {
         </label>
 
         <button className="btn primary full" type="submit" disabled={loading}>
-          {loading ? "Generating..." : "Check my route and save report"}
+          {loading ? "Generating..." : "Generate report"}
         </button>
         <p className="form-status">{status}</p>
         {error ? <p className="form-error">{error}</p> : null}
