@@ -150,6 +150,35 @@ function chooseAccountProfile(data: AccountSummary) {
   return backendActive || browserActive || profiles[0] || data.latest_profile || null;
 }
 
+function buildNextActions(form: typeof defaultForm, result: ResultState) {
+  const target = form.target_country || "your target country";
+  const route = readableLabel(form.route_category || form.goal, "route");
+  const reportRef = result.report?.report_ref || "the report reference";
+
+  return [
+    {
+      title: "1. Read the full report",
+      text: `Open ${reportRef}. Check the risk label, checklist, money estimate, and source status before making payments.`,
+    },
+    {
+      title: "2. Confirm official rules",
+      text: `Use official government, school, employer, or embassy sources to confirm the current ${target} ${route} requirements.`,
+    },
+    {
+      title: "3. Prepare documents and money",
+      text: "Use the checklist and budget range to prepare passports, evidence, proof of funds, insurance, translations, and timing.",
+    },
+    {
+      title: "4. Save or watch the route",
+      text: "Save the route or create an alert if this is still a serious option. Alerts are reminders, not approval promises.",
+    },
+    {
+      title: "5. Ask for support only when needed",
+      text: "Use Services for document review, expert review, courier, translation, accommodation, or settlement help after you understand the report.",
+    },
+  ];
+}
+
 export default function RouteReadinessForm() {
   const [form, setForm] = useState(defaultForm);
   const [result, setResult] = useState<ResultState | null>(null);
@@ -211,10 +240,10 @@ export default function RouteReadinessForm() {
       } else if (email) {
         setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
       } else if (showMessage) {
-        setStatus("No signed-in profile was found. Open My Account, choose a profile, then return here.");
+        setStatus("No signed-in profile was found. Open Account, save one profile, then return here.");
       }
     } catch {
-      if (showMessage) setStatus("Could not load your active profile. Please refresh or open My Account to confirm your profile.");
+      if (showMessage) setStatus("Could not load your active profile. Please refresh or open Account to confirm your profile.");
     } finally {
       setProfileLoading(false);
     }
@@ -255,10 +284,36 @@ export default function RouteReadinessForm() {
     if (typeof window !== "undefined") window.print();
   }
 
+  function validateForm() {
+    const problems: string[] = [];
+    const funds = Number(form.available_funds_amount || 0);
+    const familyCount = Number(form.family_members_count || 0);
+    const months = Number(form.timeline_months || 0);
+
+    if (!form.current_country.trim()) problems.push("where you are now");
+    if (!form.target_country.trim()) problems.push("where you want to move");
+    if (!form.goal.trim()) problems.push("why you want to move");
+    if (!form.route_category.trim()) problems.push("route type");
+    if (!Number.isFinite(funds) || funds < 0) problems.push("money available");
+    if (!Number.isFinite(familyCount) || familyCount < 0) problems.push("family members");
+    if (!Number.isFinite(months) || months < 0) problems.push("timeline in months");
+
+    if (problems.length) return `Please check: ${problems.join(", ")}.`;
+    return "";
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
     setError("");
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      setStatus("Some important route details are missing or invalid. Please correct them, then generate again.");
+      return;
+    }
+
+    setLoading(true);
     setStatus("Generating checklist, budget estimate, and readiness report...");
 
     const contactConsent = form.consent_to_contact === "true";
@@ -277,7 +332,7 @@ export default function RouteReadinessForm() {
       metadata: {
         active_profile_id: activeProfileId || undefined,
         active_profile_name: activeProfileName || undefined,
-        generated_from: "route_checker_active_profile",
+        generated_from: activeProfileId ? "route_checker_active_profile" : "route_checker_manual_entry",
       },
     };
 
@@ -295,9 +350,9 @@ export default function RouteReadinessForm() {
       });
       scrollToResult();
       if (reportResponse.report?.stored) {
-        setStatus(`Report generated and saved. Reference: ${reportResponse.report.report_ref}. The result is now open on the right.`);
+        setStatus(`Report generated and saved. Reference: ${reportResponse.report.report_ref}. The result is open on the right.`);
       } else {
-        setStatus(`Report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}. The result is now open on the right.`);
+        setStatus(`Report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}. The result is open on the right.`);
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -315,6 +370,7 @@ export default function RouteReadinessForm() {
 
   const reportRef = result?.report?.report_ref || "";
   const quickGenerateLabel = activeProfileName ? "Use active profile and generate report" : "Check my route and save report";
+  const nextActionItems = result ? buildNextActions(form, result) : [];
 
   return (
     <div className="live-workspace">
@@ -328,19 +384,26 @@ export default function RouteReadinessForm() {
         </div>
 
         {accountEmail ? (
-          <div className="mini-list">
+          <div className="mini-list simple-status-list">
             <div>
               <strong>Signed in as {accountEmail}</strong>
-              <span>{activeProfileName ? `Using active profile: ${activeProfileName} (${activeProfileRoute}).` : "No active profile loaded yet. Open My Account and choose one profile."}</span>
+              <span>{activeProfileName ? `Using active profile: ${activeProfileName} (${activeProfileRoute}).` : "No active profile loaded yet. Open Account and choose one profile."}</span>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="mini-list simple-status-list">
+            <div>
+              <strong>Not signed in yet</strong>
+              <span>You can still check a route. Sign in if you want reports, routes, alerts, and support requests connected to one account.</span>
+            </div>
+          </div>
+        )}
 
         <div className="actions">
           <button className="btn" type="button" onClick={() => loadAccountDefaults(true)} disabled={profileLoading || loading}>
             {profileLoading ? "Loading profile..." : "Load my active profile"}
           </button>
-          <a className="btn" href="/dashboard#profile-chooser">Choose profile in My Account</a>
+          <a className="btn" href="/dashboard#profile-chooser">Choose profile in Account</a>
         </div>
 
         <div className="result-block soft" style={{ marginTop: 14, padding: 14 }}>
@@ -504,6 +567,24 @@ export default function RouteReadinessForm() {
                 </div>
               </article>
             ) : null}
+
+            <article className="result-block featured">
+              <p className="overline">What to do next</p>
+              <h2>Follow these simple steps before spending money.</h2>
+              <div className="mini-list">
+                {nextActionItems.map((item) => (
+                  <div key={item.title}>
+                    <strong>{item.title}</strong>
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="actions compact-actions">
+                <a className="btn" href="/saved-routes">Save or load route</a>
+                <a className="btn" href="/watchlist">Create alert</a>
+                <a className="btn" href="/services">Ask for support</a>
+              </div>
+            </article>
 
             {result.budget ? (
               <article className="result-block">
