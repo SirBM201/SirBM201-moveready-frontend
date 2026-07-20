@@ -8,12 +8,17 @@ const quickStart = [
     text: "Enter your goal, current country, target country, funds, timeline, and family count to get a starter readiness view.",
   },
   {
-    title: "2. Compare options",
+    title: "2. Check visa power",
+    href: "/visa-power",
+    text: "Enter visas you already hold to see possible third-country travel benefits, conditions, and official-source links.",
+  },
+  {
+    title: "3. Compare options",
     href: "/compare",
     text: "Compare route families before spending money on documents, applications, bookings, or support providers.",
   },
   {
-    title: "3. Save what matters",
+    title: "4. Save what matters",
     href: "/dashboard",
     text: "Create a profile, save routes, generate reports, track alerts, and keep your timeline in one account workspace.",
   },
@@ -29,6 +34,11 @@ const publicTools = [
     title: "Compare countries",
     href: "/country-comparison",
     text: "Review country fit, route coverage, risk signals, source confidence, and next steps side by side.",
+  },
+  {
+    title: "Visa Power & Travel Benefits",
+    href: "/visa-power",
+    text: "Check whether visas you already hold can unlock easier travel, no separate visa, or simplified entry in selected destinations.",
   },
   {
     title: "Compare routes",
@@ -96,6 +106,7 @@ export default function Home() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Open My Account</a>
             <a className="btn" href="/compare">Compare routes</a>
             <a className="btn" href="/country-comparison">Compare countries</a>
@@ -107,11 +118,13 @@ export default function Home() {
           <h2>How to use MoveReady</h2>
           <div className="mini-list">
             <div><strong>Start with your route</strong><span>Use the route checker or compare pages to understand realistic options.</span></div>
+            <div><strong>Check visa power</strong><span>Use existing strong visas to see possible extra travel benefits before applying elsewhere.</span></div>
             <div><strong>Save your profile</strong><span>Use My Account so reports, saved routes, alerts, and service requests stay connected.</span></div>
             <div><strong>Act from the report</strong><span>Follow document, funds, timeline, and risk actions before spending money.</span></div>
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Generate starter plan</a>
+            <a className="btn" href="/visa-power">Open Visa Power</a>
             <a className="btn" href="/start">Open start guide</a>
           </div>
         </aside>
@@ -130,9 +143,9 @@ export default function Home() {
         <div className="section-heading-row">
           <div>
             <p className="overline">Start here</p>
-            <h2>Three steps for every user</h2>
+            <h2>Four steps for every user</h2>
             <p className="section-intro">
-              The app is designed to keep users from jumping straight into payments, bookings, or service requests without first understanding route fit, risk, documents, funds, and timing.
+              The app is designed to keep users from jumping straight into payments, bookings, or service requests without first understanding route fit, risk, documents, funds, visa power, and timing.
             </p>
           </div>
           <span className="status-dot">Guided flow</span>
@@ -150,7 +163,7 @@ export default function Home() {
       <section className="section" id="tools">
         <h2>Main tools</h2>
         <p className="section-intro">
-          Start with the tools below. They guide a user from route discovery to account records, reports, alerts, timelines, and support requests.
+          Start with the tools below. They guide a user from route discovery to visa-power checks, account records, reports, alerts, timelines, and support requests.
         </p>
         <div className="grid">
           {publicTools.map((route) => (
@@ -167,7 +180,7 @@ export default function Home() {
           <div>
             <h2>MoveReady service areas</h2>
             <p className="section-intro">
-              Service areas are grouped so users can move from route choice to alerts, documents, funds, trusted support, and settlement inside one clear platform.
+              Service areas are grouped so users can move from route choice to visa benefits, alerts, documents, funds, trusted support, and settlement inside one clear platform.
             </p>
           </div>
           <div className="actions">
@@ -202,6 +215,7 @@ export default function Home() {
             <span className="badge">Budget estimate</span>
             <span className="badge">Insurance notes</span>
             <span className="badge">Timeline events</span>
+            <span className="badge">Visa power</span>
             <span className="badge">Service requests</span>
             <span className="badge">Source freshness</span>
           </div>
