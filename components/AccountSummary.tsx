@@ -95,8 +95,16 @@ function profileGoal(profile?: AccountProfile | null) {
   return profile?.main_goal || profile?.goal || profile?.route_category || "relocation";
 }
 
+function isClosedProfile(profile: AccountProfile) {
+  return String(profile.status || "new").toLowerCase() === "closed";
+}
+
+function isBackendActive(profile?: AccountProfile | null) {
+  return String(profile?.status || "").toLowerCase() === "active";
+}
+
 function usableProfiles(summary: AccountSummaryResponse | null) {
-  return (summary?.sections?.profiles?.rows || []).filter((profile) => profile.status !== "closed");
+  return (summary?.sections?.profiles?.rows || []).filter((profile) => !isClosedProfile(profile));
 }
 
 function profileRouteLine(profile?: AccountProfile | null) {
@@ -113,6 +121,7 @@ export default function AccountSummary() {
   const [message, setMessage] = useState("Checking for a signed-in session...");
   const [loading, setLoading] = useState(true);
   const [archivingId, setArchivingId] = useState("");
+  const [choosingId, setChoosingId] = useState("");
 
   async function loadSummary() {
     setLoading(true);
@@ -121,7 +130,8 @@ export default function AccountSummary() {
       const data = await apiJson<AccountSummaryResponse>("account/summary", { timeoutMs: 15000 });
       const profiles = usableProfiles(data);
       const storedActiveId = getActiveProfileId();
-      const chosenProfile = profiles.find((item) => item.id === storedActiveId) || profiles[0] || data.latest_profile || null;
+      const backendActiveProfile = profiles.find((item) => isBackendActive(item));
+      const chosenProfile = backendActiveProfile || profiles.find((item) => item.id === storedActiveId) || profiles[0] || data.latest_profile || null;
       if (chosenProfile?.id) {
         setActiveProfile(chosenProfile.id, profileName(chosenProfile));
         setActiveProfileId(chosenProfile.id);
@@ -147,10 +157,33 @@ export default function AccountSummary() {
     loadSummary();
   }, []);
 
-  function chooseProfile(profile: AccountProfile) {
-    setActiveProfile(profile.id, profileName(profile));
-    setActiveProfileId(profile.id);
-    setMessage(`${profileName(profile)} is now your active profile. Route Checker and Saved Routes will use this profile first.`);
+  async function chooseProfile(profile: AccountProfile) {
+    const email = summary?.session?.email || profile.email || "";
+    const phone = profile.phone || "";
+    if (!email && !phone) {
+      setMessage("This profile cannot be selected because no matching email or phone was found.");
+      return;
+    }
+
+    setChoosingId(profile.id);
+    setMessage(`Saving ${profileName(profile)} as your active profile...`);
+    try {
+      await apiJson(`profiles/${profile.id}`, {
+        method: "PATCH",
+        body: { status: "active", email: email || undefined, phone: !email ? phone : undefined },
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      setActiveProfile(profile.id, profileName(profile));
+      setActiveProfileId(profile.id);
+      setMessage(`${profileName(profile)} is now your active profile on this account. Route Checker and Saved Routes will use this profile first.`);
+      await loadSummary();
+    } catch (error) {
+      const apiError = error as ApiError;
+      setMessage(apiError?.data?.error ? `Unable to use this profile: ${apiError.data.error}` : "Unable to save active profile right now.");
+    } finally {
+      setChoosingId("");
+    }
   }
 
   function switchAccount() {
@@ -178,6 +211,10 @@ export default function AccountSummary() {
         timeoutMs: 15000,
         useAuthToken: false,
       });
+      if (profile.id === activeProfileId) {
+        clearActiveProfile();
+        setActiveProfileId("");
+      }
       setMessage("Old profile hidden. Your account summary has been refreshed.");
       await loadSummary();
     } catch (error) {
@@ -191,7 +228,7 @@ export default function AccountSummary() {
   const counts = summary?.counts || {};
   const profiles = usableProfiles(summary);
   const profileCount = counts.profiles ?? summary?.sections?.profiles?.count ?? profiles.length;
-  const activeProfile = profiles.find((item) => item.id === activeProfileId) || profiles[0] || summary?.latest_profile || null;
+  const activeProfile = profiles.find((item) => item.id === activeProfileId) || profiles.find((item) => isBackendActive(item)) || profiles[0] || summary?.latest_profile || null;
   const snapshot = activeProfile?.readiness_snapshot || {};
   const sessionEmail = summary?.session?.email || "Not signed in";
 
@@ -243,7 +280,7 @@ export default function AccountSummary() {
               This list only shows profiles saved under <strong>{sessionEmail}</strong>. If PowerShell, another browser, or another tab is signed in with a different email, it will show a different profile count.
             </p>
             <p className="form-status">
-              Keep only the correct current profile visible. Click <strong>Use this profile</strong> for the profile you want MoveReady to use. Click <strong>Hide old profile</strong> only when another old profile appears in this same list.
+              Click <strong>Use this profile</strong> for the profile MoveReady should use now. This selection is saved on your account. Click <strong>Hide old profile</strong> only for old test profiles you no longer want to see.
             </p>
 
             {profiles.length ? (
@@ -251,27 +288,28 @@ export default function AccountSummary() {
                 {profiles.length === 1 ? (
                   <div>
                     <strong>Only one profile is visible for this signed-in email.</strong>
-                    <span>There is no old profile to hide on this browser account. To hide the 5 profiles from PowerShell, sign in here with the same email used in PowerShell.</span>
+                    <span>There is no old profile to hide on this account. Use this profile, or switch email account if your other test records belong to another email.</span>
                     <div className="actions compact-actions">
-                      <button className="btn primary" type="button" onClick={() => chooseProfile(profiles[0])}>Use this profile</button>
+                      <button className="btn primary" type="button" onClick={() => chooseProfile(profiles[0])} disabled={choosingId === profiles[0].id || loading}>{choosingId === profiles[0].id ? "Saving..." : isBackendActive(profiles[0]) ? "Using this profile" : "Use this profile"}</button>
                       <button className="btn" type="button" onClick={switchAccount}>Switch email account</button>
                     </div>
                   </div>
-                ) : null}
-                {profiles.map((item, index) => {
-                  const isActive = item.id === activeProfile?.id;
-                  const itemSnapshot = item.readiness_snapshot || {};
-                  return (
-                    <div className={isActive ? "active-profile-row" : ""} key={item.id}>
-                      <strong>{isActive ? "Active now: " : `Profile ${index + 1}: `}{profileName(item)}</strong>
-                      <span>{profileRouteLine(item)} · Readiness {itemSnapshot.readiness_score ?? 0}/100</span>
-                      <div className="actions compact-actions">
-                        <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={isActive}>{isActive ? "Using this profile" : "Use this profile"}</button>
-                        {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
+                ) : (
+                  profiles.map((item, index) => {
+                    const isActive = item.id === activeProfile?.id;
+                    const itemSnapshot = item.readiness_snapshot || {};
+                    return (
+                      <div className={isActive ? "active-profile-row" : ""} key={item.id}>
+                        <strong>{isActive ? "Active now: " : `Profile ${index + 1}: `}{profileName(item)}</strong>
+                        <span>{profileRouteLine(item)} · Readiness {itemSnapshot.readiness_score ?? 0}/100{isBackendActive(item) ? " · Saved as account active profile" : ""}</span>
+                        <div className="actions compact-actions">
+                          <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={choosingId === item.id || loading}>{choosingId === item.id ? "Saving..." : isActive ? "Using this profile" : "Use this profile"}</button>
+                          {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             ) : (
               <article className="result-block soft">
