@@ -5,7 +5,7 @@ const publicNavigation = [
   { label: "Countries", href: "/country-comparison", title: "Compare countries" },
   { label: "Routes", href: "/compare", title: "Compare relocation routes" },
   { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
-  { label: "Alerts", href: "/opportunities", title: "Opportunities and route alerts" },
+  { label: "Alerts", href: "/watchlist", title: "Create and review route alerts" },
   { label: "Services", href: "/services", title: "Request trusted support" },
   { label: "Prices", href: "/pricing", title: "Pricing" },
   { label: "Account", href: "/dashboard", title: "My Account" },
