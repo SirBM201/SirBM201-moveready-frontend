@@ -7,18 +7,8 @@ export default function RouteCheckerPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="Route checker" />
 
-      <section
-        className="section"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) minmax(260px, 0.55fr)",
-          gap: 18,
-          alignItems: "start",
-          paddingTop: 24,
-          paddingBottom: 18,
-        }}
-      >
-        <div>
+      <section className="hero-band" style={{ paddingTop: 24, paddingBottom: 18 }}>
+        <div className="hero-copy">
           <span className="eyebrow">Check Route</span>
           <h1 style={{ fontSize: "clamp(34px, 4.4vw, 52px)", lineHeight: 1.05, marginBottom: 12 }}>
             Check your route before you spend money.
