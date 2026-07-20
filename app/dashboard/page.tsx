@@ -4,22 +4,22 @@ import ProfileDashboard from "@/components/ProfileDashboard";
 
 const accountAreas = [
   {
-    title: "Create your profile",
-    detail: "Add your country, nationality, target country, goal, timeline, funds, family count, and contact details once.",
+    title: "Save your details once",
+    detail: "Add your country, target country, reason for moving, timeline, money available, family count, and contact details once.",
     href: "#profile-dashboard",
   },
   {
-    title: "Save routes to compare later",
-    detail: "Keep serious country and route options in one place so you do not lose the choices you are considering.",
+    title: "Save routes you care about",
+    detail: "Keep serious country and route options in one place so you can return later without starting again.",
     href: "/saved-routes",
   },
   {
-    title: "Track important changes",
-    detail: "Opt in to watch deadlines, opening windows, requirement changes, and source-review reminders.",
+    title: "Get alerts for changes",
+    detail: "Choose the routes you want to watch. MoveReady stores your alert preference and keeps it advisory.",
     href: "/watchlist",
   },
   {
-    title: "Build your timeline",
+    title: "Make a simple plan",
     detail: "Turn your relocation idea into dated actions for documents, appointments, payments, results, and follow-up tasks.",
     href: "/timeline",
   },
@@ -29,14 +29,14 @@ const accountAreas = [
     href: "/my-reports",
   },
   {
-    title: "Ask for practical support",
-    detail: "Request expert review or document support only when you want help and consent has been captured.",
+    title: "Ask for support",
+    detail: "Request expert or document review only when you want help and consent has been captured.",
     href: "/service-requests",
   },
 ];
 
 const trustControls = [
-  "Your private profile, reports, and service requests are not public.",
+  "Your private profile, reports, and support requests are not public.",
   "MoveReady asks for consent before contact, alerts, or support requests.",
   "Reports show risk labels, source status, and generated date.",
   "MoveReady gives readiness guidance; it does not promise approval, admission, jobs, lottery selection, or ballot success.",
@@ -70,15 +70,16 @@ export default function DashboardPage() {
           <span className="eyebrow">Account Center</span>
           <h1>Use one profile for your whole relocation plan.</h1>
           <p className="lede">
-            Save your key details once, then use them for route checks, saved routes, watchlist alerts, timelines, readiness reports, and service requests. This keeps MoveReady simple: profile first, then actions.
+            Save your key details once, then use them for route checks, saved routes, alerts, timelines, readiness reports, and support requests. This keeps MoveReady simple: profile first, then actions.
           </p>
           <div className="actions">
-            <a className="btn primary" href="#profile-dashboard">Start with my profile</a>
+            <a className="btn primary" href="#profile-dashboard">Save my details</a>
             <a className="btn" href="/login">Sign in</a>
-            <a className="btn" href="/my-reports">My reports</a>
+            <a className="btn" href="/route-checker">Check route</a>
+            <a className="btn" href="/my-reports">Reports</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
-            <a className="btn" href="/watchlist">Watchlist</a>
-            <a className="btn" href="/service-requests">Service requests</a>
+            <a className="btn" href="/watchlist">Alerts</a>
+            <a className="btn" href="/service-requests">Support</a>
           </div>
         </div>
       </section>
@@ -89,7 +90,7 @@ export default function DashboardPage() {
             <p className="overline">Start here</p>
             <h2>What your account connects</h2>
             <p className="section-intro">
-              Start with a profile. After that, every saved route, report, alert, timeline event, and service request can stay connected to the same email or phone. Sign in with email when you want a verified account session.
+              Start with a profile. After that, every saved route, report, alert, timeline event, and support request can stay connected to the same email or phone. Sign in with email when you want a verified account session.
             </p>
           </div>
           <span className="status-dot">Available now</span>
@@ -118,11 +119,11 @@ export default function DashboardPage() {
               MoveReady should feel like a guided workspace, not a collection of separate forms. Use the steps below as the normal path.
             </p>
             <div className="mini-list">
-              <div><strong>1. Create or load your profile</strong><span>Add your contact, country, target country, goal, funds, family count, and timeline.</span></div>
-              <div><strong>2. Save the route you care about</strong><span>Keep the route or country option so you can return to it later.</span></div>
+              <div><strong>1. Save or load your profile</strong><span>Add your contact, country, target country, goal, money available, family count, and timeline.</span></div>
+              <div><strong>2. Check the route you care about</strong><span>Use your active profile to see whether the route looks sensible before spending money.</span></div>
               <div><strong>3. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
               <div><strong>4. Create an alert</strong><span>Track important deadlines, route changes, and source-review reminders only when you opt in.</span></div>
-              <div><strong>5. Request support when needed</strong><span>Ask for expert or document review after you understand your route and report.</span></div>
+              <div><strong>5. Ask for support when needed</strong><span>Request expert or document review after you understand your route and report.</span></div>
             </div>
           </article>
 
@@ -159,9 +160,9 @@ export default function DashboardPage() {
         <div className="section-heading-row">
           <div>
             <p className="overline">Your relocation profile</p>
-            <h2>Create or retrieve your profile</h2>
+            <h2>Save your details or load your saved profile</h2>
             <p className="section-intro">
-              Use the same email or phone each time. After saving, you can generate a report, save a route, create a watchlist alert, or request expert review from the profile summary.
+              Use the same email or phone each time. After saving, you can check a route, generate a report, save a route, create an alert, or request support from the profile summary.
             </p>
           </div>
           <span className="status-dot">Contact lookup</span>
