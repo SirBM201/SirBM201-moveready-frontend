@@ -8,31 +8,37 @@ const simpleSteps = [
     href: "/route-checker",
   },
   {
-    title: "2. Compare before you spend money",
+    title: "2. Check the power of visas you already hold",
+    text: "Use Visa Power to see whether your Canada, U.S., UK, Schengen, Australia, or Japan visa may unlock extra travel benefits.",
+    action: "Check visa power",
+    href: "/visa-power",
+  },
+  {
+    title: "3. Compare before you spend money",
     text: "Look at countries and routes side by side before paying for documents, agents, tickets, hotels, or support.",
     action: "Compare routes",
     href: "/compare",
   },
   {
-    title: "3. Save one profile",
+    title: "4. Save one profile",
     text: "Create one clear profile in Account. This keeps your reports, saved routes, alerts, timeline, and support requests together.",
     action: "Open Account",
     href: "/dashboard",
   },
   {
-    title: "4. Generate a readiness report",
+    title: "5. Generate a readiness report",
     text: "Use the report to see your document gaps, funds pressure, risk label, and next actions. It is guidance, not approval.",
     action: "My reports",
     href: "/my-reports",
   },
   {
-    title: "5. Watch important changes",
+    title: "6. Watch important changes",
     text: "Create alerts only for routes or opportunities you truly care about, such as openings, closing dates, document changes, or source updates.",
     action: "Create alerts",
     href: "/watchlist",
   },
   {
-    title: "6. Ask for support only when needed",
+    title: "7. Ask for support only when needed",
     text: "Request help for document review, translation, insurance, courier, accommodation, pickup, or settlement only after your route is clearer.",
     action: "Request support",
     href: "/services",
@@ -40,10 +46,11 @@ const simpleSteps = [
 ];
 
 const plainRules = [
-  "MoveReady does not promise visa, admission, job, lottery, ballot, or route approval.",
+  "MoveReady does not promise visa, admission, job, lottery, ballot, travel entry, or route approval.",
   "Use official sources first before paying money or uploading sensitive documents.",
   "Choose one active profile so the app does not confuse old test profiles with your real plan.",
   "Read the risk label before acting. A high score is not the same as approval.",
+  "Visa Power is a planning tool only. Airlines and border officers still make their own checks.",
 ];
 
 const whoNeedsWhat = [
@@ -51,6 +58,11 @@ const whoNeedsWhat = [
     title: "I do not know where to go",
     text: "Use Decide and Countries first.",
     href: "/decision-center",
+  },
+  {
+    title: "I already have a strong visa",
+    text: "Use Visa Power to check possible travel benefits before applying for another visa.",
+    href: "/visa-power",
   },
   {
     title: "I already know the country",
@@ -81,6 +93,11 @@ const nextActions = [
     href: "/route-checker",
   },
   {
+    title: "Already have Canada, U.S., UK, Schengen, Australia, or Japan visa",
+    text: "Open Visa Power and check what extra destinations may become easier.",
+    href: "/visa-power",
+  },
+  {
     title: "Already generated a report",
     text: "Open Reports to review your risk label and next steps.",
     href: "/my-reports",
@@ -106,6 +123,7 @@ export default function StartPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Check my route</a>
+            <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Open Account</a>
             <a className="btn" href="/decision-center">Help me decide</a>
           </div>
@@ -115,9 +133,10 @@ export default function StartPage() {
           <h2>Best simple order</h2>
           <div className="mini-list">
             <div><strong>First</strong><span>Check or compare your route.</span></div>
-            <div><strong>Second</strong><span>Save one profile in Account.</span></div>
-            <div><strong>Third</strong><span>Generate a readiness report.</span></div>
-            <div><strong>Fourth</strong><span>Set alerts or request support only when needed.</span></div>
+            <div><strong>Second</strong><span>Check visas you already hold with Visa Power.</span></div>
+            <div><strong>Third</strong><span>Save one profile in Account.</span></div>
+            <div><strong>Fourth</strong><span>Generate a readiness report.</span></div>
+            <div><strong>Fifth</strong><span>Set alerts or request support only when needed.</span></div>
           </div>
         </aside>
       </section>
@@ -199,6 +218,7 @@ export default function StartPage() {
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Check my route</a>
+            <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Go to Account</a>
             <a className="btn" href="/trust">Read trust and safety</a>
           </div>
