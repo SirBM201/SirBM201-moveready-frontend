@@ -31,6 +31,16 @@ export const platformModules: PlatformModule[] = [
     href: "/watchlist",
   },
   {
+    slug: "visa-power",
+    title: "Visa Power and Travel Benefits",
+    category: "Passport index",
+    availability: "available",
+    summary: "Check whether visas a user already holds can unlock easier travel, no separate visa, or simplified entry in selected destinations.",
+    readiness: "The Visa Power page is live as a premium-preview planning tool with official-source rule records and safety notes.",
+    launchScope: "Passport power, existing visa stack, destination benefits, max stay notes, conditions, official source URLs, confidence labels, and last verified date.",
+    href: "/visa-power",
+  },
+  {
     slug: "documents",
     title: "Document readiness and name consistency",
     category: "Readiness",
