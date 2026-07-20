@@ -21,22 +21,33 @@ export default function MyReportsPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="My reports" />
 
-      <section className="hero-band compact-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Readiness history</span>
-          <h1>Find and review your saved readiness reports.</h1>
-          <p className="lede">
-            Load reports from your signed-in account, report reference, email, or phone. Use each report as an action plan for documents, funds, route questions, and next steps.
-          </p>
-          <div className="actions">
-            <a className="btn primary" href="/route-checker">Generate new report</a>
-            <a className="btn" href="/dashboard">Back to Account Center</a>
-            <a className="btn" href="/saved-routes">Saved routes</a>
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Reports</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Find and review your saved readiness reports.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Load reports from your signed-in account, report reference, email, or phone. Use reports as guidance, not approval.
+              </p>
+            </div>
+            <span className="status-dot">Lookup active</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
+            <a className="btn primary" href="#report-lookup">Load reports</a>
+            <a className="btn" href="/route-checker">Generate new report</a>
+            <a className="btn" href="/dashboard">Back to Account</a>
           </div>
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="report-lookup">
+        <ReportsLookup />
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Report basics</p>
@@ -45,7 +56,7 @@ export default function MyReportsPage() {
               A saved report should show the route context, user inputs, risk level, source status, and generated date so you can understand what the advice was based on.
             </p>
           </div>
-          <span className="status-dot">Lookup active</span>
+          <span className="status-dot">Review before action</span>
         </div>
         <div className="grid">
           {reportTrustItems.map((item) => (
@@ -55,10 +66,6 @@ export default function MyReportsPage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section className="section">
-        <ReportsLookup />
       </section>
     </main>
   );
