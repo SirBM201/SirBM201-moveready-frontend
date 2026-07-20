@@ -3,35 +3,35 @@ import ServiceRequestsLookup from "@/components/ServiceRequestsLookup";
 
 const trustRules = [
   {
-    title: "Admin review first",
-    detail: "A request can be saved immediately, but provider handoff should wait until an admin confirms the user need, route context, and request quality.",
+    title: "We review first",
+    detail: "Your request can be saved immediately, but MoveReady should review it before any provider receives details.",
   },
   {
-    title: "Consent before contact",
-    detail: "MoveReady should only contact the user or share request context after explicit consent is captured and stored.",
+    title: "You stay in control",
+    detail: "MoveReady should only contact you or share your request after consent is captured and stored.",
   },
   {
     title: "No shortcut promise",
-    detail: "Service providers can support preparation and execution, but MoveReady must not imply approval, selection, admission, or job success.",
+    detail: "Support can help you prepare, but it cannot guarantee approval, selection, admission, appointment, or job success.",
   },
 ];
 
 export default function ServiceRequestsPage() {
   return (
     <main className="page-shell">
-      <SiteHeader sectionLabel="Service requests" />
+      <SiteHeader sectionLabel="Support requests" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account Center: service requests</span>
-          <h1>Track trusted-support requests without turning MoveReady into a shortcut platform.</h1>
+          <span className="eyebrow">Support requests</span>
+          <h1>Track the help you asked MoveReady for.</h1>
           <p className="lede">
-            My Service Requests connects user support needs to the verified account, while keeping provider handoff private, consent-based, and subject to admin review.
+            This page keeps your private support requests connected to your account. Use it for document review, expert review, courier, legalization, translation, insurance, accommodation, pickup, or settlement help.
           </p>
           <div className="actions">
             <a className="btn primary" href="#my-service-requests">Load my requests</a>
             <a className="btn" href="/services#request-service">Create new request</a>
-            <a className="btn" href="/dashboard">Back to Account Center</a>
+            <a className="btn" href="/dashboard">Back to Account</a>
           </div>
         </div>
       </section>
@@ -39,10 +39,10 @@ export default function ServiceRequestsPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
-            <p className="overline">Handoff controls</p>
-            <h2>Trusted support should stay private and reviewed.</h2>
+            <p className="overline">Safety rules</p>
+            <h2>Support should stay private and reviewed.</h2>
             <p className="section-intro">
-              Service requests become commercially useful only when they protect the user. The MVP should capture requests, keep them linked to the account, and hold them for review before any provider receives context.
+              MoveReady should capture your request, keep it linked to your account, and hold it for review before anyone outside MoveReady receives the details.
             </p>
           </div>
           <span className="status-dot">Consent first</span>
