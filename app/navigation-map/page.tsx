@@ -5,7 +5,7 @@ const primaryFlows = [
     title: "Start guide",
     href: "/start",
     label: "New users",
-    summary: "Explains the safest order: check route, check visa power, save one profile, generate a report, set alerts, then request support only when needed.",
+    summary: "Explains the safest order: check route, check passport, check visa power, save one profile, generate a report, set alerts, then request support only when needed.",
   },
   {
     title: "Decide",
@@ -18,6 +18,12 @@ const primaryFlows = [
     href: "/country-comparison",
     label: "Choose destination",
     summary: "Compare countries by route coverage, opportunity coverage, risk signals, source confidence, and next actions.",
+  },
+  {
+    title: "Passport Index",
+    href: "/passport-index",
+    label: "Passport baseline",
+    summary: "Check passport-only travel categories before adding existing visa benefits or choosing a relocation route.",
   },
   {
     title: "Visa Power",
@@ -49,6 +55,7 @@ const routePages = [
 
 const actionPages = [
   { title: "Account", href: "/dashboard", text: "Save one active profile and connect reports, saved routes, alerts, timeline, and support requests." },
+  { title: "Passport Index", href: "/passport-index", text: "Check passport-only travel access categories, validity notes, renewal reminders, and source status." },
   { title: "Visa Power", href: "/visa-power", text: "Check existing visa travel benefits, max-stay notes, conditions, source URLs, and confidence labels." },
   { title: "Saved routes", href: "/saved-routes", text: "Save selected countries, routes, opportunities, scholarships, and services for later lookup." },
   { title: "Alerts", href: "/watchlist", text: "Create opt-in alerts for routes, countries, scholarships, services, and official opportunities." },
@@ -112,6 +119,7 @@ export default function NavigationMapPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/start">Open Start Guide</a>
+            <a className="btn" href="/passport-index">Passport Index</a>
             <a className="btn" href="/visa-power">Visa Power</a>
             <a className="btn" href="/route-checker">Check Route</a>
             <a className="btn" href="/dashboard">Open Account</a>
@@ -121,7 +129,7 @@ export default function NavigationMapPage() {
 
       <section className="trust-strip">
         <div className="trust-item"><strong>Start</strong><span>Plain guide for first-time users</span></div>
-        <div className="trust-item"><strong>Decide</strong><span>Country, route, and visa-power flow</span></div>
+        <div className="trust-item"><strong>Decide</strong><span>Country, route, passport, and visa-power flow</span></div>
         <div className="trust-item"><strong>Act</strong><span>Save, alert, report, timeline, and support</span></div>
         <div className="trust-item"><strong>Trust</strong><span>Sources, admin, launch, and safety controls</span></div>
       </section>
@@ -140,7 +148,7 @@ export default function NavigationMapPage() {
 
       <PageGroup
         title="User action pages"
-        intro="These pages turn information into progress: saved decisions, visa-benefit checks, alerts, timeline records, readiness checks, and reports."
+        intro="These pages turn information into progress: saved decisions, passport checks, visa-benefit checks, alerts, timeline records, readiness checks, and reports."
         items={actionPages}
       />
 
