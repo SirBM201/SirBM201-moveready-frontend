@@ -8,37 +8,43 @@ const simpleSteps = [
     href: "/route-checker",
   },
   {
-    title: "2. Check the power of visas you already hold",
+    title: "2. Check your passport first",
+    text: "Use Passport Index to see your passport baseline before applying for another visa or paying an agent.",
+    action: "Check passport",
+    href: "/passport-index",
+  },
+  {
+    title: "3. Check the power of visas you already hold",
     text: "Use Visa Power to see whether your Canada, U.S., UK, Schengen, Australia, or Japan visa may unlock extra travel benefits.",
     action: "Check visa power",
     href: "/visa-power",
   },
   {
-    title: "3. Compare before you spend money",
+    title: "4. Compare before you spend money",
     text: "Look at countries and routes side by side before paying for documents, agents, tickets, hotels, or support.",
     action: "Compare routes",
     href: "/compare",
   },
   {
-    title: "4. Save one profile",
+    title: "5. Save one profile",
     text: "Create one clear profile in Account. This keeps your reports, saved routes, alerts, timeline, and support requests together.",
     action: "Open Account",
     href: "/dashboard",
   },
   {
-    title: "5. Generate a readiness report",
+    title: "6. Generate a readiness report",
     text: "Use the report to see your document gaps, funds pressure, risk label, and next actions. It is guidance, not approval.",
     action: "My reports",
     href: "/my-reports",
   },
   {
-    title: "6. Watch important changes",
+    title: "7. Watch important changes",
     text: "Create alerts only for routes or opportunities you truly care about, such as openings, closing dates, document changes, or source updates.",
     action: "Create alerts",
     href: "/watchlist",
   },
   {
-    title: "7. Ask for support only when needed",
+    title: "8. Ask for support only when needed",
     text: "Request help for document review, translation, insurance, courier, accommodation, pickup, or settlement only after your route is clearer.",
     action: "Request support",
     href: "/services",
@@ -50,7 +56,7 @@ const plainRules = [
   "Use official sources first before paying money or uploading sensitive documents.",
   "Choose one active profile so the app does not confuse old test profiles with your real plan.",
   "Read the risk label before acting. A high score is not the same as approval.",
-  "Visa Power is a planning tool only. Airlines and border officers still make their own checks.",
+  "Passport Index and Visa Power are planning tools only. Airlines and border officers still make their own checks.",
 ];
 
 const whoNeedsWhat = [
@@ -58,6 +64,11 @@ const whoNeedsWhat = [
     title: "I do not know where to go",
     text: "Use Decide and Countries first.",
     href: "/decision-center",
+  },
+  {
+    title: "I want to know what my passport can do",
+    text: "Use Passport Index to check your passport baseline and travel-access categories.",
+    href: "/passport-index",
   },
   {
     title: "I already have a strong visa",
@@ -93,6 +104,11 @@ const nextActions = [
     href: "/route-checker",
   },
   {
+    title: "Only checking passport strength",
+    text: "Open Passport Index to see your passport baseline first.",
+    href: "/passport-index",
+  },
+  {
     title: "Already have Canada, U.S., UK, Schengen, Australia, or Japan visa",
     text: "Open Visa Power and check what extra destinations may become easier.",
     href: "/visa-power",
@@ -123,6 +139,7 @@ export default function StartPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Check my route</a>
+            <a className="btn" href="/passport-index">Check passport</a>
             <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Open Account</a>
             <a className="btn" href="/decision-center">Help me decide</a>
@@ -133,10 +150,11 @@ export default function StartPage() {
           <h2>Best simple order</h2>
           <div className="mini-list">
             <div><strong>First</strong><span>Check or compare your route.</span></div>
-            <div><strong>Second</strong><span>Check visas you already hold with Visa Power.</span></div>
-            <div><strong>Third</strong><span>Save one profile in Account.</span></div>
-            <div><strong>Fourth</strong><span>Generate a readiness report.</span></div>
-            <div><strong>Fifth</strong><span>Set alerts or request support only when needed.</span></div>
+            <div><strong>Second</strong><span>Check what your passport can do by itself.</span></div>
+            <div><strong>Third</strong><span>Check visas you already hold with Visa Power.</span></div>
+            <div><strong>Fourth</strong><span>Save one profile in Account.</span></div>
+            <div><strong>Fifth</strong><span>Generate a readiness report.</span></div>
+            <div><strong>Sixth</strong><span>Set alerts or request support only when needed.</span></div>
           </div>
         </aside>
       </section>
@@ -218,6 +236,7 @@ export default function StartPage() {
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Check my route</a>
+            <a className="btn" href="/passport-index">Check passport</a>
             <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Go to Account</a>
             <a className="btn" href="/trust">Read trust and safety</a>
