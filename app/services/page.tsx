@@ -30,14 +30,21 @@ export default function ServicesPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="Services" />
 
-      <section className="hero-band compact-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Optional support</span>
-          <h1>Ask for practical help when your route is clearer.</h1>
-          <p className="lede">
-            MoveReady can save your support request and keep it connected to your account. A request is not a promise of approval. It is a way to ask for help with preparation.
-          </p>
-          <div className="actions">
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Optional support</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Ask for practical help when your route is clearer.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Save a support request and keep it connected to your account. This is preparation help only, not a promise of approval.
+              </p>
+            </div>
+            <span className="status-dot">Consent first</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#request-service">Request support</a>
             <a className="btn" href="/service-requests">My support requests</a>
             <a className="btn" href="/dashboard">Back to Account</a>
@@ -45,7 +52,11 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="request-service">
+        <GeneralServiceRequestForm />
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Support areas</p>
@@ -54,7 +65,7 @@ export default function ServicesPage() {
               Choose the support area that matches your need. Share only what is necessary. MoveReady should review requests before any provider receives details.
             </p>
           </div>
-          <span className="status-dot">Consent first</span>
+          <span className="status-dot">Private first</span>
         </div>
         <div className="service-strip">
           {services.map(([title, text]) => (
@@ -86,10 +97,6 @@ export default function ServicesPage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section className="section" id="request-service">
-        <GeneralServiceRequestForm />
       </section>
     </main>
   );
