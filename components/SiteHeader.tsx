@@ -1,14 +1,14 @@
 const publicNavigation = [
-  { label: "Home", href: "/" },
-  { label: "Start Here", href: "/start" },
-  { label: "Decision Center", href: "/decision-center" },
-  { label: "Countries", href: "/country-comparison" },
-  { label: "Routes", href: "/compare" },
-  { label: "Route Checker", href: "/route-checker" },
-  { label: "Opportunities", href: "/opportunities" },
-  { label: "Services", href: "/services" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "My Account", href: "/dashboard" },
+  { label: "Home", href: "/", title: "Home page" },
+  { label: "Start", href: "/start", title: "Start here if you are new" },
+  { label: "Decide", href: "/decision-center", title: "Choose your direction" },
+  { label: "Countries", href: "/country-comparison", title: "Compare countries" },
+  { label: "Routes", href: "/compare", title: "Compare relocation routes" },
+  { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
+  { label: "Alerts", href: "/opportunities", title: "Opportunities and route alerts" },
+  { label: "Services", href: "/services", title: "Request trusted support" },
+  { label: "Prices", href: "/pricing", title: "Pricing" },
+  { label: "Account", href: "/dashboard", title: "My Account" },
 ];
 
 type SiteHeaderProps = {
@@ -27,7 +27,7 @@ export default function SiteHeader({ sectionLabel = "Global relocation readiness
       </a>
       <nav className="nav" aria-label="Main navigation">
         {publicNavigation.map((item) => (
-          <a href={item.href} key={item.href}>{item.label}</a>
+          <a href={item.href} key={item.href} title={item.title}>{item.label}</a>
         ))}
       </nav>
     </header>
