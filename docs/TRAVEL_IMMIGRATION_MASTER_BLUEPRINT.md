@@ -1,24 +1,29 @@
 # Travel & Immigration Guide – Master Feature Blueprint
 
-This document locks the long-term MoveReady/Travel Guide feature vision into the product roadmap. The goal is not to turn MoveReady into a generic travel blog. The goal is to build an AI-powered travel, immigration, relocation, study-abroad, and settlement platform that helps users discover options, compare routes, prepare safely, travel confidently, and settle with trusted support.
+This document locks the long-term product blueprint for MoveReady as an AI-powered Travel, Immigration, and Relocation Platform.
 
-## Product positioning
+The goal is not to build a generic travel website. The goal is to help users discover realistic routes, compare countries, prepare documents, plan finances, travel safely, relocate, settle, and access trusted partners through optional referral or service workflows.
 
-MoveReady should remain an advisory planning assistant. It must not promise visa approval, admission approval, job approval, lottery selection, ballot selection, citizenship approval, permanent residence approval, or guaranteed entry at a border.
+## Product vision
 
-The system should always show official sources, last verified dates, confidence labels, risk notes, and clear disclaimers before users spend money, upload sensitive documents, book travel, or request provider support.
+MoveReady should support the full user journey:
 
-## Recommended rollout logic
+1. Discover destinations, visas, admissions, work routes, PR paths, and official opportunities.
+2. Compare routes before spending money.
+3. Prepare documents, funds, timelines, language, and travel plans.
+4. Travel with confidence using source-reviewed guidance.
+5. Relocate and settle with practical support.
+6. Use trusted partners only with consent, review, and clear advisory disclaimers.
 
-1. Build source-backed planning tools first.
-2. Add account, report, saved route, alert, and timeline memory.
-3. Add premium decision tools such as Visa Power, Passport Index, route comparison, points calculators, and personalized roadmaps.
-4. Add trusted provider marketplace only after consent, review, vetting, and handoff controls are ready.
-5. Add booking and affiliate referrals only where they support the user's verified plan.
+MoveReady must remain source-first and advisory. It must not promise visa approval, admission, job approval, lottery selection, ballot selection, PR approval, border entry, or citizenship approval.
 
 ---
 
-## Module 1 – Travel & Immigration Information
+## Module 1 – Travel and Immigration Information
+
+Core function: explain routes and official requirements in plain language.
+
+Features:
 
 1. Country immigration guide
 2. Tourist visa guidance
@@ -26,11 +31,11 @@ The system should always show official sources, last verified dates, confidence 
 4. Student visa guidance
 5. Business visa guidance
 6. Family sponsorship guidance
-7. Permanent Residency (PR) pathways
+7. Permanent Residency pathways
 8. Citizenship pathways where applicable
-9. Digital Nomad Visa information
+9. Digital nomad visa information
 10. Retirement visa information
-11. Investment/Golden Visa information
+11. Investment and Golden Visa information
 12. Transit visa requirements
 13. Visa extension information
 14. Visa renewal information
@@ -40,7 +45,15 @@ The system should always show official sources, last verified dates, confidence 
 18. Official government source references
 19. Immigration glossary and terminology
 
-## Module 2 – Student Admission & Study Abroad
+User benefit: users understand route options without relying only on agents, social media posts, or scattered websites.
+
+---
+
+## Module 2 – Student Admission and Study Abroad
+
+Core function: help users compare study options and prepare school plus visa steps.
+
+Features:
 
 20. Study abroad country comparison
 21. University search
@@ -54,22 +67,30 @@ The system should always show official sources, last verified dates, confidence 
 29. Degree comparison
 30. Admission checklist generator
 31. Document checklist
-32. SOP or Statement of Purpose guidance
+32. Statement of Purpose guidance
 33. Personal Statement guidance
-34. CV/Resume guidance
+34. CV and resume guidance
 35. Recommendation letter guidance
 36. Interview preparation
 37. English language requirement guide such as IELTS and TOEFL
 38. Student visa document preparation guide
-39. Study-to-Work pathway
+39. Study-to-work pathway
 40. Study-to-PR pathway
 
-## Module 3 – PR & Relocation Intelligence
+User benefit: students and families can compare admissions, tuition, visa steps, scholarships, and long-term settlement outcomes before applying.
+
+---
+
+## Module 3 – PR and Relocation Intelligence
+
+Core function: compare long-term settlement routes and readiness.
+
+Features:
 
 41. PR pathway comparison
 42. Skilled worker pathways
 43. Employer-sponsored pathways
-44. Provincial or State nomination pathways
+44. Provincial or state nomination pathways
 45. Occupation shortage lists
 46. Points calculator where applicable
 47. PR eligibility self-assessment
@@ -82,7 +103,15 @@ The system should always show official sources, last verified dates, confidence 
 54. Risk indicator
 55. Common rejection reasons
 
-## Module 4 – Passport & Visa Intelligence
+User benefit: users can see whether their long-term settlement plan is realistic before spending money on the wrong country or route.
+
+---
+
+## Module 4 – Passport and Visa Intelligence
+
+Core function: show what a user's passport and existing visas can unlock.
+
+Features:
 
 56. Passport Index
 57. Passport strength ranking
@@ -95,13 +124,19 @@ The system should always show official sources, last verified dates, confidence 
 64. Visa expiry reminders
 65. Travel history tracker
 
-### Visa Power & Travel Benefits sub-feature
+Sub-feature already started: Visa Power and Travel Benefits.
 
-This is a premium feature that allows a user to enter visas they already hold, such as Canada, U.S., UK, Schengen, Australia, or Japan visas. MoveReady then shows possible extra travel benefits, destinations that may not require another visa, simplified entry conditions, maximum-stay notes, official sources, last verified dates, and confidence levels.
+This lets users enter visas they already hold, such as Canada, U.S., UK, Schengen, Australia, or Japan visitor visas, then view possible countries where entry may be easier, subject to current official rules.
 
-The feature must always say that the result is planning guidance only. Users must still check the official destination source, airline rules, border conditions, passport validity, visa validity, multiple-entry requirements, previous-use requirements, proof of funds, ticket, accommodation address, and personal immigration history.
+User benefit: users understand the value of their passport and existing visas, including possible simplified entry or travel benefits.
+
+---
 
 ## Module 5 – Travel Planning
+
+Core function: turn travel or relocation ideas into an action plan.
+
+Features:
 
 66. Trip planner
 67. Personalized travel itinerary
@@ -115,10 +150,18 @@ The feature must always say that the result is planning guidance only. Users mus
 75. Business travel planner
 76. Solo traveler planner
 
-## Module 6 – Booking & Referral Marketplace
+User benefit: users know what to do before departure, during travel, and after arrival.
+
+---
+
+## Module 6 – Booking and Referral Marketplace
+
+Core function: generate revenue through safe, optional partner/referral services.
+
+Features:
 
 77. Hotel booking
-78. Airbnb booking
+78. Airbnb or short-stay booking
 79. Hostel booking
 80. Apartment booking
 81. Flight booking
@@ -130,15 +173,25 @@ The feature must always say that the result is planning guidance only. Users mus
 87. Ferry booking
 88. Local transport recommendations
 89. Travel insurance referrals
-90. eSIM/SIM recommendations
+90. eSIM and SIM recommendations
 91. Currency exchange partner referrals
 92. International money transfer referrals
 93. Tour package referrals
 94. Attraction ticket referrals
 95. Visa photo service referrals
-96. Courier/document delivery referrals
+96. Courier and document delivery referrals
 
-## Module 7 – Cost & Financial Planning
+User benefit: users can move from planning to execution while MoveReady earns through referral links, partner commissions, or service fees.
+
+Safety rule: partner handoff must be consent-first and clearly optional.
+
+---
+
+## Module 7 – Cost and Financial Planning
+
+Core function: help users understand and plan expected costs.
+
+Features:
 
 97. Cost of living calculator
 98. Tuition calculator
@@ -152,7 +205,15 @@ The feature must always say that the result is planning guidance only. Users mus
 106. Utility cost guide
 107. Healthcare cost guide
 
+User benefit: users avoid underestimating relocation, study, travel, and settlement costs.
+
+---
+
 ## Module 8 – AI Travel Assistant
+
+Core function: answer user questions and personalize guidance using the user's profile and verified route data.
+
+Features:
 
 108. AI chat assistant
 109. Personalized recommendations
@@ -164,7 +225,17 @@ The feature must always say that the result is planning guidance only. Users mus
 115. Study abroad Q&A
 116. Travel preparation guidance
 
-## Module 9 – Safety & Compliance
+User benefit: users get plain-language guidance without needing to understand immigration terms first.
+
+Safety rule: AI must explain verified source records. AI must not invent official requirements.
+
+---
+
+## Module 9 – Safety and Compliance
+
+Core function: protect users from scams, unsafe travel, fake institutions, and wrong information.
+
+Features:
 
 117. Travel advisory alerts
 118. Scam alerts
@@ -179,7 +250,15 @@ The feature must always say that the result is planning guidance only. Users mus
 127. Embassy locator
 128. Local emergency guide
 
-## Module 10 – Culture & Survival Guide
+User benefit: users can make safer decisions and avoid paying fake providers.
+
+---
+
+## Module 10 – Culture and Survival Guide
+
+Core function: help users understand everyday life in the destination country.
+
+Features:
 
 129. Local customs
 130. Cultural etiquette
@@ -194,7 +273,15 @@ The feature must always say that the result is planning guidance only. Users mus
 139. Shopping guide
 140. Tipping guide
 
+User benefit: users prepare not only for visas, but also for real-life arrival and adjustment.
+
+---
+
 ## Module 11 – Language Integration
+
+Core function: connect MoveReady to the planned Language Tutor platform.
+
+Features:
 
 141. Essential travel phrases
 142. Airport conversation practice
@@ -203,9 +290,17 @@ The feature must always say that the result is planning guidance only. Users mus
 145. Emergency conversation practice
 146. Offline phrasebook
 147. One-tap translation
-148. Integration with the Language Tutor platform
+148. Integration with Language Tutor platform
+
+User benefit: users can prepare for real conversations before and after travel.
+
+---
 
 ## Module 12 – Personalized User Profile
+
+Core function: keep user context in one place so tools can personalize results.
+
+Features:
 
 149. Nationality profile
 150. Residence profile
@@ -218,7 +313,15 @@ The feature must always say that the result is planning guidance only. Users mus
 157. Saved documents
 158. Saved applications
 
-## Module 13 – Notifications & Alerts
+User benefit: users avoid entering the same information repeatedly. MoveReady can personalize route checks, reports, alerts, and support.
+
+---
+
+## Module 13 – Notifications and Alerts
+
+Core function: remind users when important changes or deadlines happen.
+
+Features:
 
 159. Visa policy updates
 160. Immigration law updates
@@ -231,7 +334,15 @@ The feature must always say that the result is planning guidance only. Users mus
 167. Visa expiry reminders
 168. Travel reminders
 
-## Module 14 – Community & Reviews
+User benefit: users do not miss important dates, source updates, or expiry issues.
+
+---
+
+## Module 14 – Community and Reviews
+
+Core function: build trust through verified stories and controlled community feedback.
+
+Features:
 
 169. Country reviews
 170. City reviews
@@ -243,7 +354,15 @@ The feature must always say that the result is planning guidance only. Users mus
 176. Immigration success stories
 177. Verified community discussions
 
+User benefit: users learn from real experiences while MoveReady controls misinformation and scams through moderation.
+
+---
+
 ## Module 15 – Premium Decision Tools
+
+Core function: paid tools for deeper planning, comparison, and settlement strategy.
+
+Features:
 
 178. Best country recommendation engine
 179. Career-to-country matching
@@ -255,7 +374,15 @@ The feature must always say that the result is planning guidance only. Users mus
 185. Climate comparison
 186. Long-term settlement planner
 
+User benefit: serious users can pay for deeper decision support before making expensive moves.
+
+---
+
 ## Module 16 – Future Enterprise Features
+
+Core function: advanced automation, document intelligence, enterprise support, and marketplace operations.
+
+Features:
 
 187. AI document scanner
 188. OCR document reader
@@ -272,34 +399,70 @@ The feature must always say that the result is planning guidance only. Users mus
 199. Personalized migration roadmap
 200. Referral and affiliate management system
 
+User benefit: MoveReady becomes a complete relocation operating system for individuals, families, students, professionals, businesses, and partners.
+
 ---
 
-## Long-term vision
+## Recommended rollout order
 
-MoveReady should support the full user journey:
+### MVP and near-term
 
-- Discover destinations and opportunities.
-- Compare visas, study options, work routes, business routes, and PR pathways.
-- Prepare documents, finances, timelines, and travel plans.
-- Travel with confidence using verified information.
-- Relocate and settle with practical guidance.
-- Access trusted partners through optional referral links only after consent and review controls are ready.
+1. Start guide
+2. Account and active profile
+3. Route checker
+4. Readiness report
+5. Reports lookup
+6. Saved routes
+7. Alerts/watchlist
+8. Support requests
+9. Opportunities
+10. Visa Power and Travel Benefits
 
-## Monetization direction
+### Phase 2
 
-The strongest model is freemium plus premium tools plus vetted service referrals.
+1. Passport Index expansion
+2. Student admission module
+3. PR pathway comparison
+4. Cost calculators
+5. Timeline and task center
+6. Document vault planning
+7. Insurance, courier, translation, and accommodation referrals
 
-Free users can access basic route checking, starter reports, basic country pages, and limited saved records. Paid users can access deeper reports, Visa Power, Passport Index, full alerts, document vault, source-refresh tracking, family planning, cost tools, and priority support. Referral and affiliate revenue can come from insurance, accommodation, flights, airport transfers, SIM/eSIM, money transfer, document courier, translations, document review, and settlement services.
+### Phase 3
 
-## Safety requirements
+1. AI assistant connected to verified source records
+2. Full marketplace/referral management
+3. Language Tutor integration
+4. Community stories and verified reviews
+5. Enterprise and partner dashboards
 
-Every sensitive module must preserve these rules:
+---
 
-- Use official sources as the source of truth.
-- Show last verified date and confidence level.
-- Avoid approval promises.
-- Require user consent before alerts, support requests, provider handoff, or marketing contact.
-- Keep user records private.
-- Separate planning guidance from paid provider services.
-- Review provider applications before listing or handoff.
-- Keep scam warnings visible where users may spend money.
+## Monetization model
+
+1. Free tier: basic route checker, starter report, limited saved routes, and public guides.
+2. Premium tier: unlimited reports, advanced comparison, Visa Power, Passport Index, PR scoring, alerts, and task center.
+3. Service commission: document review, expert review, courier, translation, insurance, accommodation, transport, and settlement support.
+4. Referral income: hotels, flights, eSIM, money transfer, insurance, tours, and booking partners.
+5. B2B/enterprise: relocation tools for HR teams, schools, agencies, and service providers.
+
+---
+
+## Product safety rules
+
+1. MoveReady must always use official sources where possible.
+2. Every result should show source status, last verified date, and confidence level.
+3. Users must be told that guidance is not approval.
+4. Sensitive documents require clear consent and secure handling.
+5. Partner handoff must happen only after provider review and user consent.
+6. Alerts are reminders, not guarantees.
+7. Community content must be moderated.
+8. AI must not invent laws, fees, requirements, or eligibility rules.
+
+---
+
+## Final positioning
+
+MoveReady is an AI-powered travel, immigration, relocation, and settlement readiness platform.
+
+It helps users move from confusion to a practical plan by combining country guides, route checks, reports, alerts, cost planning, visa intelligence, student guidance, PR intelligence, support services, and trusted referral partners in one easy-to-use workspace.
