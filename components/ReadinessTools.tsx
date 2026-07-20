@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { apiJson } from "@/lib/api";
 
 type Result = Record<string, any> | null;
+type ResultKind = "name" | "document" | "funds" | "refusal";
 
 function sourcePage() {
   try {
@@ -14,11 +15,90 @@ function sourcePage() {
   }
 }
 
-function ResultPanel({ title, result }: { title: string; result: Result }) {
+function readableStatus(value: any) {
+  return String(value || "not checked").replace(/_/g, " ");
+}
+
+function ResultPanel({ title, result, kind }: { title: string; result: Result; kind: ResultKind }) {
+  if (!result) {
+    return (
+      <article className="result-block soft">
+        <p className="overline">Result</p>
+        <h3>{title}</h3>
+        <p>Run this check to see the result here in simple language.</p>
+      </article>
+    );
+  }
+
+  const risk = readableStatus(result.risk_level);
+  const status = readableStatus(result.readiness_status);
+
   return (
-    <article className="result-block">
-      <h3>{title}</h3>
-      {!result ? <p>Run a check to see results here.</p> : <pre className="json-result">{JSON.stringify(result, null, 2)}</pre>}
+    <article className="result-block featured">
+      <div className="panel-heading">
+        <div>
+          <p className="overline">Result</p>
+          <h3>{title}</h3>
+        </div>
+        <span className="status-dot">Risk: {risk}</span>
+      </div>
+
+      {result.summary ? <p>{result.summary}</p> : null}
+      <div className="badge-row">
+        <span className="badge">Readiness: {status}</span>
+        {result.stored ? <span className="badge">Saved: yes</span> : <span className="badge">Saved: local/API result</span>}
+      </div>
+
+      {kind === "name" ? (
+        <div className="mini-list">
+          {(result.issues || []).length ? (
+            result.issues.map((issue: any, index: number) => (
+              <div key={index}>
+                <strong>{issue.label || "Document"}: {issue.issue || "Name issue"}</strong>
+                <span>{issue.suggestion || "Check the spelling, order, abbreviation, or supporting affidavit need."}</span>
+              </div>
+            ))
+          ) : (
+            <div><strong>No obvious name issue</strong><span>Still compare all documents against the exact official application checklist.</span></div>
+          )}
+        </div>
+      ) : null}
+
+      {kind === "document" ? (
+        <div className="mini-list two-col-list">
+          <div><strong>Missing required</strong><span>{(result.missing_required || []).length ? result.missing_required.join(", ") : "No required starter document gap detected."}</span></div>
+          <div><strong>Recommended checks</strong><span>{(result.recommended_checks || []).length ? result.recommended_checks.join(", ") : "No extra recommended checks shown."}</span></div>
+          <div><strong>Next action</strong><span>Compare this with the official checklist before paying or submitting.</span></div>
+          <div><strong>Important</strong><span>{result.note || "Starter categories are not the final official document list."}</span></div>
+        </div>
+      ) : null}
+
+      {kind === "funds" ? (
+        <div className="mini-list two-col-list">
+          <div><strong>Available funds</strong><span>{result.currency} {Number(result.available_funds || 0).toLocaleString()}</span></div>
+          <div><strong>Planning requirement</strong><span>{result.currency} {Number(result.required_funds_adjusted || 0).toLocaleString()}</span></div>
+          <div><strong>Shortfall</strong><span>{result.currency} {Number(result.shortfall || 0).toLocaleString()}</span></div>
+          <div><strong>Monthly savings target</strong><span>{result.currency} {Number(result.monthly_savings_target || 0).toLocaleString()}</span></div>
+          <div><strong>Warnings</strong><span>{(result.warnings || []).length ? result.warnings.join(" ") : "No major funds warning from the entered values."}</span></div>
+          <div><strong>Important</strong><span>{result.note || "Use official proof-of-funds rules before applying."}</span></div>
+        </div>
+      ) : null}
+
+      {kind === "refusal" ? (
+        <div className="mini-list">
+          {(result.findings || []).length ? (
+            result.findings.map((finding: any, index: number) => (
+              <div key={index}>
+                <strong>{finding.indicator ? readableStatus(finding.indicator) : "Risk finding"}</strong>
+                <span>{finding.issue}</span>
+              </div>
+            ))
+          ) : (
+            <div><strong>No selected risk indicator</strong><span>No risk box was ticked. Still review your full profile before applying.</span></div>
+          )}
+          <div><strong>Repair plan</strong><span>{(result.repair_plan || []).join(" ")}</span></div>
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -28,7 +108,7 @@ export default function ReadinessTools() {
   const [documentResult, setDocumentResult] = useState<Result>(null);
   const [fundsResult, setFundsResult] = useState<Result>(null);
   const [refusalResult, setRefusalResult] = useState<Result>(null);
-  const [status, setStatus] = useState("Ready.");
+  const [status, setStatus] = useState("Ready. Choose one tool and click the green button.");
 
   async function runNameCheck(formData: FormData) {
     const records = [
@@ -37,7 +117,7 @@ export default function ReadinessTools() {
       { label: "Bank statement", name: String(formData.get("bank_name") || "") },
     ];
     const data = await apiJson("readiness/name-consistency", { method: "POST", body: { records, source_page: sourcePage() }, useAuthToken: false });
-    setNameResult(data);
+    setNameResult(data as Result);
   }
 
   async function runDocumentCheck(formData: FormData) {
@@ -50,7 +130,7 @@ export default function ReadinessTools() {
       body: { route_category: String(formData.get("route_category") || "startup"), documents, source_page: sourcePage() },
       useAuthToken: false,
     });
-    setDocumentResult(data);
+    setDocumentResult(data as Result);
   }
 
   async function runFundsPlan(formData: FormData) {
@@ -67,7 +147,7 @@ export default function ReadinessTools() {
       },
       useAuthToken: false,
     });
-    setFundsResult(data);
+    setFundsResult(data as Result);
   }
 
   async function runRefusalRisk(formData: FormData) {
@@ -81,7 +161,7 @@ export default function ReadinessTools() {
       weak_business_plan: formData.get("weak_business_plan") === "on",
     };
     const data = await apiJson("readiness/refusal-risk", { method: "POST", body: { indicators, source_page: sourcePage() }, useAuthToken: false });
-    setRefusalResult(data);
+    setRefusalResult(data as Result);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>, runner: (formData: FormData) => Promise<void>) {
@@ -89,7 +169,7 @@ export default function ReadinessTools() {
     setStatus("Running check...");
     try {
       await runner(new FormData(event.currentTarget));
-      setStatus("Check completed.");
+      setStatus("Check completed. Read the result card before taking action.");
     } catch {
       setStatus("Unable to run this check. Confirm backend deployment is complete.");
     }
@@ -103,13 +183,27 @@ export default function ReadinessTools() {
         .tool-card h3 { margin: 0; font-size: 24px; }
         .tool-card p { margin: 0; color: var(--muted); line-height: 1.6; }
         .tool-layout { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); gap: 16px; align-items: start; }
-        .json-result { margin: 0; max-height: 360px; overflow: auto; white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: var(--ink); }
         .check-list { display: grid; gap: 8px; color: var(--muted); }
         .check-list label { display: flex; gap: 8px; align-items: flex-start; }
         @media (max-width: 980px) { .tool-layout { grid-template-columns: 1fr; } }
       `}</style>
 
-      <p className="form-status">{status}</p>
+      <article className="result-block soft">
+        <div className="panel-heading">
+          <div>
+            <p className="overline">Simple readiness tools</p>
+            <h2>Use these before paying or submitting.</h2>
+          </div>
+          <span className="status-dot">No guarantee</span>
+        </div>
+        <p className="form-status">{status}</p>
+        <div className="badge-row">
+          <span className="badge">Names</span>
+          <span className="badge">Documents</span>
+          <span className="badge">Funds</span>
+          <span className="badge">Refusal risk</span>
+        </div>
+      </article>
 
       <article className="tool-card">
         <div>
@@ -123,7 +217,7 @@ export default function ReadinessTools() {
             <div className="field"><label>Bank statement name</label><input name="bank_name" placeholder="Full name on bank statement" /></div>
             <button className="btn primary" type="submit">Check names</button>
           </form>
-          <ResultPanel title="Name result" result={nameResult} />
+          <ResultPanel title="Name result" result={nameResult} kind="name" />
         </div>
       </article>
 
@@ -138,13 +232,13 @@ export default function ReadinessTools() {
             <div className="field"><label>Documents you have</label><textarea name="documents" rows={4} placeholder="passport, proof of funds, purpose evidence, business plan" /></div>
             <button className="btn primary" type="submit">Check documents</button>
           </form>
-          <ResultPanel title="Document result" result={documentResult} />
+          <ResultPanel title="Document result" result={documentResult} kind="document" />
         </div>
       </article>
 
       <article className="tool-card">
         <div>
-          <h3>Proof-of-funds planner</h3>
+          <h3>Proof-of-funds and budget planner</h3>
           <p>Estimate shortfall, monthly savings target, family adjustment, and large-deposit risk.</p>
         </div>
         <div className="tool-layout">
@@ -157,7 +251,7 @@ export default function ReadinessTools() {
             <label className="checkbox-field"><input name="recent_large_deposits" type="checkbox" />Recent large deposits</label>
             <button className="btn primary full" type="submit">Plan funds</button>
           </form>
-          <ResultPanel title="Funds result" result={fundsResult} />
+          <ResultPanel title="Funds result" result={fundsResult} kind="funds" />
         </div>
       </article>
 
@@ -179,7 +273,7 @@ export default function ReadinessTools() {
             </div>
             <button className="btn primary" type="submit">Screen risk</button>
           </form>
-          <ResultPanel title="Risk result" result={refusalResult} />
+          <ResultPanel title="Risk result" result={refusalResult} kind="refusal" />
         </div>
       </article>
     </div>
