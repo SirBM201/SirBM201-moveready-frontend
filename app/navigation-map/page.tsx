@@ -2,28 +2,34 @@ import SiteHeader from "@/components/SiteHeader";
 
 const primaryFlows = [
   {
-    title: "Decision Center",
-    href: "/decision-center",
-    label: "Best starting point",
-    summary: "Guides users from country choice to route comparison, readiness checks, watchlist alerts, trusted services, and reports.",
+    title: "Start guide",
+    href: "/start",
+    label: "New users",
+    summary: "Explains the safest order: check route, save one profile, generate a report, set alerts, then request support only when needed.",
   },
   {
-    title: "Country comparison",
+    title: "Decide",
+    href: "/decision-center",
+    label: "Choose direction",
+    summary: "Guides users from country choice to route comparison, readiness checks, alerts, trusted services, and reports.",
+  },
+  {
+    title: "Countries",
     href: "/country-comparison",
     label: "Choose destination",
     summary: "Compare countries by route coverage, opportunity coverage, risk signals, source confidence, and next actions.",
   },
   {
-    title: "Route comparison",
+    title: "Routes",
     href: "/compare",
     label: "Choose route family",
     summary: "Compare startup, D visa, entrepreneur, youth mobility, lottery, ballot, quota, and readiness routes.",
   },
   {
-    title: "Route checker",
+    title: "Check Route",
     href: "/route-checker",
-    label: "Check readiness",
-    summary: "Generate practical next steps from user route inputs: documents, funds, risk, budget, insurance, and report actions.",
+    label: "Create report",
+    summary: "Use the active profile to generate practical next steps: documents, funds, risk, budget, insurance, and report actions.",
   },
 ];
 
@@ -36,16 +42,17 @@ const routePages = [
 ];
 
 const actionPages = [
-  { title: "Saved routes", href: "/saved-routes", text: "Save selected countries, visa routes, opportunities, scholarships, and services for later lookup." },
-  { title: "Watchlist and alerts", href: "/watchlist", text: "Create opt-in alerts for routes, countries, scholarships, services, and official opportunities." },
+  { title: "Account", href: "/dashboard", text: "Save one active profile and connect reports, saved routes, alerts, timeline, and support requests." },
+  { title: "Saved routes", href: "/saved-routes", text: "Save selected countries, routes, opportunities, scholarships, and services for later lookup." },
+  { title: "Alerts", href: "/watchlist", text: "Create opt-in alerts for routes, countries, scholarships, services, and official opportunities." },
   { title: "Timeline", href: "/timeline", text: "Track document deadlines, appointments, payment dates, result checks, travel, and arrival steps." },
   { title: "Readiness tools", href: "/readiness", text: "Check name consistency, documents, funds gaps, refusal-risk indicators, and next actions." },
-  { title: "Reports", href: "/report-preview", text: "Preview route-specific readiness reports with risk notes, sources, and action steps." },
-  { title: "My reports", href: "/my-reports", text: "Retrieve previously generated reports by reference, email, or phone." },
+  { title: "Reports", href: "/my-reports", text: "Retrieve previously generated reports by reference, email, phone, or signed-in account." },
 ];
 
 const supportPages = [
-  { title: "Trusted services", href: "/services", text: "Request courier, legalization, translation, insurance, expert review, admission, accommodation, and settlement support." },
+  { title: "Services", href: "/services", text: "Request courier, legalization, translation, insurance, expert review, admission, accommodation, and settlement support." },
+  { title: "Support requests", href: "/service-requests", text: "Review private help requests connected to the signed-in account." },
   { title: "Courier requests", href: "/courier", text: "Capture sensitive-document courier needs for passports, certificates, embassy files, and legalization documents." },
   { title: "Legalization", href: "/legalization", text: "Plan notarization, apostille, attestation, embassy legalization, authentication, and translation support." },
   { title: "Family planner", href: "/family-planner", text: "Prepare spouse/children documents, funds, school, accommodation, and arrival tasks." },
@@ -58,7 +65,7 @@ const trustAndAdminPages = [
   { title: "Sources", href: "/sources", text: "Review official sources, freshness, source confidence, review timing, and route versioning controls." },
   { title: "Launch readiness", href: "/launch-readiness", text: "Check product surfaces, deployment checks, provider boundaries, and public safety controls." },
   { title: "Workspace", href: "/workspace", text: "Main operating page for testing all active product areas and admin surfaces." },
-  { title: "Admin", href: "/admin", text: "Review submitted requests, saved records, watchlists, service requests, and provider applications." },
+  { title: "Admin", href: "/admin", text: "Review submitted requests, saved records, alerts, support requests, and provider applications." },
 ];
 
 function PageGroup({ title, intro, items }: { title: string; intro: string; items: { title: string; href: string; text?: string; summary?: string; label?: string }[] }) {
@@ -94,20 +101,20 @@ export default function NavigationMapPage() {
           <span className="eyebrow">Product navigation design</span>
           <h1>Every major MoveReady page in one clear map.</h1>
           <p className="lede">
-            This map makes the design easier to supervise: it shows the core decision flow, route pages, user action pages, service-support pages, and trust/admin pages from one place.
+            This map makes the app easier to supervise: it shows the core decision flow, route pages, user action pages, support pages, and trust/admin pages from one place.
           </p>
           <div className="actions">
-            <a className="btn primary" href="/decision-center">Open Decision Center</a>
-            <a className="btn" href="/workspace">Open Workspace</a>
-            <a className="btn" href="/country-comparison">Compare countries</a>
+            <a className="btn primary" href="/start">Open Start Guide</a>
+            <a className="btn" href="/route-checker">Check Route</a>
+            <a className="btn" href="/dashboard">Open Account</a>
           </div>
         </div>
       </section>
 
       <section className="trust-strip">
-        <div className="trust-item"><strong>Core</strong><span>Decision, country, route, and readiness flow</span></div>
-        <div className="trust-item"><strong>Routes</strong><span>Country and route-family detail pages</span></div>
-        <div className="trust-item"><strong>Actions</strong><span>Save, alert, report, timeline, and tools</span></div>
+        <div className="trust-item"><strong>Start</strong><span>Plain guide for first-time users</span></div>
+        <div className="trust-item"><strong>Decide</strong><span>Country, route, and readiness flow</span></div>
+        <div className="trust-item"><strong>Act</strong><span>Save, alert, report, timeline, and support</span></div>
         <div className="trust-item"><strong>Trust</strong><span>Sources, admin, launch, and safety controls</span></div>
       </section>
 
