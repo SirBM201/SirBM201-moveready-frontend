@@ -12,7 +12,7 @@ const savedRouteUses = [
   },
   {
     title: "Create alerts",
-    detail: "A saved route can later become a watchlist item for opening dates, deadline windows, or rule changes.",
+    detail: "A saved route can later become an alert item for opening dates, deadline windows, or rule changes.",
   },
 ];
 
@@ -21,28 +21,40 @@ export default function SavedRoutesPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="Saved routes" />
 
-      <section className="hero-band compact-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Account Center: saved decisions</span>
-          <h1>Keep the routes and opportunities worth revisiting.</h1>
-          <p className="lede">
-            Saved Routes turns browsing into a proper relocation workspace. Signed-in users can load saved routes from their verified account, and email or phone lookup remains available for quick retrieval.
-          </p>
-          <div className="actions">
-            <a className="btn primary" href="/compare">Compare routes</a>
-            <a className="btn" href="/country-comparison">Compare countries</a>
-            <a className="btn" href="/dashboard">Back to Account Center</a>
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Saved routes</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Keep routes worth revisiting.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Save serious routes, load them later, generate reports, create alerts, or archive old route ideas.
+              </p>
+            </div>
+            <span className="status-dot">Account linked</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
+            <a className="btn primary" href="#saved-route-manager">Load saved routes</a>
+            <a className="btn" href="/compare">Compare routes</a>
+            <a className="btn" href="/route-checker">Check route</a>
+            <a className="btn" href="/dashboard">Back to Account</a>
           </div>
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="saved-route-manager">
+        <SavedRoutesManager />
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Why saving matters</p>
             <h2>Saved routes are the bridge between planning and action</h2>
             <p className="section-intro">
-              A saved route should eventually connect to reports, timeline steps, watchlist alerts, and provider requests. Verified account loading now makes those records easier to return to without retyping contact details.
+              A saved route should eventually connect to reports, timeline steps, alerts, and support requests. Verified account loading now makes those records easier to return to without retyping contact details.
             </p>
           </div>
           <span className="status-dot">Verified + lookup</span>
@@ -55,10 +67,6 @@ export default function SavedRoutesPage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section className="section">
-        <SavedRoutesManager />
       </section>
     </main>
   );
