@@ -1,21 +1,10 @@
+import SiteHeader from "@/components/SiteHeader";
 import ReadinessTools from "@/components/ReadinessTools";
 
 export default function ReadinessPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/">
-          <strong>Project MoveReady</strong>
-          <span>Readiness tools</span>
-        </a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="/platform">Platform</a>
-          <a href="/route-checker">Route Checker</a>
-          <a href="/opportunities">Opportunities</a>
-          <a href="/report-preview">Report</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Readiness tools" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
@@ -24,10 +13,15 @@ export default function ReadinessPage() {
           <p className="lede">
             These tools help users catch common readiness gaps before paying advisers, booking travel, or submitting route evidence.
           </p>
+          <div className="actions">
+            <a className="btn primary" href="#readiness-tools">Open tools</a>
+            <a className="btn" href="/route-checker">Generate report</a>
+            <a className="btn" href="/dashboard">Back to Account</a>
+          </div>
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="readiness-tools">
         <ReadinessTools />
       </section>
     </main>
