@@ -1,6 +1,6 @@
 # MoveReady MVP user testing guide
 
-This guide is for testing the app like a normal user. Use one email account for each test so profile, reports, saved routes, watchlist, timeline, and service requests stay together.
+This guide is for testing the app like a normal user. Use one email account for each test so profile, reports, saved routes, alerts, timeline, and support requests stay together.
 
 ## Main test account rule
 
@@ -20,26 +20,27 @@ bms.concept+promo1@hotmail.com
 
 MoveReady treats those as different accounts.
 
-## Browser test flow
+## Best simple browser flow
 
-1. Open `/login`.
-2. Request login code.
-3. Enter the code.
+1. Open `/start`.
+2. Click **Start with route checker** or open **Account** from the top menu.
+3. Open `/login` and sign in with one email.
 4. After successful login, open `/dashboard`.
 5. Confirm the dashboard shows the signed-in email.
-6. Go to **Choose or hide saved profiles**.
-7. Click **Use this profile** on the correct profile.
-8. Click **Hide old profile** only on old test profiles.
+6. Click **Choose or hide profiles** if there is more than one profile.
+7. Click **Use this profile** on the correct current profile.
+8. Click **Hide old profile** only on old test profiles you do not want to use again.
 9. Open `/route-checker`.
-10. Confirm the form uses the active profile first.
-11. Generate a readiness report.
-12. Open the report detail page.
-13. Open `/my-reports` and confirm the new report appears.
-14. Save a route from `/saved-routes` or from a generated report.
-15. Create a watchlist alert.
-16. Add a timeline event.
-17. Create a service request.
-18. Return to `/dashboard` and confirm counts update.
+10. Confirm the form says **Using active profile** and shows the correct name, target country, and route type.
+11. Click **Load my active profile** if the details do not look correct.
+12. Generate a readiness report.
+13. Open the report detail page.
+14. Open `/my-reports` and confirm the new report appears.
+15. Save a route from `/saved-routes` or from a generated report.
+16. Create an alert from `/watchlist`.
+17. Add a timeline event from `/timeline`.
+18. Create a support request from `/service-requests`.
+19. Return to `/dashboard` and confirm counts update.
 
 ## Expected dashboard result
 
@@ -52,6 +53,17 @@ status: active
 ```
 
 Old hidden profiles should not appear in the dashboard profile chooser.
+
+## Expected route checker result
+
+After the active profile is selected, `/route-checker` should show a message like:
+
+```text
+Signed in as bms.concept@hotmail.com
+Using active profile: Sir BM (Estonia · Startup / entrepreneur).
+```
+
+The form should use the active profile details before generating a report.
 
 ## PowerShell API test setup
 
@@ -110,7 +122,7 @@ $Summary.sections.saved_routes.rows |
   Format-Table
 ```
 
-## Check watchlist
+## Check alerts
 
 ```powershell
 $Summary.sections.watchlist.rows |
@@ -126,7 +138,7 @@ $Summary.sections.timeline.rows |
   Format-Table
 ```
 
-## Check service requests
+## Check support requests
 
 ```powershell
 $Summary.sections.service_requests.rows |
@@ -139,7 +151,7 @@ $Summary.sections.service_requests.rows |
 A non-technical user should be able to answer these questions within five minutes:
 
 1. Where do I start?
-2. What is my active profile?
+2. Which profile is active?
 3. How do I check my route?
 4. Where is my report?
 5. Where are my saved routes?
