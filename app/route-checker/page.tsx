@@ -7,30 +7,31 @@ export default function RouteCheckerPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="Route checker" />
 
-      <section className="hero-band" style={{ paddingTop: 24, paddingBottom: 18 }}>
-        <div className="hero-copy">
-          <span className="eyebrow">Check Route</span>
-          <h1 style={{ fontSize: "clamp(34px, 4.4vw, 52px)", lineHeight: 1.05, marginBottom: 12 }}>
-            Check your route before you spend money.
-          </h1>
-          <p className="section-intro">
-            Load your active profile, confirm the basic details, then generate a simple readiness report with checklist, budget range, risk label, and next steps.
-          </p>
-          <div className="actions" style={{ marginTop: 16 }}>
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Check Route</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Check your route before you spend money.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Use the active profile from Account, confirm the details, then generate a simple report with checklist, budget, risk label, and next steps.
+              </p>
+            </div>
+            <span className="status-dot">3 steps</span>
+          </div>
+          <div className="badge-row" style={{ marginTop: 10 }}>
+            <span className="badge">1. Load active profile</span>
+            <span className="badge">2. Check details</span>
+            <span className="badge">3. Generate report</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#route-check-form">Go to form</a>
             <a className="btn" href="/dashboard">Open Account</a>
             <a className="btn" href="/my-reports">My reports</a>
           </div>
         </div>
-
-        <aside className="workflow-panel">
-          <h2>Simple order</h2>
-          <div className="mini-list">
-            <div><strong>1. Load active profile</strong><span>Use the profile selected in Account.</span></div>
-            <div><strong>2. Check the details</strong><span>Confirm country, route, funds, family count, and timeline.</span></div>
-            <div><strong>3. Generate report</strong><span>Open or save the report reference after it appears.</span></div>
-          </div>
-        </aside>
       </section>
 
       <section className="section no-top-pad" id="route-check-form">
