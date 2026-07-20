@@ -21,14 +21,21 @@ export default function WatchlistPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="Alerts" />
 
-      <section className="hero-band compact-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Alerts</span>
-          <h1>Get reminders for routes you care about.</h1>
-          <p className="lede">
-            Alerts help you remember important route changes such as application openings, closing dates, result windows, eligibility changes, document updates, fee changes, and source-review updates.
-          </p>
-          <div className="actions">
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Alerts</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Get reminders for routes you care about.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Use alerts for openings, closing dates, result windows, eligibility changes, document updates, fee changes, and report refresh reminders.
+              </p>
+            </div>
+            <span className="status-dot">Consent first</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#create-alert">Create alert</a>
             <a className="btn" href="/opportunities">Browse opportunities</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
@@ -37,7 +44,11 @@ export default function WatchlistPage() {
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="create-alert">
+        <WatchlistSignup />
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Alert rules</p>
@@ -46,7 +57,7 @@ export default function WatchlistPage() {
               Alerts should help you remember what to check. They do not replace official websites, embassy instructions, school instructions, employer instructions, or government sources.
             </p>
           </div>
-          <span className="status-dot">Consent first</span>
+          <span className="status-dot">Official sources matter</span>
         </div>
         <div className="grid">
           {alertPrinciples.map((item) => (
@@ -56,10 +67,6 @@ export default function WatchlistPage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section className="section" id="create-alert">
-        <WatchlistSignup />
       </section>
     </main>
   );
