@@ -9,11 +9,12 @@ MoveReady should help a user do this in a simple order:
 1. Sign in or open Account.
 2. Save one active profile.
 3. Check a route using that profile.
-4. Generate a readiness report.
-5. Find the report later.
-6. Save a route, create an alert, or request support only when needed.
+4. Check Visa Power if the user already holds strong visas.
+5. Generate a readiness report.
+6. Find the report later.
+7. Save a route, create an alert, or request support only when needed.
 
-MoveReady must not promise visa approval, job approval, admission, lottery selection, ballot selection, or government approval.
+MoveReady must not promise visa approval, job approval, admission, lottery selection, ballot selection, travel entry, or government approval.
 
 ## Browser test order
 
@@ -34,9 +35,10 @@ Use this order for a clean test:
    - checklist,
    - budget estimate,
    - next steps.
-10. Click **Open full report**.
-11. Go to **Reports** and confirm the report can be loaded again.
-12. Go to **Saved routes**, **Alerts**, and **Support** and confirm the active profile is prefilled where expected.
+10. Open `/visa-power` and select an existing visa such as **Canada visitor visa**.
+11. Confirm Visa Power shows possible travel-benefit destinations, conditions, source links, last verified date, confidence level, and safety notes.
+12. Click **Open full report** from Route Checker or go to **Reports** and confirm the report can be loaded again.
+13. Go to **Saved routes**, **Alerts**, and **Support** and confirm the active profile is prefilled where expected.
 
 ## PowerShell smoke test
 
@@ -107,6 +109,34 @@ Expected result:
 - The report is saved when contact consent and email are included.
 - The report appears on `/my-reports` after clicking **Load reports**.
 
+Check Visa Power from PowerShell:
+
+```powershell
+$VisaPowerPayload = @{
+  passport_country = "Nigeria"
+  held_visas = @("canada_visitor")
+  multiple_entry_confirmed = $true
+  visa_used_before_confirmed = $false
+}
+
+$VisaPower = Invoke-RestMethod `
+  -Method Post `
+  -Uri "$Api/visa-power/check" `
+  -ContentType "application/json" `
+  -Body ($VisaPowerPayload | ConvertTo-Json -Depth 10)
+
+$VisaPower.visa_opportunity_score
+$VisaPower.matched_destination_count
+$VisaPower.matches | Select-Object destination,separate_visa_needed,maximum_stay,last_verified,confidence | Format-Table
+```
+
+Expected result:
+
+- The API returns `ok: true`.
+- The API returns a starter visa opportunity score.
+- The API returns matched destinations and official-source notes.
+- The safety note says this is not permission to travel.
+
 ## Route checker user test
 
 The Route Checker page should be easy for a non-technical user:
@@ -116,6 +146,20 @@ The Route Checker page should be easy for a non-technical user:
 - It should have a clear green button to generate a report quickly.
 - It should still allow editing details before generating.
 - After generating, the result should show what to do next.
+
+## Visa Power user test
+
+The Visa Power page should:
+
+- Let the user enter passport country.
+- Let the user select visas they already hold.
+- Show possible travel-benefit destinations.
+- Show whether a separate visa may be needed.
+- Show maximum-stay notes.
+- Show conditions.
+- Show official source links.
+- Show last verified date and confidence level.
+- Clearly say it is planning guidance only, not permission to travel.
 
 ## Account page user test
 
@@ -153,6 +197,7 @@ The MVP is acceptable when:
 - New users can understand where to start.
 - Signed-in users can see one active profile.
 - Route Checker uses the active profile correctly.
+- Visa Power shows existing-visa travel benefits safely.
 - A report can be generated, opened, printed, downloaded, and loaded later.
 - Old profiles can be hidden without deleting reports.
 - Buttons use simple language.
