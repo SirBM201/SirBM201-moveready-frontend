@@ -135,10 +135,19 @@ function profileGoal(profile?: AccountProfile | null) {
   return profile?.main_goal || profile?.goal || profile?.route_category || "relocation";
 }
 
+function profileRouteText(profile?: AccountProfile | null) {
+  if (!profile) return "No active profile loaded yet";
+  const target = profile.target_country || "target country";
+  const route = readableLabel(profile.route_category || profileGoal(profile), "route");
+  return `${target} · ${route}`;
+}
+
 function chooseAccountProfile(data: AccountSummary) {
   const profiles = (data.sections?.profiles?.rows || []).filter((item) => item.status !== "closed");
+  const backendActive = profiles.find((item) => item.status === "active");
   const activeId = getActiveProfileId();
-  return profiles.find((item) => item.id === activeId) || profiles[0] || data.latest_profile || null;
+  const browserActive = profiles.find((item) => item.id === activeId);
+  return backendActive || browserActive || profiles[0] || data.latest_profile || null;
 }
 
 export default function RouteReadinessForm() {
@@ -150,6 +159,8 @@ export default function RouteReadinessForm() {
   const [accountEmail, setAccountEmail] = useState("");
   const [activeProfileId, setActiveProfileId] = useState("");
   const [activeProfileName, setActiveProfileName] = useState("");
+  const [activeProfileRoute, setActiveProfileRoute] = useState("");
+  const [profileLoading, setProfileLoading] = useState(false);
 
   function updateField(name: string, value: string) {
     setForm((current) => {
@@ -165,6 +176,7 @@ export default function RouteReadinessForm() {
     const goal = profileGoal(profile);
     setActiveProfileId(profile?.id || "");
     setActiveProfileName(profile ? profileName(profile) : "");
+    setActiveProfileRoute(profile ? profileRouteText(profile) : "");
     setForm((current) => ({
       ...current,
       full_name: profile?.full_name || current.full_name,
@@ -184,24 +196,31 @@ export default function RouteReadinessForm() {
     }));
   }
 
-  useEffect(() => {
-    async function loadAccountDefaults() {
-      try {
-        const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 10000 });
-        const email = data.session?.email || data.latest_profile?.email || "";
-        const profile = chooseAccountProfile(data);
-        setAccountEmail(email);
-        applyProfile(profile, email);
-        if (profile) {
-          setStatus(`Using active profile: ${profileName(profile)}. Check the details, then generate a report.`);
-        } else if (email) {
-          setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
-        }
-      } catch {
-        // Route checker still works without login.
+  async function loadAccountDefaults(showMessage = false) {
+    setProfileLoading(true);
+    try {
+      const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 10000 });
+      const email = data.session?.email || data.latest_profile?.email || "";
+      const profile = chooseAccountProfile(data);
+      setAccountEmail(email);
+      applyProfile(profile, email);
+      if (profile) {
+        const routeText = profileRouteText(profile);
+        setStatus(`${showMessage ? "Loaded" : "Using"} active profile: ${profileName(profile)} (${routeText}). Check the details, then generate a report.`);
+      } else if (email) {
+        setStatus("Signed in. Your account email has been added so the report can be saved and found later.");
+      } else if (showMessage) {
+        setStatus("No signed-in profile was found. Open My Account, choose a profile, then return here.");
       }
+    } catch {
+      if (showMessage) setStatus("Could not load your active profile. Please refresh or open My Account to confirm your profile.");
+    } finally {
+      setProfileLoading(false);
     }
-    loadAccountDefaults();
+  }
+
+  useEffect(() => {
+    loadAccountDefaults(false);
   }, []);
 
   function downloadReport() {
@@ -298,7 +317,22 @@ export default function RouteReadinessForm() {
           <span className="status-dot">{accountEmail ? "Signed in" : loading ? "Working" : "Ready"}</span>
         </div>
 
-        {accountEmail ? <p className="form-status">Signed in as {accountEmail}. {activeProfileName ? `Using active profile: ${activeProfileName}.` : "Reports can be saved to your account when the checkbox below is selected."}</p> : null}
+        {accountEmail ? (
+          <div className="mini-list">
+            <div>
+              <strong>Signed in as {accountEmail}</strong>
+              <span>{activeProfileName ? `Using active profile: ${activeProfileName} (${activeProfileRoute}).` : "No active profile loaded yet. Open My Account and choose one profile."}</span>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="actions">
+          <button className="btn" type="button" onClick={() => loadAccountDefaults(true)} disabled={profileLoading || loading}>
+            {profileLoading ? "Loading profile..." : "Load my active profile"}
+          </button>
+          <a className="btn" href="/dashboard#profile-chooser">Choose profile in My Account</a>
+        </div>
+
         <p className="form-status">Simple guide: choose your goal, country, funds, family count, then click the green button.</p>
 
         <div className="form-grid two-col">
