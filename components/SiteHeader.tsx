@@ -3,6 +3,7 @@ const publicNavigation = [
   { label: "Start", href: "/start", title: "Start here if you are new" },
   { label: "Decide", href: "/decision-center", title: "Choose your direction" },
   { label: "Countries", href: "/country-comparison", title: "Compare countries" },
+  { label: "Passport", href: "/passport-index", title: "Check passport index starter" },
   { label: "Visa Power", href: "/visa-power", title: "Check travel benefits from visas you already hold" },
   { label: "Routes", href: "/compare", title: "Compare relocation routes" },
   { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
