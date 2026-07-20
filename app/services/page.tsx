@@ -2,45 +2,45 @@ import SiteHeader from "@/components/SiteHeader";
 import GeneralServiceRequestForm from "@/components/GeneralServiceRequestForm";
 
 const services = [
-  ["Courier", "Passport, certificate, embassy, notarization, and sensitive-document delivery requests."],
-  ["Legalization", "Notarization, apostille, attestation, translation, and embassy legalization support."],
-  ["Insurance", "Travel, health, student, family, Schengen-style, and work-route insurance requests."],
-  ["Expert review", "Route evidence, refusal-risk, proof-of-funds, scholarship, and startup-route review requests."],
-  ["Arrival support", "Accommodation, airport pickup, SIM, bank, local registration, and first-arrival settlement support."],
-  ["Admission support", "Scholarship, study-abroad, SOP, application, and school-document support."],
+  ["Courier", "Help moving passports, certificates, embassy files, notarized papers, and other sensitive documents."],
+  ["Legalization", "Help with notarization, apostille, attestation, translation, embassy legalization, and document checks."],
+  ["Insurance", "Help finding travel, health, student, family, Schengen-style, or work-route insurance options."],
+  ["Expert review", "Help checking route evidence, refusal risk, proof of funds, scholarships, startup route evidence, or report gaps."],
+  ["Arrival support", "Help with accommodation, airport pickup, SIM, bank setup, local registration, and first-arrival settlement."],
+  ["Admission support", "Help with scholarships, study-abroad applications, SOPs, school documents, and application planning."],
 ];
 
 const handoffRules = [
   {
-    title: "Admin review first",
-    detail: "Service requests should be reviewed before any provider receives user details or sensitive context.",
+    title: "MoveReady checks first",
+    detail: "Your request should be reviewed before any provider receives your details or route context.",
   },
   {
-    title: "Consent before contact",
-    detail: "MoveReady should only contact users or share request context after explicit consent is captured.",
+    title: "You must agree first",
+    detail: "MoveReady should only contact you or share request context after consent is captured.",
   },
   {
-    title: "No shortcut promise",
-    detail: "Providers can support preparation and execution, but the page must not imply visa, admission, job, lottery, or ballot approval.",
+    title: "Support is not approval",
+    detail: "Support can help you prepare, but it cannot guarantee visa, admission, job, lottery, ballot, appointment, or route approval.",
   },
 ];
 
 export default function ServicesPage() {
   return (
     <main className="page-shell">
-      <SiteHeader sectionLabel="Trusted services" />
+      <SiteHeader sectionLabel="Services" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Account Center: service requests</span>
-          <h1>Request practical support without turning MoveReady into a shortcut platform.</h1>
+          <span className="eyebrow">Optional support</span>
+          <h1>Ask for practical help when your route is clearer.</h1>
           <p className="lede">
-            MoveReady can capture service needs now and route them for admin review. Provider handoff only happens after the relevant partner, source, and consent checks are in place.
+            MoveReady can save your support request and keep it connected to your account. A request is not a promise of approval. It is a way to ask for help with preparation.
           </p>
           <div className="actions">
-            <a className="btn primary" href="#request-service">Request a service</a>
-            <a className="btn" href="/partners/apply">Apply as provider</a>
-            <a className="btn" href="/dashboard">Back to Account Center</a>
+            <a className="btn primary" href="#request-service">Request support</a>
+            <a className="btn" href="/service-requests">My support requests</a>
+            <a className="btn" href="/dashboard">Back to Account</a>
           </div>
         </div>
       </section>
@@ -48,18 +48,18 @@ export default function ServicesPage() {
       <section className="section no-top-pad">
         <div className="section-heading-row">
           <div>
-            <p className="overline">Service categories</p>
-            <h2>Support areas MoveReady can capture</h2>
+            <p className="overline">Support areas</p>
+            <h2>What kind of help can I ask for?</h2>
             <p className="section-intro">
-              In the full account system, service requests should connect to the user profile, saved route, report, and timeline so providers receive only the context the user has agreed to share.
+              Choose the support area that matches your need. Share only what is necessary. MoveReady should review requests before any provider receives details.
             </p>
           </div>
-          <span className="status-dot">Provider screening</span>
+          <span className="status-dot">Consent first</span>
         </div>
         <div className="service-strip">
           {services.map(([title, text]) => (
             <article className="service-strip-item" key={title}>
-              <span className="overline">Service</span>
+              <span className="overline">Support</span>
               <h3>{title}</h3>
               <p>{text}</p>
             </article>
@@ -70,13 +70,13 @@ export default function ServicesPage() {
       <section className="section">
         <div className="section-heading-row">
           <div>
-            <p className="overline">Trusted handoff rules</p>
-            <h2>Protect users before provider handoff</h2>
+            <p className="overline">Safety rules</p>
+            <h2>Before anyone helps, protect the user first.</h2>
             <p className="section-intro">
-              Services can become a strong commercial layer, but trust is the product. Requests should stay private, consent-based, and clearly advisory.
+              Support should stay private, consent-based, reviewed, and clearly advisory.
             </p>
           </div>
-          <span className="status-dot">Consent required</span>
+          <span className="status-dot">No shortcut</span>
         </div>
         <div className="grid">
           {handoffRules.map((item) => (
