@@ -9,6 +9,11 @@ const accountAreas = [
     href: "#profile-dashboard",
   },
   {
+    title: "Check visa power",
+    detail: "Enter visas you already hold and see possible travel benefits, source links, conditions, and safety notes.",
+    href: "/visa-power",
+  },
+  {
     title: "Save routes you care about",
     detail: "Keep serious country and route options in one place so you can return later without starting again.",
     href: "/saved-routes",
@@ -38,8 +43,8 @@ const accountAreas = [
 const trustControls = [
   "Your private profile, reports, and support requests are not public.",
   "MoveReady asks for consent before contact, alerts, or support requests.",
-  "Reports show risk labels, source status, and generated date.",
-  "MoveReady gives readiness guidance; it does not promise approval, admission, jobs, lottery selection, or ballot success.",
+  "Reports and Visa Power results show source status, confidence, and generated or verified date.",
+  "MoveReady gives readiness guidance; it does not promise approval, admission, jobs, lottery selection, ballot success, or travel entry.",
 ];
 
 const nextFeatures = [
@@ -54,9 +59,14 @@ const nextFeatures = [
     detail: "Use email login to connect account records on the same device and reduce repeated lookups.",
   },
   {
+    status: "Available now",
+    title: "Visa Power preview",
+    detail: "Use existing visas to check possible third-country travel benefits with source links and safety notes.",
+  },
+  {
     status: "Coming soon",
     title: "Paid account features",
-    detail: "Premium reports, refresh history, expert review, and provider handoff will stay behind clear consent and review steps.",
+    detail: "Premium reports, visa-benefit monitoring, refresh history, expert review, and provider handoff will stay behind clear consent and review steps.",
   },
 ];
 
@@ -74,7 +84,7 @@ export default function DashboardPage() {
                 Use one profile for your whole relocation plan.
               </h1>
               <p className="section-intro" style={{ marginBottom: 0 }}>
-                Save your details once. Then use the same profile for route checks, reports, saved routes, alerts, timeline actions, and support.
+                Save your details once. Then use the same profile for route checks, Visa Power, reports, saved routes, alerts, timeline actions, and support.
               </p>
             </div>
             <span className="status-dot">Profile first</span>
@@ -83,6 +93,7 @@ export default function DashboardPage() {
             <a className="btn primary" href="#account-summary">View account summary</a>
             <a className="btn" href="#profile-dashboard">Save my details</a>
             <a className="btn" href="/route-checker">Check route</a>
+            <a className="btn" href="/visa-power">Visa Power</a>
             <a className="btn" href="/my-reports">Reports</a>
             <a className="btn" href="/login">Sign in</a>
           </div>
@@ -99,7 +110,7 @@ export default function DashboardPage() {
             <p className="overline">Start here</p>
             <h2>What your account connects</h2>
             <p className="section-intro">
-              Start with a profile. After that, every saved route, report, alert, timeline event, and support request can stay connected to the same email or phone. Sign in with email when you want a verified account session.
+              Start with a profile. After that, every saved route, report, alert, timeline event, visa-benefit check, and support request can stay connected to the same email or phone. Sign in with email when you want a verified account session.
             </p>
           </div>
           <span className="status-dot">Available now</span>
@@ -119,16 +130,17 @@ export default function DashboardPage() {
         <div className="live-workspace">
           <article className="workflow-panel">
             <p className="overline">Simple flow</p>
-            <h2>Profile → route → report → alert → support</h2>
+            <h2>Profile → route → visa power → report → alert → support</h2>
             <p className="section-intro">
               MoveReady should feel like a guided workspace, not a collection of separate forms. Use the steps below as the normal path.
             </p>
             <div className="mini-list">
               <div><strong>1. Save or load your profile</strong><span>Add your contact, country, target country, goal, money available, family count, and timeline.</span></div>
               <div><strong>2. Check the route you care about</strong><span>Use your active profile to see whether the route looks sensible before spending money.</span></div>
-              <div><strong>3. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
-              <div><strong>4. Create an alert</strong><span>Track important deadlines, route changes, and source-review reminders only when you opt in.</span></div>
-              <div><strong>5. Ask for support when needed</strong><span>Request expert or document review after you understand your route and report.</span></div>
+              <div><strong>3. Check visas you already hold</strong><span>Use Visa Power when a Canada, U.S., UK, Schengen, Australia, or Japan visa may create extra travel options.</span></div>
+              <div><strong>4. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
+              <div><strong>5. Create an alert</strong><span>Track important deadlines, route changes, visa-benefit changes, and source-review reminders only when you opt in.</span></div>
+              <div><strong>6. Ask for support when needed</strong><span>Request expert or document review after you understand your route and report.</span></div>
             </div>
           </article>
 
@@ -167,7 +179,7 @@ export default function DashboardPage() {
             <p className="overline">Your relocation profile</p>
             <h2>Save your details or load your saved profile</h2>
             <p className="section-intro">
-              Use the same email or phone each time. After saving, you can check a route, generate a report, save a route, create an alert, or request support from the profile summary.
+              Use the same email or phone each time. After saving, you can check a route, check Visa Power, generate a report, save a route, create an alert, or request support from the profile summary.
             </p>
           </div>
           <span className="status-dot">Contact lookup</span>
