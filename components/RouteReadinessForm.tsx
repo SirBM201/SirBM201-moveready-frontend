@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 import { getActiveProfileId } from "@/lib/profileStorage";
@@ -161,6 +161,7 @@ export default function RouteReadinessForm() {
   const [activeProfileName, setActiveProfileName] = useState("");
   const [activeProfileRoute, setActiveProfileRoute] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
+  const resultPanelRef = useRef<HTMLElement | null>(null);
 
   function updateField(name: string, value: string) {
     setForm((current) => {
@@ -222,6 +223,13 @@ export default function RouteReadinessForm() {
   useEffect(() => {
     loadAccountDefaults(false);
   }, []);
+
+  function scrollToResult() {
+    window.setTimeout(() => {
+      resultPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      resultPanelRef.current?.focus({ preventScroll: true });
+    }, 120);
+  }
 
   function downloadReport() {
     if (!result?.report) return;
@@ -285,10 +293,11 @@ export default function RouteReadinessForm() {
         budget: budgetResponse,
         report: reportResponse.report,
       });
+      scrollToResult();
       if (reportResponse.report?.stored) {
-        setStatus(`Report generated and saved. Reference: ${reportResponse.report.report_ref}.`);
+        setStatus(`Report generated and saved. Reference: ${reportResponse.report.report_ref}. The result is now open on the right.`);
       } else {
-        setStatus(`Report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}.`);
+        setStatus(`Report generated. Keep this reference: ${reportResponse.report?.report_ref || "not available"}. The result is now open on the right.`);
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -453,7 +462,7 @@ export default function RouteReadinessForm() {
         {error ? <p className="form-error">{error}</p> : null}
       </form>
 
-      <section className="result-panel" aria-live="polite">
+      <section className="result-panel" aria-live="polite" ref={resultPanelRef} tabIndex={-1}>
         {!result ? (
           <div className="empty-result">
             <p className="overline">What you will get</p>
@@ -466,11 +475,12 @@ export default function RouteReadinessForm() {
               <article className="result-block featured">
                 <div className="panel-heading">
                   <div>
-                    <p className="overline">Readiness report</p>
+                    <p className="overline">Report ready</p>
                     <h2>{result.report.report_title}</h2>
                   </div>
                   <span className="status-dot">{scoreLabel(result.report)}</span>
                 </div>
+                <p className="note">Your report is ready. Open it, print it, or find it later from My reports.</p>
                 <div className="badge-row">
                   <span className="badge">Reference: {result.report.report_ref}</span>
                   <span className="badge">Risk: {readableLabel(result.report.risk_level)}</span>
@@ -478,7 +488,7 @@ export default function RouteReadinessForm() {
                   <span className="badge">{sourceStatusLabel(result.report.source_status)}</span>
                 </div>
                 <div className="actions report-actions">
-                  {reportRef ? <a className="btn primary" href={`/report-detail?ref=${encodeURIComponent(reportRef)}`}>Open report</a> : null}
+                  {reportRef ? <a className="btn primary" href={`/report-detail?ref=${encodeURIComponent(reportRef)}`}>Open full report</a> : null}
                   <a className="btn" href="/my-reports">My reports</a>
                   <button className="btn" type="button" onClick={printReport}>Print report</button>
                   <button className="btn" type="button" onClick={downloadReport}>Download report data</button>
