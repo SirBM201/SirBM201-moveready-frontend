@@ -115,6 +115,15 @@ function profileRouteLine(profile?: AccountProfile | null) {
   return `${target} · ${route} · ${created}`;
 }
 
+function profileMoneyLine(profile?: AccountProfile | null) {
+  if (!profile) return "Money, family count, and timeline not set";
+  const amount = profile.available_funds_amount ?? 0;
+  const currency = profile.available_funds_currency || "currency not set";
+  const family = profile.family_members_count ?? 0;
+  const months = profile.timeline_months ?? 0;
+  return `${currency} ${Number(amount).toLocaleString()} · Family members: ${family} · Timeline: ${months} months`;
+}
+
 export default function AccountSummary() {
   const [summary, setSummary] = useState<AccountSummaryResponse | null>(null);
   const [activeProfileId, setActiveProfileId] = useState("");
@@ -176,7 +185,7 @@ export default function AccountSummary() {
       });
       setActiveProfile(profile.id, profileName(profile));
       setActiveProfileId(profile.id);
-      setMessage(`${profileName(profile)} is now your active profile on this account. Route Checker and Saved Routes will use this profile first.`);
+      setMessage(`${profileName(profile)} is now your active profile. Route Checker, Saved Routes, Alerts, Reports, Timeline, and Support will use this profile first.`);
       await loadSummary();
     } catch (error) {
       const apiError = error as ApiError;
@@ -202,6 +211,13 @@ export default function AccountSummary() {
       setMessage("This profile cannot be hidden because no matching email or phone was found.");
       return;
     }
+
+    const confirmHide = typeof window === "undefined" || window.confirm(`Hide old profile: ${profileName(profile)}? This only removes it from your active account list. It does not delete reports that were already generated.`);
+    if (!confirmHide) {
+      setMessage("No profile was hidden.");
+      return;
+    }
+
     setArchivingId(profile.id);
     setMessage("Hiding old profile...");
     try {
@@ -259,14 +275,29 @@ export default function AccountSummary() {
             ))}
           </div>
 
-          <div className="mini-list active-profile-summary">
-            <div><strong>Signed-in email</strong><span>{sessionEmail}</span></div>
-            <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
-            <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
-            <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
-            <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
-            <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
-          </div>
+          <article className="result-block soft" style={{ marginTop: 16 }}>
+            <div className="panel-heading">
+              <div>
+                <p className="overline">Use this first</p>
+                <h3>Current active profile</h3>
+              </div>
+              <span className="status-dot">Used by route checker</span>
+            </div>
+            <div className="mini-list active-profile-summary">
+              <div><strong>Signed-in email</strong><span>{sessionEmail}</span></div>
+              <div><strong>Active profile</strong><span>{profileName(activeProfile)}</span></div>
+              <div><strong>Main goal</strong><span>{readableLabel(profileGoal(activeProfile))}</span></div>
+              <div><strong>Route plan</strong><span>{activeProfile?.target_country || "Target country not set"} · {readableLabel(activeProfile?.route_category || profileGoal(activeProfile))}</span></div>
+              <div><strong>Money, family, timeline</strong><span>{profileMoneyLine(activeProfile)}</span></div>
+              <div><strong>Readiness</strong><span>{snapshot.readiness_score ?? 0} / 100 · {readableLabel(snapshot.readiness_level || "Not calculated")}</span></div>
+              <div><strong>Session expires</strong><span>{formatDate(summary.session?.expires_at)}</span></div>
+            </div>
+            <div className="actions compact-actions">
+              <a className="btn primary" href="/route-checker">Check route with this profile</a>
+              <a className="btn" href="#profile-chooser">Choose a different profile</a>
+              <a className="btn" href="/my-reports">Open reports</a>
+            </div>
+          </article>
 
           <article className="result-block soft profile-chooser-panel" id="profile-chooser">
             <div className="panel-heading">
@@ -280,7 +311,7 @@ export default function AccountSummary() {
               This list only shows profiles saved under <strong>{sessionEmail}</strong>. If PowerShell, another browser, or another tab is signed in with a different email, it will show a different profile count.
             </p>
             <p className="form-status">
-              Click <strong>Use this profile</strong> for the profile MoveReady should use now. This selection is saved on your account. Click <strong>Hide old profile</strong> only for old test profiles you no longer want to see.
+              Use <strong>Use this profile</strong> for the profile MoveReady should use now. Use <strong>Hide old profile</strong> only for old test profiles you no longer want to see.
             </p>
 
             {profiles.length ? (
@@ -291,6 +322,7 @@ export default function AccountSummary() {
                     <span>There is no old profile to hide on this account. Use this profile, or switch email account if your other test records belong to another email.</span>
                     <div className="actions compact-actions">
                       <button className="btn primary" type="button" onClick={() => chooseProfile(profiles[0])} disabled={choosingId === profiles[0].id || loading}>{choosingId === profiles[0].id ? "Saving..." : isBackendActive(profiles[0]) ? "Using this profile" : "Use this profile"}</button>
+                      <a className="btn" href="/route-checker">Check route</a>
                       <button className="btn" type="button" onClick={switchAccount}>Switch email account</button>
                     </div>
                   </div>
@@ -302,8 +334,10 @@ export default function AccountSummary() {
                       <div className={isActive ? "active-profile-row" : ""} key={item.id}>
                         <strong>{isActive ? "Active now: " : `Profile ${index + 1}: `}{profileName(item)}</strong>
                         <span>{profileRouteLine(item)} · Readiness {itemSnapshot.readiness_score ?? 0}/100{isBackendActive(item) ? " · Saved as account active profile" : ""}</span>
+                        <span>{profileMoneyLine(item)}</span>
                         <div className="actions compact-actions">
                           <button className={isActive ? "btn primary" : "btn"} type="button" onClick={() => chooseProfile(item)} disabled={choosingId === item.id || loading}>{choosingId === item.id ? "Saving..." : isActive ? "Using this profile" : "Use this profile"}</button>
+                          {isActive ? <a className="btn" href="/route-checker">Check route with this</a> : null}
                           {!isActive ? <button className="btn" type="button" onClick={() => hideProfile(item)} disabled={archivingId === item.id || loading}>{archivingId === item.id ? "Hiding..." : "Hide old profile"}</button> : null}
                         </div>
                       </div>
