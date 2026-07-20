@@ -1,5 +1,6 @@
 const publicNavigation = [
   { label: "Home", href: "/" },
+  { label: "Start Here", href: "/start" },
   { label: "Decision Center", href: "/decision-center" },
   { label: "Countries", href: "/country-comparison" },
   { label: "Routes", href: "/compare" },
@@ -10,12 +11,19 @@ const publicNavigation = [
   { label: "My Account", href: "/dashboard" },
 ];
 
-export default function SiteHeader({ sectionLabel = "Global relocation readiness platform" }: { sectionLabel?: string }) {
+type SiteHeaderProps = {
+  sectionLabel?: string;
+  subtitle?: string;
+};
+
+export default function SiteHeader({ sectionLabel = "Global relocation readiness platform", subtitle }: SiteHeaderProps) {
+  const label = subtitle || sectionLabel;
+
   return (
     <header className="topbar">
       <a className="brand" href="/">
         <strong>Project MoveReady</strong>
-        <span>{sectionLabel}</span>
+        <span>{label}</span>
       </a>
       <nav className="nav" aria-label="Main navigation">
         {publicNavigation.map((item) => (
