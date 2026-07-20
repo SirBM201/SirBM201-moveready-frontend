@@ -65,26 +65,35 @@ export default function DashboardPage() {
     <main className="page-shell">
       <SiteHeader sectionLabel="My Account" />
 
-      <section className="hero-band compact-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Account Center</span>
-          <h1>Use one profile for your whole relocation plan.</h1>
-          <p className="lede">
-            Save your key details once, then use them for route checks, saved routes, alerts, timelines, readiness reports, and support requests. This keeps MoveReady simple: profile first, then actions.
-          </p>
-          <div className="actions">
-            <a className="btn primary" href="#profile-dashboard">Save my details</a>
-            <a className="btn" href="/login">Sign in</a>
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <div className="panel-heading">
+            <div>
+              <p className="overline">Account Center</p>
+              <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
+                Use one profile for your whole relocation plan.
+              </h1>
+              <p className="section-intro" style={{ marginBottom: 0 }}>
+                Save your details once. Then use the same profile for route checks, reports, saved routes, alerts, timeline actions, and support.
+              </p>
+            </div>
+            <span className="status-dot">Profile first</span>
+          </div>
+          <div className="actions" style={{ marginTop: 14 }}>
+            <a className="btn primary" href="#account-summary">View account summary</a>
+            <a className="btn" href="#profile-dashboard">Save my details</a>
             <a className="btn" href="/route-checker">Check route</a>
             <a className="btn" href="/my-reports">Reports</a>
-            <a className="btn" href="/saved-routes">Saved routes</a>
-            <a className="btn" href="/watchlist">Alerts</a>
-            <a className="btn" href="/service-requests">Support</a>
+            <a className="btn" href="/login">Sign in</a>
           </div>
         </div>
       </section>
 
-      <section className="section no-top-pad">
+      <section className="section no-top-pad" id="account-summary">
+        <AccountSummary />
+      </section>
+
+      <section className="section">
         <div className="section-heading-row">
           <div>
             <p className="overline">Start here</p>
@@ -104,10 +113,6 @@ export default function DashboardPage() {
             </a>
           ))}
         </div>
-      </section>
-
-      <section className="section">
-        <AccountSummary />
       </section>
 
       <section className="section">
