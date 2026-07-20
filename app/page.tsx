@@ -8,14 +8,14 @@ const quickStart = [
     text: "Enter your goal, current country, target country, funds, timeline, and family count to get a starter readiness view.",
   },
   {
-    title: "2. Check visa power",
-    href: "/visa-power",
-    text: "Enter visas you already hold to see possible third-country travel benefits, conditions, and official-source links.",
+    title: "2. Check your passport",
+    href: "/passport-index",
+    text: "See your passport baseline first: visa-free, visa-on-arrival, eVisa, and visa-required categories.",
   },
   {
-    title: "3. Compare options",
-    href: "/compare",
-    text: "Compare route families before spending money on documents, applications, bookings, or support providers.",
+    title: "3. Check visa power",
+    href: "/visa-power",
+    text: "Enter visas you already hold to see possible third-country travel benefits, conditions, and official-source links.",
   },
   {
     title: "4. Save what matters",
@@ -34,6 +34,11 @@ const publicTools = [
     title: "Compare countries",
     href: "/country-comparison",
     text: "Review country fit, route coverage, risk signals, source confidence, and next steps side by side.",
+  },
+  {
+    title: "Passport Index",
+    href: "/passport-index",
+    text: "Check your passport baseline before applying elsewhere: visa-free, visa-on-arrival, eVisa, and visa-required categories.",
   },
   {
     title: "Visa Power & Travel Benefits",
@@ -102,14 +107,14 @@ export default function Home() {
           <span className="eyebrow">Relocation readiness workspace</span>
           <h1>Choose your route, then get ready properly.</h1>
           <p className="lede">
-            MoveReady helps you compare relocation pathways, understand document and funds pressure, create a practical timeline, monitor important changes, and request trusted support when you need it.
+            MoveReady helps you compare relocation pathways, check passport and visa power, understand document and funds pressure, create a practical timeline, monitor important changes, and request trusted support when you need it.
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route checker</a>
+            <a className="btn" href="/passport-index">Check passport</a>
             <a className="btn" href="/visa-power">Check visa power</a>
             <a className="btn" href="/dashboard">Open My Account</a>
             <a className="btn" href="/compare">Compare routes</a>
-            <a className="btn" href="/country-comparison">Compare countries</a>
             <a className="btn" href="/services">Request support</a>
           </div>
         </div>
@@ -118,12 +123,14 @@ export default function Home() {
           <h2>How to use MoveReady</h2>
           <div className="mini-list">
             <div><strong>Start with your route</strong><span>Use the route checker or compare pages to understand realistic options.</span></div>
+            <div><strong>Check your passport</strong><span>Use Passport Index to understand your passport baseline before paying anyone.</span></div>
             <div><strong>Check visa power</strong><span>Use existing strong visas to see possible extra travel benefits before applying elsewhere.</span></div>
             <div><strong>Save your profile</strong><span>Use My Account so reports, saved routes, alerts, and service requests stay connected.</span></div>
             <div><strong>Act from the report</strong><span>Follow document, funds, timeline, and risk actions before spending money.</span></div>
           </div>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Generate starter plan</a>
+            <a className="btn" href="/passport-index">Open Passport Index</a>
             <a className="btn" href="/visa-power">Open Visa Power</a>
             <a className="btn" href="/start">Open start guide</a>
           </div>
@@ -145,7 +152,7 @@ export default function Home() {
             <p className="overline">Start here</p>
             <h2>Four steps for every user</h2>
             <p className="section-intro">
-              The app is designed to keep users from jumping straight into payments, bookings, or service requests without first understanding route fit, risk, documents, funds, visa power, and timing.
+              The app is designed to keep users from jumping straight into payments, bookings, or service requests without first understanding route fit, risk, documents, funds, passport access, visa power, and timing.
             </p>
           </div>
           <span className="status-dot">Guided flow</span>
@@ -163,7 +170,7 @@ export default function Home() {
       <section className="section" id="tools">
         <h2>Main tools</h2>
         <p className="section-intro">
-          Start with the tools below. They guide a user from route discovery to visa-power checks, account records, reports, alerts, timelines, and support requests.
+          Start with the tools below. They guide a user from route discovery to passport checks, visa-power checks, account records, reports, alerts, timelines, and support requests.
         </p>
         <div className="grid">
           {publicTools.map((route) => (
@@ -180,7 +187,7 @@ export default function Home() {
           <div>
             <h2>MoveReady service areas</h2>
             <p className="section-intro">
-              Service areas are grouped so users can move from route choice to visa benefits, alerts, documents, funds, trusted support, and settlement inside one clear platform.
+              Service areas are grouped so users can move from route choice to passport and visa benefits, alerts, documents, funds, trusted support, and settlement inside one clear platform.
             </p>
           </div>
           <div className="actions">
@@ -213,9 +220,10 @@ export default function Home() {
             <span className="badge">Document checklist</span>
             <span className="badge">Proof of funds</span>
             <span className="badge">Budget estimate</span>
+            <span className="badge">Passport index</span>
+            <span className="badge">Visa power</span>
             <span className="badge">Insurance notes</span>
             <span className="badge">Timeline events</span>
-            <span className="badge">Visa power</span>
             <span className="badge">Service requests</span>
             <span className="badge">Source freshness</span>
           </div>
