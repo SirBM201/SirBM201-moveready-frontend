@@ -93,7 +93,7 @@ function countRows(rows: AccessRow[], category: string) {
 function resultCountText(rows: AccessRow[], isStarterRecord: boolean) {
   if (!rows.length) return "No destination rows loaded yet";
   if (isStarterRecord) return `${rows.length} starter rows loaded`;
-  return `${rows.length} destination rows loaded`;
+  return `${rows.length} provider/cache rows loaded`;
 }
 
 function valueOrDash(value: any) {
@@ -118,6 +118,15 @@ function categoryCountText(passportIndex: any, countKey: string, estimateKey: st
   return passportIndex?.[estimateKey] || "Provider sync pending";
 }
 
+function providerRefreshText(refresh: any) {
+  if (!refresh) return "not checked";
+  if (refresh.synced) return "synced now";
+  if (refresh.status === "cache_fresh") return "cache fresh";
+  if (refresh.status === "skipped_provider_not_configured") return "not configured";
+  if (refresh.attempted && refresh.error) return "sync failed";
+  return refresh.status || "not needed";
+}
+
 export default function PassportIndexExplorer() {
   const [passportCountry, setPassportCountry] = useState("Nigeria");
   const [passportOptions, setPassportOptions] = useState<PassportOption[]>(defaultPassportOptions);
@@ -135,7 +144,9 @@ export default function PassportIndexExplorer() {
         if (Array.isArray(data.passport_country_options) && data.passport_country_options.length) {
           setPassportOptions(data.passport_country_options);
         }
-        if (data?.provider_status?.sync_frequency) {
+        if (data?.provider_status?.ready_to_sync) {
+          setMessage(`Choose a passport country. Provider cache refresh is ready: ${data.provider_status.sync_frequency}.`);
+        } else if (data?.provider_status?.sync_frequency) {
           setMessage(`Choose a passport country. Provider cache refresh: ${data.provider_status.sync_frequency}.`);
         }
       })
@@ -155,11 +166,18 @@ export default function PassportIndexExplorer() {
         method: "POST",
         useAuthToken: false,
         body: { passport_country: passportCountry },
+        timeoutMs: 30000,
       });
       setResult(data);
       setActiveCategory("all");
       setSearchTerm("");
-      setMessage("Passport result ready. The country list is shown on this same page.");
+      if (data?.provider_refresh?.synced) {
+        setMessage("Provider data synced. The full country list is shown on this same page.");
+      } else if (data?.provider_refresh?.attempted && data?.provider_refresh?.error) {
+        setMessage("Provider sync was attempted but failed. Starter/cache rows are shown until the provider setting is corrected.");
+      } else {
+        setMessage("Passport result ready. The country list is shown on this same page.");
+      }
     } catch (error: any) {
       setMessage(error?.message || "Passport index check failed. Confirm the API deployment and try again.");
     } finally {
@@ -170,11 +188,14 @@ export default function PassportIndexExplorer() {
   const passportIndex = result?.passport_index;
   const cacheStatus = result?.cache_status || {};
   const providerStatus = result?.provider_status || {};
+  const providerRefresh = result?.provider_refresh || {};
   const accessRows = useMemo(() => getAccessRows(passportIndex), [passportIndex]);
-  const isStarterRecord =
-    String(passportIndex?.confidence || "").includes("starter") ||
-    String(passportIndex?.confidence || "").includes("pending") ||
-    String(passportIndex?.data_source || "").includes("starter");
+  const isStarterRecord = useMemo(() => {
+    const dataSource = String(cacheStatus.data_source || passportIndex?.data_source || "").toLowerCase();
+    const providerName = String(cacheStatus.source_provider || passportIndex?.source_provider || "").toLowerCase();
+    const confidence = String(passportIndex?.confidence || cacheStatus.source_status || "").toLowerCase();
+    return dataSource.includes("starter") || providerName.includes("starter") || confidence.includes("starter_");
+  }, [cacheStatus.data_source, cacheStatus.source_provider, cacheStatus.source_status, passportIndex]);
   const filteredRows = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     return accessRows.filter((row) => {
@@ -236,8 +257,9 @@ export default function PassportIndexExplorer() {
                 <span className="badge">Band: {passportIndex.passport_strength_band}</span>
                 <span className="badge">Rows: {resultCountText(accessRows, isStarterRecord)}</span>
                 <span className="badge">Provider: {cacheStatus.source_provider || passportIndex.source_provider || "Starter cache"}</span>
+                <span className="badge">Refresh: {providerRefreshText(providerRefresh)}</span>
                 <span className="badge">Synced: {niceDate(cacheStatus.last_synced_at || passportIndex.last_synced_at)}</span>
-                <span className="badge">Refresh: {cacheStatus.sync_frequency || passportIndex.sync_frequency || providerStatus.sync_frequency || "twice weekly"}</span>
+                <span className="badge">Next: {niceDate(cacheStatus.next_sync_due_at || passportIndex.next_sync_due_at)}</span>
               </div>
             </article>
 
@@ -283,9 +305,15 @@ export default function PassportIndexExplorer() {
                 />
               </div>
 
+              {providerRefresh?.attempted && providerRefresh?.error ? (
+                <p className="form-status">
+                  Provider sync note: {providerRefresh.error}. Check the provider URL, method, host header, and country-code format in Railway.
+                </p>
+              ) : null}
+
               {isStarterRecord ? (
                 <p className="form-status">
-                  Launch note: MoveReady is ready for a live passport provider. Until provider sync is connected, rows shown here are starter rows and must not be treated as final travel permission.
+                  Launch note: these are starter rows. Once provider sync succeeds, this same page will show provider/cache rows without users opening another page.
                 </p>
               ) : null}
             </article>
@@ -331,7 +359,7 @@ export default function PassportIndexExplorer() {
                 <div><strong>Passport validity</strong><span>{passportIndex.validity_notes}</span></div>
                 <div><strong>Renewal timing</strong><span>{passportIndex.renewal_notes}</span></div>
                 <div><strong>Data source</strong><span>{cacheStatus.data_source || passportIndex.data_source || "provider cache or starter fallback"}</span></div>
-                <div><strong>Next refresh due</strong><span>{niceDate(cacheStatus.next_sync_due_at || passportIndex.next_sync_due_at)}</span></div>
+                <div><strong>Provider status</strong><span>{providerStatus.ready_to_sync ? "Provider ready to sync" : "Provider not fully configured or not enabled"}</span></div>
                 <div><strong>Official source order</strong><span>{passportIndex.official_source_priority?.join(" → ")}</span></div>
                 <div><strong>Important</strong><span>{result.safety_note}</span></div>
               </div>
