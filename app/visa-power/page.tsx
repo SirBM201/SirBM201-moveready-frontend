@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import VisaPowerPlanner from "@/components/VisaPowerPlanner";
 
 const featureBenefits = [
@@ -39,7 +40,7 @@ export default function VisaPowerPage() {
                 Enter visas you already hold, then see destinations that may become easier to visit because of those visas. This is a planning guide, not permission to travel.
               </p>
             </div>
-            <span className="status-dot">Premium feature</span>
+            <span className="status-dot">Premium preview</span>
           </div>
           <div className="badge-row" style={{ marginTop: 10 }}>
             <span className="badge">1. Choose passport</span>
@@ -55,6 +56,12 @@ export default function VisaPowerPage() {
           </div>
         </div>
       </section>
+
+      <BeginnerFriendlyGuide
+        compact
+        title="Use this only for visas you already have"
+        intro="Tick a visa only if it is valid now. The result can show possible travel benefits, but you must still check the destination's official rule, airline checks, and border conditions before booking."
+      />
 
       <section className="section no-top-pad" id="visa-power-tool">
         <VisaPowerPlanner />
