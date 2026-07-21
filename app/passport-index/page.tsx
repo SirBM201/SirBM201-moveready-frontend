@@ -4,8 +4,8 @@ import PassportIndexExplorer from "@/components/PassportIndexExplorer";
 
 const benefits = [
   {
-    title: "Know your passport baseline",
-    text: "See starter visa-free, visa-on-arrival, eVisa, and visa-required categories before choosing a route.",
+    title: "See countries in one place",
+    text: "After checking your passport, destinations should appear on the same page under visa-free, visa on arrival, eVisa/ETA, and visa required.",
   },
   {
     title: "Avoid wrong assumptions",
@@ -28,13 +28,13 @@ export default function PassportIndexPage() {
             <div>
               <p className="overline">Passport Index</p>
               <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>
-                Check what your passport can do before adding visas.
+                Select a passport and see the travel-access list on one page.
               </h1>
               <p className="section-intro" style={{ marginBottom: 0 }}>
-                MoveReady shows a starter passport-strength snapshot, travel-access categories, safety notes, and source status. This is planning guidance only, not permission to travel.
+                MoveReady should show passport strength, visa-free destinations, visa-on-arrival destinations, eVisa/ETA destinations, visa-required destinations, safety notes, and source status without forcing users to jump around the app.
               </p>
             </div>
-            <span className="status-dot">Starter feature</span>
+            <span className="status-dot">One-page list</span>
           </div>
           <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#passport-index-tool">Open passport index</a>
@@ -47,7 +47,7 @@ export default function PassportIndexPage() {
       <BeginnerFriendlyGuide
         compact
         title="Use Passport Index first"
-        intro="This page checks your passport alone. After that, use Visa Power if you already hold Canada, U.S., UK, Schengen, Australia, or Japan visas."
+        intro="This page checks your passport alone and shows the access list here. After that, use Visa Power if you already hold Canada, U.S., UK, Schengen, Australia, or Japan visas."
       />
 
       <section className="section no-top-pad" id="passport-index-tool">
@@ -58,9 +58,9 @@ export default function PassportIndexPage() {
         <div className="section-heading-row">
           <div>
             <p className="overline">How to use this</p>
-            <h2>Passport first, visa power second, route checker third.</h2>
+            <h2>Passport list first, visa power second, route checker third.</h2>
             <p className="section-intro">
-              This order helps everyday users understand their baseline travel access, extra benefits from strong visas, and relocation readiness before paying money.
+              This order helps everyday users understand passport-only travel access, extra benefits from strong visas, and relocation readiness before paying money.
             </p>
           </div>
           <span className="status-dot">Plain language</span>
