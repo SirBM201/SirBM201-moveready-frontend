@@ -2,10 +2,34 @@ import SiteHeader from "@/components/SiteHeader";
 
 const workflows = [
   {
+    title: "Start guide",
+    status: "Available",
+    href: "/start",
+    summary: "Plain-language order for users who do not know where to begin.",
+  },
+  {
+    title: "Account profile",
+    status: "Available",
+    href: "/dashboard",
+    summary: "Save one active profile and connect reports, saved routes, alerts, timeline, Visa Power checks, and support requests.",
+  },
+  {
     title: "Route readiness",
     status: "Available",
     href: "/route-checker",
     summary: "Generate checklist, budget estimate, risk label, and readiness report from route inputs.",
+  },
+  {
+    title: "Passport Index",
+    status: "Available",
+    href: "/passport-index",
+    summary: "Check passport-only travel access categories, validity notes, renewal notes, and source status.",
+  },
+  {
+    title: "Visa Power",
+    status: "Available",
+    href: "/visa-power",
+    summary: "Check whether valid existing visas may create extra third-country travel benefits, subject to official rules.",
   },
   {
     title: "Route comparison",
@@ -141,6 +165,7 @@ const controls = [
   "Contact only after user consent",
   "Provider review before public handoff",
   "Official links for lottery and ballot submissions",
+  "Passport and Visa Power results marked as advisory",
   "Report and saved-route records preserved for lookup",
 ];
 
@@ -158,6 +183,8 @@ export default function WorkspacePage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="/route-checker">Start route check</a>
+            <a className="btn" href="/passport-index">Passport Index</a>
+            <a className="btn" href="/visa-power">Visa Power</a>
             <a className="btn" href="/compare">Compare routes</a>
             <a className="btn" href="/watchlist">Create watchlist</a>
             <a className="btn" href="/services">Request service</a>
