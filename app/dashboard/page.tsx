@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import AccountSummary from "@/components/AccountSummary";
 import ProfileDashboard from "@/components/ProfileDashboard";
 
@@ -93,12 +94,19 @@ export default function DashboardPage() {
             <a className="btn primary" href="#account-summary">View account summary</a>
             <a className="btn" href="#profile-dashboard">Save my details</a>
             <a className="btn" href="/route-checker">Check route</a>
+            <a className="btn" href="/passport-index">Passport</a>
             <a className="btn" href="/visa-power">Visa Power</a>
             <a className="btn" href="/my-reports">Reports</a>
             <a className="btn" href="/login">Sign in</a>
           </div>
         </div>
       </section>
+
+      <BeginnerFriendlyGuide
+        compact
+        title="Use your account without confusion"
+        intro="Start by keeping only one active profile. That one profile should feed your route checks, passport and visa checks, reports, alerts, saved routes, and support requests."
+      />
 
       <section className="section no-top-pad" id="account-summary">
         <AccountSummary />
@@ -130,17 +138,18 @@ export default function DashboardPage() {
         <div className="live-workspace">
           <article className="workflow-panel">
             <p className="overline">Simple flow</p>
-            <h2>Profile → route → visa power → report → alert → support</h2>
+            <h2>Profile → route → passport → visa power → report → alert → support</h2>
             <p className="section-intro">
               MoveReady should feel like a guided workspace, not a collection of separate forms. Use the steps below as the normal path.
             </p>
             <div className="mini-list">
               <div><strong>1. Save or load your profile</strong><span>Add your contact, country, target country, goal, money available, family count, and timeline.</span></div>
               <div><strong>2. Check the route you care about</strong><span>Use your active profile to see whether the route looks sensible before spending money.</span></div>
-              <div><strong>3. Check visas you already hold</strong><span>Use Visa Power when a Canada, U.S., UK, Schengen, Australia, or Japan visa may create extra travel options.</span></div>
-              <div><strong>4. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
-              <div><strong>5. Create an alert</strong><span>Track important deadlines, route changes, visa-benefit changes, and source-review reminders only when you opt in.</span></div>
-              <div><strong>6. Ask for support when needed</strong><span>Request expert or document review after you understand your route and report.</span></div>
+              <div><strong>3. Check your passport</strong><span>Use Passport Index to understand your passport baseline before depending on another route.</span></div>
+              <div><strong>4. Check visas you already hold</strong><span>Use Visa Power when a Canada, U.S., UK, Schengen, Australia, or Japan visa may create extra travel options.</span></div>
+              <div><strong>5. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
+              <div><strong>6. Create an alert</strong><span>Track important deadlines, route changes, visa-benefit changes, and source-review reminders only when you opt in.</span></div>
+              <div><strong>7. Ask for support when needed</strong><span>Request expert or document review after you understand your route and report.</span></div>
             </div>
           </article>
 
@@ -179,7 +188,7 @@ export default function DashboardPage() {
             <p className="overline">Your relocation profile</p>
             <h2>Save your details or load your saved profile</h2>
             <p className="section-intro">
-              Use the same email or phone each time. After saving, you can check a route, check Visa Power, generate a report, save a route, create an alert, or request support from the profile summary.
+              Use the same email or phone each time. After saving, you can check a route, check your passport, check Visa Power, generate a report, save a route, create an alert, or request support from the profile summary.
             </p>
           </div>
           <span className="status-dot">Contact lookup</span>
