@@ -12,6 +12,8 @@ The public app now includes live route checks, Passport Index, Visa Power & Trav
 
 A launch simplicity pass has been added so first-time users can follow a plain-language order across Account, Route Checker, Passport Index, Visa Power, Reports, Alerts, and Services.
 
+The Passport Index page is now provider-cache ready. When a passport provider is connected, users can select a passport and see passport rating, rank where available, visa-free rows, visa-on-arrival rows, eVisa/ETA rows, visa-required rows, provider name, last synced date, and twice-weekly refresh status on one page.
+
 ## Implemented Pages
 
 - `/`
@@ -51,7 +53,7 @@ A launch simplicity pass has been added so first-time users can follow a plain-l
 
 - Country and route data loading from backend/Supabase
 - Estonia startup founder route workspace
-- Passport Index starter checks
+- Passport Index checks with passport rating, category filters, source status, and provider-cache fields
 - Visa Power & Travel Benefits checks for selected existing visas
 - Readiness report generation
 - Readiness report JSON download and print action from the route checker result
@@ -80,6 +82,25 @@ A launch simplicity pass has been added so first-time users can follow a plain-l
 6. Generate or retrieve readiness reports.
 7. Save routes and create alerts only when useful.
 8. Request support only after the route is clearer.
+
+## Passport Index User Experience
+
+The user should not need to move from page to page just to understand passport access.
+
+On `/passport-index`, the user selects a passport country and clicks **Check my passport**. The result page should show:
+
+- Passport rating / opportunity score
+- Passport rank where provider supplies it
+- Strength band
+- Visa-free list
+- Visa on arrival list
+- eVisa / ETA list
+- Visa-required list
+- Conditions and maximum stay where available
+- Provider/source status
+- Last synced date
+- Twice-weekly refresh status
+- Safety warning before booking or paying anyone
 
 ## Reused Foundation
 
