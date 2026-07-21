@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import LiveRouteGrid from "@/components/LiveRouteGrid";
 import RouteReadinessForm from "@/components/RouteReadinessForm";
 
@@ -16,7 +17,7 @@ export default function RouteCheckerPage() {
                 Check your route before you spend money.
               </h1>
               <p className="section-intro" style={{ marginBottom: 0 }}>
-                Use the active profile from Account, confirm the details, then generate a simple report with checklist, budget, risk label, and next steps.
+                Load your active profile, confirm the details, then generate a simple report with checklist, budget, risk label, and next steps.
               </p>
             </div>
             <span className="status-dot">3 steps</span>
@@ -33,6 +34,12 @@ export default function RouteCheckerPage() {
           </div>
         </div>
       </section>
+
+      <BeginnerFriendlyGuide
+        compact
+        title="How to use this page"
+        intro="This page is for checking whether a relocation route looks sensible before you pay anyone or start collecting documents. Use the green button after the active profile looks correct."
+      />
 
       <section className="section no-top-pad" id="route-check-form">
         <RouteReadinessForm />
