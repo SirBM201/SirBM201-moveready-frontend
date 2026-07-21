@@ -12,7 +12,9 @@ type PassportOption = {
 
 type AccessRow = {
   destination?: string;
+  destination_region?: string;
   access_bucket?: string;
+  access_label?: string;
   access_type?: string;
   stay?: string;
   maximum_stay?: string;
@@ -67,7 +69,9 @@ function getAccessRows(passportIndex: any): AccessRow[] {
 function rowText(row: AccessRow) {
   return [
     row.destination,
+    row.destination_region,
     row.access_bucket,
+    row.access_label,
     row.access_type,
     row.stay,
     row.maximum_stay,
@@ -92,6 +96,28 @@ function resultCountText(rows: AccessRow[], isStarterRecord: boolean) {
   return `${rows.length} destination rows loaded`;
 }
 
+function valueOrDash(value: any) {
+  if (value === null || value === undefined || value === "") return "Not available yet";
+  return String(value);
+}
+
+function niceDate(value: any) {
+  if (!value) return "Not synced yet";
+  try {
+    return new Date(String(value)).toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return String(value);
+  }
+}
+
+function categoryCountText(passportIndex: any, countKey: string, estimateKey: string, rows: AccessRow[], bucket: string) {
+  const exact = passportIndex?.[countKey];
+  if (exact !== null && exact !== undefined && exact !== "") return String(exact);
+  const rowCount = countRows(rows, bucket);
+  if (rowCount) return `${rowCount} listed now`;
+  return passportIndex?.[estimateKey] || "Provider sync pending";
+}
+
 export default function PassportIndexExplorer() {
   const [passportCountry, setPassportCountry] = useState("Nigeria");
   const [passportOptions, setPassportOptions] = useState<PassportOption[]>(defaultPassportOptions);
@@ -108,6 +134,9 @@ export default function PassportIndexExplorer() {
         if (!alive) return;
         if (Array.isArray(data.passport_country_options) && data.passport_country_options.length) {
           setPassportOptions(data.passport_country_options);
+        }
+        if (data?.provider_status?.sync_frequency) {
+          setMessage(`Choose a passport country. Provider cache refresh: ${data.provider_status.sync_frequency}.`);
         }
       })
       .catch(() => {
@@ -139,8 +168,13 @@ export default function PassportIndexExplorer() {
   }
 
   const passportIndex = result?.passport_index;
+  const cacheStatus = result?.cache_status || {};
+  const providerStatus = result?.provider_status || {};
   const accessRows = useMemo(() => getAccessRows(passportIndex), [passportIndex]);
-  const isStarterRecord = String(passportIndex?.confidence || "").includes("starter") || String(passportIndex?.confidence || "").includes("pending");
+  const isStarterRecord =
+    String(passportIndex?.confidence || "").includes("starter") ||
+    String(passportIndex?.confidence || "").includes("pending") ||
+    String(passportIndex?.data_source || "").includes("starter");
   const filteredRows = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     return accessRows.filter((row) => {
@@ -152,17 +186,17 @@ export default function PassportIndexExplorer() {
 
   return (
     <div className="live-workspace">
-      <section className="workflow-panel live-form">
+      <section className="workflow-panel live-form" id="passport-index-tool">
         <div className="panel-heading">
           <div>
             <p className="overline">Passport Index</p>
             <h2>Check passport-only travel access</h2>
           </div>
-          <span className="status-dot">Starter</span>
+          <span className="status-dot">Rating included</span>
         </div>
 
         <p className="form-status">
-          Select your passport and click the green button. The country list will show here under visa-free, visa on arrival, eVisa, and visa required.
+          Select your passport and click the green button. Your rating and country list will show here under visa-free, visa on arrival, eVisa, and visa required.
         </p>
 
         <div className="form-grid">
@@ -197,10 +231,13 @@ export default function PassportIndexExplorer() {
               </div>
               <p>{passportIndex.summary}</p>
               <div className="badge-row">
+                <span className="badge">Rating: {passportIndex.passport_opportunity_score}/100</span>
+                <span className="badge">Rank: {valueOrDash(passportIndex.passport_rank)}</span>
                 <span className="badge">Band: {passportIndex.passport_strength_band}</span>
                 <span className="badge">Rows: {resultCountText(accessRows, isStarterRecord)}</span>
-                <span className="badge">Source: {passportIndex.confidence}</span>
-                <span className="badge">Reviewed: {passportIndex.last_reviewed}</span>
+                <span className="badge">Provider: {cacheStatus.source_provider || passportIndex.source_provider || "Starter cache"}</span>
+                <span className="badge">Synced: {niceDate(cacheStatus.last_synced_at || passportIndex.last_synced_at)}</span>
+                <span className="badge">Refresh: {cacheStatus.sync_frequency || passportIndex.sync_frequency || providerStatus.sync_frequency || "twice weekly"}</span>
               </div>
             </article>
 
@@ -217,10 +254,10 @@ export default function PassportIndexExplorer() {
               </div>
 
               <div className="mini-list two-col-list" style={{ marginTop: 0 }}>
-                <div><strong>Visa-free</strong><span>{passportIndex.visa_free_count_estimate}</span></div>
-                <div><strong>Visa on arrival</strong><span>{passportIndex.visa_on_arrival_count_estimate}</span></div>
-                <div><strong>eVisa / ETA</strong><span>{passportIndex.evisa_count_estimate}</span></div>
-                <div><strong>Visa required</strong><span>{passportIndex.visa_required_count_estimate}</span></div>
+                <div><strong>Visa-free</strong><span>{categoryCountText(passportIndex, "visa_free_count", "visa_free_count_estimate", accessRows, "visa_free")}</span></div>
+                <div><strong>Visa on arrival</strong><span>{categoryCountText(passportIndex, "visa_on_arrival_count", "visa_on_arrival_count_estimate", accessRows, "visa_on_arrival")}</span></div>
+                <div><strong>eVisa / ETA</strong><span>{categoryCountText(passportIndex, "evisa_count", "evisa_count_estimate", accessRows, "evisa")}</span></div>
+                <div><strong>Visa required</strong><span>{categoryCountText(passportIndex, "visa_required_count", "visa_required_count_estimate", accessRows, "visa_required")}</span></div>
               </div>
 
               <div className="actions" style={{ marginTop: 16 }}>
@@ -248,7 +285,7 @@ export default function PassportIndexExplorer() {
 
               {isStarterRecord ? (
                 <p className="form-status">
-                  Launch note: this page now supports the full country-list experience. The current backend may still contain starter rows until each destination is officially verified. MoveReady should not invent unverified country access.
+                  Launch note: MoveReady is ready for a live passport provider. Until provider sync is connected, rows shown here are starter rows and must not be treated as final travel permission.
                 </p>
               ) : null}
             </article>
@@ -267,7 +304,7 @@ export default function PassportIndexExplorer() {
                   {filteredRows.map((row, index) => (
                     <div key={`${row.destination || "destination"}-${row.access_bucket || "access"}-${index}`}>
                       <strong>{row.destination || "Destination"}</strong>
-                      <span><strong>Category:</strong> {categoryLabels[row.access_bucket || ""] || row.access_bucket || "Check official source"}</span>
+                      <span><strong>Category:</strong> {categoryLabels[row.access_bucket || ""] || row.access_label || row.access_bucket || "Check official source"}</span>
                       <span><strong>Access type:</strong> {row.access_type || "Check official source"}</span>
                       <span><strong>Stay:</strong> {row.maximum_stay || row.stay || "Confirm current stay rule before travel"}</span>
                       <span><strong>Conditions:</strong> {row.conditions || "Confirm official rules before booking."}</span>
@@ -293,6 +330,8 @@ export default function PassportIndexExplorer() {
               <div className="mini-list">
                 <div><strong>Passport validity</strong><span>{passportIndex.validity_notes}</span></div>
                 <div><strong>Renewal timing</strong><span>{passportIndex.renewal_notes}</span></div>
+                <div><strong>Data source</strong><span>{cacheStatus.data_source || passportIndex.data_source || "provider cache or starter fallback"}</span></div>
+                <div><strong>Next refresh due</strong><span>{niceDate(cacheStatus.next_sync_due_at || passportIndex.next_sync_due_at)}</span></div>
                 <div><strong>Official source order</strong><span>{passportIndex.official_source_priority?.join(" → ")}</span></div>
                 <div><strong>Important</strong><span>{result.safety_note}</span></div>
               </div>
@@ -306,7 +345,7 @@ export default function PassportIndexExplorer() {
         ) : (
           <div className="empty-result">
             <p className="overline">What you will get</p>
-            <h2>Country lists will appear here after you click Check my passport.</h2>
+            <h2>Passport rating and country lists will appear here after you click Check my passport.</h2>
             <p>
               MoveReady will group destinations by visa-free, visa on arrival, eVisa/ETA, and visa required. It does not replace official destination rules, airline checks, or border officer decisions.
             </p>
