@@ -8,11 +8,16 @@ Final brand name and domain will be decided later. For now, this frontend uses n
 
 Next.js frontend scaffold is in place and connected to the deployed backend through `NEXT_PUBLIC_BACKEND_URL` / `NEXT_PUBLIC_API_BASE`.
 
-The public app now includes live route checks, official opportunities, watchlist subscription capture, Estonia startup route detail, readiness tools, readiness report export actions, user profile saving, saved report lookup, service request capture, and admin review surfaces.
+The public app now includes live route checks, Passport Index, Visa Power & Travel Benefits, official opportunities, watchlist subscription capture, Estonia startup route detail, readiness tools, readiness report export actions, user profile saving, saved report lookup, service request capture, and admin review surfaces.
+
+A launch simplicity pass has been added so first-time users can follow a plain-language order across Account, Route Checker, Passport Index, Visa Power, Reports, Alerts, and Services.
 
 ## Implemented Pages
 
 - `/`
+- `/start`
+- `/decision-center`
+- `/navigation-map`
 - `/opportunities`
 - `/watchlist`
 - `/readiness`
@@ -20,6 +25,9 @@ The public app now includes live route checks, official opportunities, watchlist
 - `/platform/[slug]`
 - `/routes/estonia-startup`
 - `/country-checker`
+- `/country-comparison`
+- `/passport-index`
+- `/visa-power`
 - `/route-checker`
 - `/document-checklist`
 - `/proof-of-funds`
@@ -28,7 +36,11 @@ The public app now includes live route checks, official opportunities, watchlist
 - `/insurance-guide`
 - `/report-preview`
 - `/dashboard`
+- `/saved-routes`
+- `/timeline`
 - `/my-reports`
+- `/services`
+- `/service-requests`
 - `/admin`
 - `/admin/sources`
 - `/admin/routes`
@@ -39,6 +51,8 @@ The public app now includes live route checks, official opportunities, watchlist
 
 - Country and route data loading from backend/Supabase
 - Estonia startup founder route workspace
+- Passport Index starter checks
+- Visa Power & Travel Benefits checks for selected existing visas
 - Readiness report generation
 - Readiness report JSON download and print action from the route checker result
 - Saved report lookup from `/my-reports` by report reference, email, or phone
@@ -55,6 +69,17 @@ The public app now includes live route checks, official opportunities, watchlist
 - Admin service request dashboard
 - Admin watchlist subscription dashboard after migration `007_watchlist_alert_subscriptions.sql`
 - Admin readiness check dashboard after migration `006_readiness_check_runs.sql`
+
+## Launch User Flow
+
+1. Start with the simple guide.
+2. Save or load one active profile.
+3. Check the route before spending money.
+4. Check passport baseline.
+5. Check Visa Power for visas already held.
+6. Generate or retrieve readiness reports.
+7. Save routes and create alerts only when useful.
+8. Request support only after the route is clearer.
 
 ## Reused Foundation
 
@@ -83,13 +108,15 @@ The frontend should show trust clearly:
 - Source count
 - Review due date
 - Whether a report needs refresh
+- Passport and visa-benefit source confidence
+- Safety reminders before travel booking
 
 AI output should feel helpful, but source freshness should carry the trust.
 
 ## Next Frontend Work
 
-- Add auth/session flow
+- Add paid report flow
 - Add PDF report export/download
 - Add provider onboarding screens
-- Add paid report flow
-- Add richer admin CRUD for routes, sources, opportunities, watchlists, profiles, and partner services
+- Add richer admin CRUD for routes, sources, opportunities, watchlists, profiles, Visa Power rules, passport-index records, and partner services
+- Add document vault after privacy, security, and storage rules are finalized
