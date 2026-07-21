@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 
 const simpleSteps = [
   {
@@ -149,15 +150,21 @@ export default function StartPage() {
         <aside className="workflow-panel">
           <h2>Best simple order</h2>
           <div className="mini-list">
-            <div><strong>First</strong><span>Check or compare your route.</span></div>
-            <div><strong>Second</strong><span>Check what your passport can do by itself.</span></div>
-            <div><strong>Third</strong><span>Check visas you already hold with Visa Power.</span></div>
-            <div><strong>Fourth</strong><span>Save one profile in Account.</span></div>
+            <div><strong>First</strong><span>Save or load one profile in Account.</span></div>
+            <div><strong>Second</strong><span>Check or compare your route.</span></div>
+            <div><strong>Third</strong><span>Check what your passport can do by itself.</span></div>
+            <div><strong>Fourth</strong><span>Check visas you already hold with Visa Power.</span></div>
             <div><strong>Fifth</strong><span>Generate a readiness report.</span></div>
             <div><strong>Sixth</strong><span>Set alerts or request support only when needed.</span></div>
           </div>
         </aside>
       </section>
+
+      <BeginnerFriendlyGuide
+        compact
+        title="MoveReady in plain English"
+        intro="Use this app like a checklist. It helps you decide, prepare, and avoid unnecessary spending. It does not replace official immigration, embassy, school, airline, or employer instructions."
+      />
 
       <section className="section no-top-pad">
         <div className="section-heading-row">
