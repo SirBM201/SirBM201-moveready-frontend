@@ -2,6 +2,7 @@ const footerGroups = [
   {
     title: "Plan",
     links: [
+      { label: "Start Guide", href: "/start" },
       { label: "Decision Center", href: "/decision-center" },
       { label: "Countries", href: "/country-comparison" },
       { label: "Routes", href: "/compare" },
@@ -9,12 +10,22 @@ const footerGroups = [
     ],
   },
   {
+    title: "Travel Tools",
+    links: [
+      { label: "Passport Index", href: "/passport-index" },
+      { label: "Visa Power", href: "/visa-power" },
+      { label: "Opportunities", href: "/opportunities" },
+      { label: "Alerts", href: "/watchlist" },
+      { label: "My Reports", href: "/my-reports" },
+    ],
+  },
+  {
     title: "Act",
     links: [
-      { label: "Opportunities", href: "/opportunities" },
       { label: "Services", href: "/services" },
       { label: "Pricing", href: "/pricing" },
       { label: "My Account", href: "/dashboard" },
+      { label: "Support Requests", href: "/service-requests" },
     ],
   },
   {
@@ -24,7 +35,6 @@ const footerGroups = [
       { label: "Sources", href: "/sources" },
       { label: "Safety", href: "/safety" },
       { label: "Provider Application", href: "/partners/apply" },
-      { label: "My Reports", href: "/my-reports" },
     ],
   },
 ];
@@ -38,7 +48,7 @@ export default function SiteFooter() {
           <span>Global relocation readiness platform</span>
         </a>
         <p>
-          MoveReady provides source-backed readiness support. It is not a government authority, embassy, legal representative, or approval guarantee service.
+          MoveReady provides source-backed readiness support. It is not a government authority, embassy, legal representative, travel-entry approval service, or visa approval guarantee service.
         </p>
       </div>
 
