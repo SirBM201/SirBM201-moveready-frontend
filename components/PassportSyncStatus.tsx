@@ -19,6 +19,20 @@ function readableDate(value: unknown) {
   }
 }
 
+function runStatusText(lastRun: any) {
+  if (!lastRun) return "No unattended run has been recorded yet";
+  if (lastRun.status === "scheduled_sync_completed") {
+    const rowText = Array.isArray(lastRun.row_counts)
+      ? lastRun.row_counts.map((item: any) => `${item.country}: ${item.row_count} rows`).join(" · ")
+      : "Completed";
+    return rowText || "Completed";
+  }
+  if (lastRun.status === "scheduled_sync_failed") {
+    return `Failed with ${lastRun.error_count || 0} recorded error(s)`;
+  }
+  return String(lastRun.status || "Status unavailable").replaceAll("_", " ");
+}
+
 export default function PassportSyncStatus() {
   const [status, setStatus] = useState<any | null>(null);
   const [message, setMessage] = useState("Loading the automatic refresh schedule...");
@@ -46,6 +60,7 @@ export default function PassportSyncStatus() {
   const countries = Array.isArray(status?.scheduled_countries)
     ? status.scheduled_countries.join(", ")
     : "Nigeria during launch";
+  const lastRun = status?.last_scheduled_run;
 
   return (
     <section className="section no-top-pad">
@@ -74,6 +89,14 @@ export default function PassportSyncStatus() {
           <div>
             <strong>Provider-call limit</strong>
             <span>{status?.max_countries_per_sync || 1} passport map call per scheduled run</span>
+          </div>
+          <div>
+            <strong>Last unattended run</strong>
+            <span>{runStatusText(lastRun)}</span>
+          </div>
+          <div>
+            <strong>Last run time</strong>
+            <span>{readableDate(lastRun?.created_at)}</span>
           </div>
         </div>
         <p className="form-status">
