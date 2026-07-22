@@ -1,6 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import PassportIndexExplorer from "@/components/PassportIndexExplorer";
+import PassportSyncStatus from "@/components/PassportSyncStatus";
 
 const benefits = [
   {
@@ -49,6 +50,8 @@ export default function PassportIndexPage() {
         title="Use Passport Index first"
         intro="This page checks your passport alone and shows the access list here. After that, use Visa Power if you already hold Canada, U.S., UK, Schengen, Australia, or Japan visas."
       />
+
+      <PassportSyncStatus />
 
       <section className="section no-top-pad" id="passport-index-tool">
         <PassportIndexExplorer />
