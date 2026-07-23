@@ -7,6 +7,7 @@ const publicNavigation = [
   { label: "Visa Power", href: "/visa-power", title: "Check travel benefits from visas you already hold" },
   { label: "Routes", href: "/compare", title: "Compare relocation routes" },
   { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
+  { label: "Study", href: "/study-planner", title: "Plan admission and study visa preparation" },
   { label: "Planner", href: "/journey-planner", title: "Plan documents, family, appointments, and settlement" },
   { label: "Alerts", href: "/watchlist", title: "Create and review route alerts" },
   { label: "Services", href: "/services", title: "Request trusted support" },
