@@ -1,39 +1,51 @@
 import GeneralServiceRequestForm from "@/components/GeneralServiceRequestForm";
+import JourneyPlanner from "@/components/JourneyPlanner";
+import SiteHeader from "@/components/SiteHeader";
+
 
 const settlementTasks = [
-  "Airport pickup",
-  "Temporary accommodation",
-  "SIM card and local phone setup",
+  "Airport and first-night safety",
+  "Temporary and longer-term accommodation",
+  "SIM card and local connectivity",
   "Bank account or payment setup",
-  "Tax number or local registration",
-  "Residence address registration",
-  "Health insurance activation",
+  "Tax number or social-security setup",
+  "Residence and address registration",
+  "Health insurance and primary care",
   "School or childcare setup",
   "Local transport and first-week movement",
-  "Family arrival checklist",
+  "Family, medical, work, business, and pet arrival tasks",
 ];
+
 
 export default function SettlementPage() {
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <a className="brand" href="/"><strong>Project MoveReady</strong><span>Post-arrival settlement</span></a>
-        <nav className="nav" aria-label="Main navigation">
-          <a href="/">Home</a><a href="/services">Services</a><a href="/timeline">Timeline</a><a href="/family-planner">Family Planner</a><a href="/partners/apply">Provider Apply</a>
-        </nav>
-      </header>
+      <SiteHeader sectionLabel="Post-arrival settlement" />
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Partner approval pending</span>
-          <h1>Turn approval into a managed arrival plan.</h1>
-          <p className="lede">After visa or residence approval, users still need housing, pickup, registration, banking, insurance, school, transport, and local setup. MoveReady can capture these needs before connecting approved providers.</p>
+          <span className="eyebrow">Live arrival planner</span>
+          <h1>Turn approval into a managed first 90 days.</h1>
+          <p className="lede">
+            Generate a staged checklist for the period before travel, first 72 hours, first two weeks, and first 90 days. Mandatory local rules still require official country and city confirmation.
+          </p>
+          <div className="actions">
+            <a className="btn primary" href="#settlement-planner-tool">Build arrival plan</a>
+            <a className="btn" href="/journey-planner">Open full journey planner</a>
+            <a className="btn" href="/timeline">Open timeline</a>
+          </div>
         </div>
       </section>
 
       <section className="section no-top-pad">
-        <h2>Arrival checklist</h2>
-        <article className="card"><div className="badge-row">{settlementTasks.map((item) => <span className="badge" key={item}>{item}</span>)}</div></article>
+        <h2>Arrival areas</h2>
+        <article className="card">
+          <div className="badge-row">{settlementTasks.map((item) => <span className="badge" key={item}>{item}</span>)}</div>
+        </article>
+      </section>
+
+      <section className="section" id="settlement-planner-tool">
+        <JourneyPlanner mode="settlement" />
       </section>
 
       <section className="section">
