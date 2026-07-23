@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
-import { clearActiveProfile, getActiveProfileId, setActiveProfile } from "@/lib/profileStorage";
 import { readableLabel } from "@/lib/labels";
+import { clearActiveProfile, getActiveProfileId, setActiveProfile } from "@/lib/profileStorage";
 
 type AccountCounts = {
   profiles?: number;
@@ -12,6 +12,9 @@ type AccountCounts = {
   watchlist?: number;
   timeline?: number;
   reports?: number;
+  journey_plans?: number;
+  readiness_checks?: number;
+  commercial_quotes?: number;
   service_requests?: number;
 };
 
@@ -61,11 +64,14 @@ type AccountSummaryResponse = {
 };
 
 const summaryTiles = [
-  { key: "profiles", label: "Profiles", helper: "People/plans saved", href: "#profile-chooser" },
+  { key: "profiles", label: "Profiles", helper: "People and plans saved", href: "#profile-chooser" },
   { key: "saved_routes", label: "Saved routes", helper: "Routes to revisit", href: "/saved-routes" },
   { key: "watchlist", label: "Watchlist", helper: "Alerts you asked for", href: "/watchlist" },
   { key: "timeline", label: "Timeline", helper: "Dated actions", href: "/timeline" },
   { key: "reports", label: "Reports", helper: "Readiness reports", href: "/my-reports" },
+  { key: "journey_plans", label: "Study and journey plans", helper: "Saved planning runs", href: "/journey-plans" },
+  { key: "readiness_checks", label: "Readiness checks", helper: "Risk and evidence checks", href: "/readiness" },
+  { key: "commercial_quotes", label: "Quotes", helper: "Scope and payment status", href: "/billing" },
   { key: "service_requests", label: "Support requests", helper: "Private help requests", href: "/service-requests" },
 ] as const;
 
@@ -136,7 +142,7 @@ export default function AccountSummary() {
     setLoading(true);
     setMessage("Loading account summary...");
     try {
-      const data = await apiJson<AccountSummaryResponse>("account/summary", { timeoutMs: 15000 });
+      const data = await apiJson<AccountSummaryResponse>("account/summary", { timeoutMs: 20000 });
       const profiles = usableProfiles(data);
       const storedActiveId = getActiveProfileId();
       const backendActiveProfile = profiles.find((item) => isBackendActive(item));
@@ -163,7 +169,7 @@ export default function AccountSummary() {
   }
 
   useEffect(() => {
-    loadSummary();
+    void loadSummary();
   }, []);
 
   async function chooseProfile(profile: AccountProfile) {
@@ -185,7 +191,7 @@ export default function AccountSummary() {
       });
       setActiveProfile(profile.id, profileName(profile));
       setActiveProfileId(profile.id);
-      setMessage(`${profileName(profile)} is now your active profile. Route Checker, Saved Routes, Alerts, Reports, Timeline, and Support will use this profile first.`);
+      setMessage(`${profileName(profile)} is now your active profile. Route Checker, Saved Routes, Alerts, Reports, Planning, Timeline, Quotes, and Support will use this account context first.`);
       await loadSummary();
     } catch (error) {
       const apiError = error as ApiError;
@@ -212,7 +218,7 @@ export default function AccountSummary() {
       return;
     }
 
-    const confirmHide = typeof window === "undefined" || window.confirm(`Hide old profile: ${profileName(profile)}? This only removes it from your active account list. It does not delete reports that were already generated.`);
+    const confirmHide = typeof window === "undefined" || window.confirm(`Hide old profile: ${profileName(profile)}? This only removes it from your active account list. It does not delete reports, plans, or quotes already created.`);
     if (!confirmHide) {
       setMessage("No profile was hidden.");
       return;
@@ -260,8 +266,8 @@ export default function AccountSummary() {
 
       <p>
         {summary
-          ? "This is your account home. Pick one active profile first, then use it for route checks, reports, saved routes, alerts, timeline, and support requests."
-          : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, and service requests under one account."}
+          ? "This is your account home. Pick one active profile first, then use it for route checks, reports, saved routes, alerts, timeline, planning history, quotes, and support requests."
+          : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, planning history, quotes, and service requests under one account."}
       </p>
 
       {summary ? (
@@ -295,7 +301,9 @@ export default function AccountSummary() {
             <div className="actions compact-actions">
               <a className="btn primary" href="/route-checker">Check route with this profile</a>
               <a className="btn" href="#profile-chooser">Choose a different profile</a>
+              <a className="btn" href="/journey-plans">Open plans</a>
               <a className="btn" href="/my-reports">Open reports</a>
+              <a className="btn" href="/billing">Open quotes</a>
             </div>
           </article>
 
@@ -367,7 +375,9 @@ export default function AccountSummary() {
         {summary ? <a className="btn primary" href="#profile-chooser">Choose or hide profiles</a> : null}
         <a className="btn primary" href="/route-checker">Check my route</a>
         <a className="btn" href="#profile-dashboard">Create or update profile</a>
+        <a className="btn" href="/journey-plans">My plans</a>
         <a className="btn" href="/my-reports">My reports</a>
+        <a className="btn" href="/billing">My quotes</a>
         <a className="btn" href="/saved-routes">Saved routes</a>
         {summary ? <button className="btn" type="button" onClick={switchAccount}>Switch email account</button> : null}
       </div>
