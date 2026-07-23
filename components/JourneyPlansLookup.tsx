@@ -32,6 +32,7 @@ type AccountSummary = {
 
 
 const planLabels: Record<string, string> = {
+  study_admission_plan: "Study admission and visa plan",
   legalization_check: "Document legalization plan",
   family_plan: "Family relocation plan",
   appointment_plan: "Appointment preparation plan",
@@ -40,6 +41,7 @@ const planLabels: Record<string, string> = {
 
 
 const rerunLinks: Record<string, string> = {
+  study_admission_plan: "/study-planner#study-admission-planner",
   legalization_check: "/legalization#legalization-planner",
   family_plan: "/family-planner#family-planner-tool",
   appointment_plan: "/timeline#appointment-planner-tool",
@@ -74,6 +76,9 @@ function targetLine(plan: JourneyPlan) {
 function resultHighlights(plan: JourneyPlan) {
   const result = plan.result_payload || {};
   const highlights: string[] = [];
+  if (result.desired_level) highlights.push(`Study level: ${readable(result.desired_level)}`);
+  if (result.desired_field) highlights.push(`Field: ${result.desired_field}`);
+  if (result.planning_funding_gap !== undefined && result.planning_funding_gap !== null) highlights.push(`Funding gap: ${result.currency || ""} ${Number(result.planning_funding_gap).toLocaleString()}`.trim());
   if (result.household_size) highlights.push(`Household ${result.household_size}`);
   if (result.planning_budget_multiplier) highlights.push(`Budget pressure ${result.planning_budget_multiplier}×`);
   if (result.appointment_date) highlights.push(`Appointment ${result.appointment_date}`);
@@ -87,13 +92,13 @@ function resultHighlights(plan: JourneyPlan) {
 export default function JourneyPlansLookup() {
   const [plans, setPlans] = useState<JourneyPlan[]>([]);
   const [accountEmail, setAccountEmail] = useState("");
-  const [message, setMessage] = useState("Checking for journey plans connected to your verified account...");
+  const [message, setMessage] = useState("Checking for saved planning runs connected to your verified account...");
   const [loading, setLoading] = useState(false);
 
   async function loadPlans(silent = false) {
     if (!silent) {
       setLoading(true);
-      setMessage("Loading journey plans...");
+      setMessage("Loading saved plans...");
     }
     try {
       const data = await apiJson<AccountSummary>("account/summary", { timeoutMs: 20000 });
@@ -102,15 +107,15 @@ export default function JourneyPlansLookup() {
       setPlans(rows);
       setAccountEmail(data.session?.email || "");
       if (section?.ok === false) {
-        setMessage("Journey plan history is not available yet. The readiness storage table may need the latest SQL setup.");
+        setMessage("Planning history is not available yet. The readiness storage table may need the latest SQL setup.");
       } else {
-        setMessage(rows.length ? "Verified account journey plans loaded." : "No journey plans are connected to this account yet. Run a planner while signed in.");
+        setMessage(rows.length ? "Verified account planning history loaded." : "No saved plans are connected to this account yet. Run a planner while signed in.");
       }
     } catch (error) {
       const apiError = error as ApiError;
       setPlans([]);
       setAccountEmail("");
-      setMessage(apiError?.status === 401 ? "Sign in before loading private journey plans." : apiError?.message || "Unable to load journey plans right now.");
+      setMessage(apiError?.status === 401 ? "Sign in before loading private planning history." : apiError?.message || "Unable to load saved plans right now.");
     } finally {
       if (!silent) setLoading(false);
     }
@@ -126,19 +131,20 @@ export default function JourneyPlansLookup() {
         <div className="panel-heading">
           <div>
             <p className="overline">Account history</p>
-            <h2>My Journey Plans</h2>
+            <h2>My Study and Journey Plans</h2>
           </div>
           <span className="status-dot">{accountEmail ? "Verified" : "Sign in"}</span>
         </div>
         <p className="section-intro">
-          Plans appear here only when the planner run is connected to a verified signed-in email. Older anonymous plans remain private but cannot be recovered by account lookup.
+          Study, document, family, appointment, and settlement plans appear here only when the run is connected to a verified signed-in email. Older anonymous plans remain private but cannot be recovered by account lookup.
         </p>
         {accountEmail ? <p className="form-status">Signed in as {accountEmail}</p> : null}
         <div className="actions">
           <button className="btn primary" type="button" disabled={loading} onClick={() => loadPlans(false)}>
-            {loading ? "Loading..." : "Load my journey plans"}
+            {loading ? "Loading..." : "Load my plans"}
           </button>
-          <a className="btn" href="/journey-planner">Create a new plan</a>
+          <a className="btn" href="/study-planner">Create study plan</a>
+          <a className="btn" href="/journey-planner">Create journey plan</a>
           <a className="btn" href="/dashboard">Back to Account Center</a>
         </div>
         <p className="form-status">{message}</p>
@@ -151,12 +157,12 @@ export default function JourneyPlansLookup() {
               const result = plan.result_payload || {};
               const warnings: string[] = Array.isArray(result.warnings) ? result.warnings : [];
               const highlights = resultHighlights(plan);
-              const title = planLabels[plan.tool_slug || ""] || readable(plan.tool_slug || "Journey plan");
+              const title = planLabels[plan.tool_slug || ""] || readable(plan.tool_slug || "Planning result");
               return (
                 <article className="result-block" key={plan.id || `${plan.tool_slug}-${plan.created_at}`}>
                   <div className="panel-heading">
                     <div>
-                      <p className="overline">Saved journey plan</p>
+                      <p className="overline">Saved planning run</p>
                       <h2>{title}</h2>
                     </div>
                     <span className="status-dot">{readable(plan.readiness_status || result.readiness_status)}</span>
@@ -175,6 +181,7 @@ export default function JourneyPlansLookup() {
                   ) : null}
                   <div className="actions" style={{ marginTop: 14 }}>
                     <a className="btn primary" href={rerunLinks[plan.tool_slug || ""] || "/journey-planner"}>Review or run again</a>
+                    {plan.tool_slug === "study_admission_plan" ? <a className="btn" href="/route-checker">Check study route</a> : null}
                     {plan.tool_slug === "appointment_plan" ? <a className="btn" href="/timeline">Open timeline</a> : null}
                     {plan.tool_slug === "family_plan" ? <a className="btn" href="/route-checker">Check family route</a> : null}
                     {plan.tool_slug === "settlement_plan" ? <a className="btn" href="/services?service=settlement">Request settlement support</a> : null}
@@ -187,9 +194,9 @@ export default function JourneyPlansLookup() {
         ) : (
           <article className="result-block featured">
             <p className="overline">No plans loaded</p>
-            <h2>Run Journey Planner while signed in.</h2>
+            <h2>Run a study or journey planner while signed in.</h2>
             <p>The verified account email will be attached server-side and the stored plan can then appear here.</p>
-            <div className="actions"><a className="btn primary" href="/journey-planner">Open Journey Planner</a><a className="btn" href="/login">Sign in</a></div>
+            <div className="actions"><a className="btn primary" href="/study-planner">Open Study Planner</a><a className="btn" href="/journey-planner">Open Journey Planner</a><a className="btn" href="/login">Sign in</a></div>
           </article>
         )}
       </section>
