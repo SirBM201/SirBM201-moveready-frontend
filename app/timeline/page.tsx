@@ -1,5 +1,7 @@
+import JourneyPlanner from "@/components/JourneyPlanner";
 import SiteHeader from "@/components/SiteHeader";
 import TimelinePlanner from "@/components/TimelinePlanner";
+
 
 const timelineUses = [
   {
@@ -16,6 +18,7 @@ const timelineUses = [
   },
 ];
 
+
 export default function TimelinePage() {
   return (
     <main className="page-shell">
@@ -26,11 +29,12 @@ export default function TimelinePage() {
           <span className="eyebrow">Timeline tracking</span>
           <h1>Turn relocation plans into dated actions.</h1>
           <p className="lede">
-            Timeline helps users track documents, appointments, deadlines, results, travel steps, and follow-up tasks. Signed-in users can now load these dated actions directly from the verified Account Center.
+            Work backwards from an embassy, visa-centre, biometrics, interview, submission, or passport-collection date. Generated appointment tasks can be saved into the existing MoveReady timeline with user consent.
           </p>
           <div className="actions">
-            <a className="btn primary" href="#timeline-planner">Add timeline event</a>
-            <a className="btn" href="/saved-routes">Saved routes</a>
+            <a className="btn primary" href="#appointment-planner-tool">Plan an appointment</a>
+            <a className="btn" href="#timeline-planner">Add one timeline event</a>
+            <a className="btn" href="/journey-planner">Open full journey planner</a>
             <a className="btn" href="/dashboard">Back to Account Center</a>
           </div>
         </div>
@@ -42,7 +46,7 @@ export default function TimelinePage() {
             <p className="overline">Timeline structure</p>
             <h2>Every plan needs dates, reminders, and status</h2>
             <p className="section-intro">
-              Timeline supports both account loading and email or phone lookup. Events should connect with reports, saved routes, alerts, and service requests so users can see full relocation progress.
+              Timeline supports both account loading and email or phone lookup. Events connect with reports, saved routes, alerts, service requests, appointment preparation, and arrival planning.
             </p>
           </div>
           <span className="status-dot">Verified + reminder-ready</span>
@@ -55,6 +59,10 @@ export default function TimelinePage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="section" id="appointment-planner-tool">
+        <JourneyPlanner mode="appointment" />
       </section>
 
       <section className="section" id="timeline-planner">
