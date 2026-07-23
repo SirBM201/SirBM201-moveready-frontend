@@ -21,7 +21,7 @@ type OperationsStatus = {
   ok: boolean;
   overall_status?: string;
   generated_at?: string;
-  configuration?: Record<string, boolean>;
+  configuration?: Record<string, unknown>;
   schema_checks?: SchemaCheck[];
   launch_blockers?: string[];
   controlled_rollout_items?: string[];
@@ -39,6 +39,27 @@ function formatDate(value?: string) {
   } catch {
     return value;
   }
+}
+
+function configurationValue(value: unknown) {
+  if (typeof value === "boolean") return value ? "yes" : "no";
+  if (Array.isArray(value)) return value.length ? value.map((item) => readable(String(item))).join(", ") : "none";
+  if (value === null || value === undefined || value === "") return "not set";
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "recorded";
+    }
+  }
+  return readable(String(value));
+}
+
+function configurationClass(value: unknown) {
+  if (value === true) return "available";
+  if (value === false || value === null || value === undefined || value === "") return "partner_approval_pending";
+  if (Array.isArray(value) && value.length) return "partner_approval_pending";
+  return "available";
 }
 
 export default function AdminOperationsStatus() {
@@ -62,7 +83,7 @@ export default function AdminOperationsStatus() {
       return;
     }
     setLoading(true);
-    setMessage("Checking configuration and required database schemas...");
+    setMessage("Checking account login, configuration, and required database schemas...");
     try {
       localStorage.setItem("moveready_admin_key", key);
       const data = await apiJson<OperationsStatus>("admin/operations/status", {
@@ -90,7 +111,7 @@ export default function AdminOperationsStatus() {
         <div>
           <p className="overline">Production observability</p>
           <h2>Operations and migration status</h2>
-          <p className="section-intro">Check code configuration, core tables, publication controls, quote storage, payment audit, and controlled external integrations without exposing secrets.</p>
+          <p className="section-intro">Check account-login delivery, core tables, provider publication, quote storage, payment audit, handoffs, support cases, and controlled external integrations without exposing credentials.</p>
         </div>
         <span className="status-dot">{readable(status?.overall_status)}</span>
       </div>
@@ -113,10 +134,11 @@ export default function AdminOperationsStatus() {
               <span className="status-dot">{formatDate(status.generated_at)}</span>
             </div>
             <div className="badge-row">
-              {configuration.map(([key, ready]) => (
-                <span className={`badge module-status ${ready ? "available" : "partner_approval_pending"}`} key={key}>{readable(key)}: {ready ? "yes" : "no"}</span>
+              {configuration.map(([key, value]) => (
+                <span className={`badge module-status ${configurationClass(value)}`} key={key}>{readable(key)}: {configurationValue(value)}</span>
               ))}
             </div>
+            <p className="form-status">Configuration output contains readiness flags and provider names only. Secrets and credential values are intentionally excluded.</p>
           </article>
 
           <article className="result-block">
@@ -136,7 +158,7 @@ export default function AdminOperationsStatus() {
             <p className="overline">Launch blockers</p>
             <h3>{status.launch_blockers?.length ? "Resolve before public launch" : "No critical blocker detected"}</h3>
             <div className="mini-list">
-              {(status.launch_blockers || []).map((item, index) => <div key={item}><strong>Blocker {index + 1}</strong><span>{item}</span></div>)}
+              {(status.launch_blockers || []).map((item, index) => <div key={`${item}-${index}`}><strong>Blocker {index + 1}</strong><span>{item}</span></div>)}
               {!status.launch_blockers?.length ? <div><strong>Core check</strong><span>Critical configuration and schema checks passed at the time shown above.</span></div> : null}
             </div>
           </article>
@@ -145,14 +167,15 @@ export default function AdminOperationsStatus() {
             <p className="overline">Controlled rollout</p>
             <h3>Features that must remain limited</h3>
             <div className="mini-list">
-              {(status.controlled_rollout_items || []).map((item, index) => <div key={item}><strong>Control {index + 1}</strong><span>{item}</span></div>)}
+              {(status.controlled_rollout_items || []).map((item, index) => <div key={`${item}-${index}`}><strong>Control {index + 1}</strong><span>{item}</span></div>)}
+              {!status.controlled_rollout_items?.length ? <div><strong>None</strong><span>No controlled-rollout condition was reported at the time shown above.</span></div> : null}
             </div>
           </article>
 
           <article className="result-block soft">
             <p className="overline">Recommended sequence</p>
             <div className="mini-list">
-              {(status.recommended_sequence || []).map((item, index) => <div key={item}><strong>{index + 1}</strong><span>{item}</span></div>)}
+              {(status.recommended_sequence || []).map((item, index) => <div key={`${item}-${index}`}><strong>{index + 1}</strong><span>{item}</span></div>)}
             </div>
           </article>
         </div>
