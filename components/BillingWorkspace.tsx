@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
 
-
 type CatalogItem = {
   slug: string;
   title: string;
@@ -54,6 +53,24 @@ type QuotesResponse = {
   quotes?: CommercialQuote[];
 };
 
+const FALLBACK_CATALOG: CatalogItem[] = [
+  { slug: "readiness_report", title: "Route readiness report", pricing_mode: "quote_required", summary: "Route-specific readiness review." },
+  { slug: "expert_review", title: "Expert or document review", pricing_mode: "quote_required", summary: "Manual route, refusal, funds, startup, or document review." },
+  { slug: "admission_support", title: "Admission and scholarship support", pricing_mode: "quote_required", summary: "Programme, application, scholarship, and study-visa preparation support." },
+  { slug: "travel_booking", title: "Travel booking support", pricing_mode: "quote_required", summary: "Neutral itinerary and approved-provider booking support after readiness checks." },
+  { slug: "legalization", title: "Document legalization support", pricing_mode: "quote_required", summary: "Translation, notarization, authentication, apostille, or embassy-legalization support." },
+  { slug: "settlement", title: "Post-arrival settlement support", pricing_mode: "quote_required", summary: "Accommodation, pickup, registration, banking, school, transport, and arrival support." },
+];
+
+function requestedServiceFromUrl() {
+  try {
+    if (typeof window === "undefined") return null;
+    const value = new URLSearchParams(window.location.search).get("service")?.trim() || "";
+    return FALLBACK_CATALOG.some((item) => item.slug === value) ? value : null;
+  } catch {
+    return null;
+  }
+}
 
 function formatDate(value?: string) {
   if (!value) return "Not set";
@@ -64,7 +81,6 @@ function formatDate(value?: string) {
   }
 }
 
-
 function money(value: number | undefined, currency?: string) {
   const amount = Number(value || 0);
   try {
@@ -74,11 +90,9 @@ function money(value: number | undefined, currency?: string) {
   }
 }
 
-
 function readable(value?: string) {
   return String(value || "not available").replace(/_/g, " ");
 }
-
 
 export default function BillingWorkspace() {
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
@@ -96,8 +110,13 @@ export default function BillingWorkspace() {
         apiJson<BillingStatus>("billing/status", { timeoutMs: 15000, useAuthToken: false }),
         apiJson<{ catalog?: CatalogItem[] }>("billing/catalog", { timeoutMs: 15000, useAuthToken: false }),
       ]);
+      const receivedCatalog = catalogResponse.catalog || [];
       setBillingStatus(statusResponse);
-      setCatalog(catalogResponse.catalog || []);
+      setCatalog(receivedCatalog);
+      const requested = requestedServiceFromUrl();
+      if (requested && (receivedCatalog.length === 0 || receivedCatalog.some((item) => item.slug === requested))) {
+        setServiceSlug(requested);
+      }
     } catch {
       setMessage("Pricing controls are temporarily unavailable.");
     }
@@ -124,6 +143,8 @@ export default function BillingWorkspace() {
   }
 
   useEffect(() => {
+    const requested = requestedServiceFromUrl();
+    if (requested) setServiceSlug(requested);
     void loadPublicBilling();
     void loadQuotes(true);
   }, []);
@@ -132,7 +153,7 @@ export default function BillingWorkspace() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const item = catalog.find((row) => row.slug === serviceSlug);
+    const item = [...catalog, ...FALLBACK_CATALOG].find((row) => row.slug === serviceSlug);
     const payload = {
       service_slug: serviceSlug,
       service_title: item?.title,
@@ -145,7 +166,7 @@ export default function BillingWorkspace() {
       route_or_goal: String(data.get("route_or_goal") || "").trim(),
       message: String(data.get("message") || "").trim(),
       consent_to_contact: data.get("consent_to_contact") === "on",
-      source_page: typeof window !== "undefined" ? window.location.pathname : "/billing",
+      source_page: typeof window !== "undefined" ? `${window.location.pathname}${window.location.search}` : "/billing",
     };
 
     if (!payload.email && !payload.phone && !accountEmail) {
@@ -167,7 +188,7 @@ export default function BillingWorkspace() {
       });
       setMessage("Quote request saved. MoveReady must review the scope before issuing any amount or payment link.");
       form.reset();
-      setServiceSlug("readiness_report");
+      setServiceSlug(requestedServiceFromUrl() || "readiness_report");
     } catch (error) {
       const apiError = error as ApiError;
       setMessage(apiError?.data?.error ? `Unable to submit quote request: ${apiError.data.error}` : "Unable to submit quote request.");
@@ -204,7 +225,8 @@ export default function BillingWorkspace() {
     }
   }
 
-  const selectedItem = catalog.find((row) => row.slug === serviceSlug);
+  const effectiveCatalog = catalog.length ? catalog : FALLBACK_CATALOG;
+  const selectedItem = [...catalog, ...FALLBACK_CATALOG].find((row) => row.slug === serviceSlug);
 
   return (
     <div className="live-workspace reports-workspace">
@@ -225,7 +247,7 @@ export default function BillingWorkspace() {
           <div className="field">
             <label htmlFor="billing_service">Service</label>
             <select id="billing_service" name="service_slug" value={serviceSlug} onChange={(event) => setServiceSlug(event.target.value)}>
-              {(catalog.length ? catalog : [{ slug: "readiness_report", title: "Route readiness report", pricing_mode: "quote_required", summary: "Route-specific readiness review." }]).map((item) => (
+              {effectiveCatalog.map((item) => (
                 <option key={item.slug} value={item.slug}>{item.title}</option>
               ))}
             </select>
