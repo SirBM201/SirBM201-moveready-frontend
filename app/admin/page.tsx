@@ -1,5 +1,7 @@
+import AdminCommercialQuotes from "@/components/AdminCommercialQuotes";
 import AdminOpportunities from "@/components/AdminOpportunities";
 import AdminPartnerApplications from "@/components/AdminPartnerApplications";
+import AdminProviderPublication from "@/components/AdminProviderPublication";
 import AdminReadinessChecks from "@/components/AdminReadinessChecks";
 import AdminReviewConsole from "@/components/AdminReviewConsole";
 import AdminSavedRoutes from "@/components/AdminSavedRoutes";
@@ -9,20 +11,22 @@ import AdminUserProfiles from "@/components/AdminUserProfiles";
 import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscriptions";
 
 const adminModules = [
-  ["Review queue", "Unified workload for service requests, high-risk reports, partner applications, profiles, saved routes, timelines, and alerts that need admin attention.", "#review-queue"],
+  ["Review queue", "Unified workload for service requests, high-risk reports, partner applications, profiles, saved routes, timelines, alerts, and commercial records that need attention.", "#review-queue"],
+  ["Commercial quotes", "Issue scope-controlled quotes, separate service and platform fees, record refund terms, and verify payments without promising outcomes.", "#commercial-quotes"],
+  ["Provider publication", "Keep application approval separate from public listing. Record privacy, pricing, refund, handling, affiliate, and handoff controls.", "#provider-publication"],
   ["User profiles", "Review saved relocation profiles, contact preferences, goals, funds, family count, readiness score, and follow-up status.", "#user-profiles"],
   ["Official opportunity routes", "Review lottery, ballot, invitation-pool, quota, and country-cap records before public monitoring and alerts rely on them.", "#opportunity-routes"],
   ["Saved routes", "Review routes, countries, opportunities, scholarships, and services users saved for later follow-up.", "#saved-routes"],
   ["Timeline events", "Review application tasks, deadlines, appointments, payments, result checks, travel dates, and follow-up steps.", "#timeline-events"],
-  ["Partner applications", "Screen providers for courier, insurance, legalization, translation, expert review, admission, accommodation, airport pickup, and settlement workflows.", "#partner-applications"],
-  ["Provider directory", "Check the public provider directory surface before approved partner listings are published.", "/providers"],
-  ["Service requests", "Review user interest for alerts, courier, insurance, legalization, documents, and expert support.", "#service-requests"],
+  ["Partner applications", "Screen providers for courier, insurance, legalization, translation, expert review, admission, travel booking, accommodation, transport, pickup, telecom, and settlement workflows.", "#partner-applications"],
+  ["Provider directory", "Check the public provider directory surface after publication controls pass.", "/providers"],
+  ["Service requests", "Review user interest for alerts, travel, courier, insurance, legalization, documents, admission, and expert support.", "#service-requests"],
   ["Watchlist subscriptions", "Review opt-in monitoring requests for routes, opportunities, scholarships, countries, and services.", "#watchlist-subscriptions"],
-  ["Readiness checks", "Inspect saved name, document, funds, and refusal-risk checks.", "#readiness-checks"],
+  ["Readiness checks", "Inspect saved name, document, funds, refusal-risk, study, journey, and trip checks.", "#readiness-checks"],
   ["Reports", "Inspect generated reports, delivery status, refreshes, and stale-report warnings.", "/admin/reports"],
   ["Sources", "Add trusted source links, reliability level, owner organization, and review context.", "/admin/reviews"],
   ["Routes", "Create and approve country-specific route versions after source review.", "/admin/reviews"],
-  ["Launch checks", "Review public readiness, trust, source, and safety surfaces before launch.", "/launch-readiness"],
+  ["Launch checks", "Review public readiness, trust, source, safety, provider, quote, and payment surfaces before launch.", "/launch-readiness"],
 ];
 
 export default function AdminPage() {
@@ -35,23 +39,21 @@ export default function AdminPage() {
         </a>
         <nav className="nav">
           <a href="#review-queue">Queue</a>
+          <a href="#commercial-quotes">Quotes</a>
+          <a href="#provider-publication">Provider Controls</a>
           <a href="/admin/reports">Reports</a>
           <a href="/admin/reviews">Reviews</a>
           <a href="#opportunity-routes">Opportunities</a>
           <a href="/dashboard">Dashboard</a>
-          <a href="/saved-routes">Saved Routes</a>
-          <a href="/timeline">Timeline</a>
           <a href="/providers">Providers</a>
-          <a href="/partners/apply">Partner Apply</a>
           <a href="/platform">Platform</a>
-          <a href="/watchlist">Watchlist</a>
-          <a href="/readiness">Readiness</a>
+          <a href="/billing">Billing</a>
           <a href="/">Home</a>
         </nav>
       </header>
       <section className="section">
         <h2>Admin workspace</h2>
-        <p className="section-intro">Admin tools protect the trust system: profiles, official opportunities, saved routes, timelines, partner applications, user requests, watchlists, sources, snapshots, route versions, review tasks, readiness checks, and report freshness.</p>
+        <p className="section-intro">Admin tools protect the trust system: profiles, official opportunities, saved routes, timelines, partner screening, public publication, service requests, commercial quotes, payment records, watchlists, sources, route versions, review tasks, readiness checks, and report freshness.</p>
         <div className="grid">
           {adminModules.map(([title, text, href]) => (
             <article className="card" key={title}>
@@ -63,6 +65,8 @@ export default function AdminPage() {
         </div>
       </section>
       <div id="review-queue"><AdminReviewConsole /></div>
+      <div id="commercial-quotes"><AdminCommercialQuotes /></div>
+      <div id="provider-publication"><AdminProviderPublication /></div>
       <div id="user-profiles"><AdminUserProfiles /></div>
       <div id="opportunity-routes"><AdminOpportunities /></div>
       <div id="saved-routes"><AdminSavedRoutes /></div>
