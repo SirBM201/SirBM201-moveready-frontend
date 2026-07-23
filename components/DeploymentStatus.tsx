@@ -81,7 +81,7 @@ export default function DeploymentStatus() {
     setMessage("Checking backend build information and operational controls...");
     try {
       const [buildInfo, operationsInfo] = await Promise.all([
-        apiJson<BuildInfo>("../build-info", { timeoutMs: 30000, useAuthToken: false }),
+        apiJson<BuildInfo>("build-info", { timeoutMs: 30000, useAuthToken: false }),
         apiJson<OperationsStatus>("operations/status", { timeoutMs: 30000, useAuthToken: false }),
       ]);
       setBuild(buildInfo);
