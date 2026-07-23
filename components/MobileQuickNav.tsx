@@ -1,0 +1,20 @@
+const mobileLinks = [
+  { label: "Home", href: "/", icon: "⌂" },
+  { label: "Start", href: "/onboarding", icon: "1" },
+  { label: "Applications", href: "/applications", icon: "A" },
+  { label: "Alerts", href: "/application-alerts", icon: "!" },
+  { label: "Account", href: "/dashboard", icon: "●" },
+];
+
+export default function MobileQuickNav() {
+  return (
+    <nav className="mobile-quick-nav" aria-label="Mobile quick navigation">
+      {mobileLinks.map((item) => (
+        <a href={item.href} key={item.href}>
+          <span aria-hidden="true">{item.icon}</span>
+          <strong>{item.label}</strong>
+        </a>
+      ))}
+    </nav>
+  );
+}
