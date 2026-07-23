@@ -1,4 +1,5 @@
 import JourneyPlanner from "@/components/JourneyPlanner";
+import SettlementTimelineWorkspace from "@/components/SettlementTimelineWorkspace";
 import SiteHeader from "@/components/SiteHeader";
 
 
@@ -17,7 +18,7 @@ const journeyStages = [
   },
   {
     title: "Continue after approval",
-    text: "Prepare accommodation, connectivity, registration, banking, tax, health, school, transport, work, and first-90-days settlement tasks.",
+    text: "Prepare accommodation, connectivity, registration, banking, tax, health, school, transport, work, and first-90-days settlement tasks, then save them to the private timeline with consent.",
   },
 ];
 
@@ -36,6 +37,7 @@ export default function JourneyPlannerPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="#journey-tools">Open journey tools</a>
+            <a className="btn" href="#settlement-execution">Save settlement timeline</a>
             <a className="btn" href="/journey-plans">My saved plans</a>
             <a className="btn" href="/route-checker">Check relocation route</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
@@ -57,6 +59,18 @@ export default function JourneyPlannerPage() {
 
       <section className="section" id="journey-tools">
         <JourneyPlanner />
+      </section>
+
+      <section className="section" id="settlement-execution">
+        <div className="section-heading-row">
+          <div>
+            <p className="overline">Settlement execution</p>
+            <h2>Convert the arrival checklist into dated private timeline actions.</h2>
+            <p className="section-intro">This form adds explicit arrival date, contact lookup, storage consent, and timeline-save controls. It does not activate external messages or replace local official deadlines.</p>
+          </div>
+          <span className="status-dot">Timeline consent</span>
+        </div>
+        <SettlementTimelineWorkspace />
       </section>
 
       <section className="section">
