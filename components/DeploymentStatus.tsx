@@ -31,6 +31,12 @@ type BuildInfo = {
     execution_model?: string;
   };
   expected_endpoints?: string[];
+  route_contract?: {
+    ok?: boolean;
+    expected_count?: number;
+    registered_route_count?: number;
+    missing_routes?: string[];
+  };
   deployment_verification?: {
     commit_available?: boolean;
     instruction?: string;
@@ -86,10 +92,12 @@ export default function DeploymentStatus() {
       ]);
       setBuild(buildInfo);
       setOperations(operationsInfo);
-      if (!buildInfo.deployment?.commit_sha) {
-        setMessage("Backend is responding, but Railway did not expose a commit SHA. Compare the release label and expected routes before treating production as current.");
+      if (buildInfo.route_contract?.ok === false) {
+        setMessage(`Backend is responding, but ${buildInfo.route_contract.missing_routes?.length || 0} expected routes are missing. Treat this deployment as incomplete.`);
+      } else if (!buildInfo.deployment?.commit_sha) {
+        setMessage("Backend is responding and the route contract passed, but Railway did not expose a commit SHA. Compare the release label before treating production as current.");
       } else {
-        setMessage(`Backend responded with commit ${buildInfo.deployment.commit_short || buildInfo.deployment.commit_sha}.`);
+        setMessage(`Backend responded with commit ${buildInfo.deployment.commit_short || buildInfo.deployment.commit_sha}, and its expected route contract passed.`);
       }
     } catch (error) {
       const apiError = error as ApiError;
@@ -107,6 +115,7 @@ export default function DeploymentStatus() {
 
   const deployment = build?.deployment || {};
   const schedule = build?.passport_index_schedule || {};
+  const routeContract = build?.route_contract || {};
   const features = Object.entries(build?.features || {});
   const capabilities = Object.entries(operations?.public_capabilities || {});
 
@@ -118,7 +127,7 @@ export default function DeploymentStatus() {
             <p className="overline">Production fingerprint</p>
             <h2>{build?.ok ? "Backend is responding" : "Deployment not verified"}</h2>
           </div>
-          <span className="status-dot">{readable(build?.status)}</span>
+          <span className="status-dot">{routeContract.ok === false ? "route contract failed" : readable(build?.status)}</span>
         </div>
         <p>{message}</p>
         <div className="mini-list">
@@ -135,6 +144,18 @@ export default function DeploymentStatus() {
           <button className="btn primary" type="button" disabled={loading} onClick={loadStatus}>{loading ? "Checking..." : "Refresh deployment check"}</button>
           <a className="btn" href="/launch-readiness">Launch readiness</a>
           <a className="btn" href="/admin#operations-status">Protected operations</a>
+        </div>
+      </article>
+
+      <article className="result-block">
+        <div className="panel-heading">
+          <div><p className="overline">Live route registration</p><h3>{routeContract.ok ? "Expected routes are registered" : "Route contract needs attention"}</h3></div>
+          <span className="status-dot">{routeContract.ok ? "passed" : "failed"}</span>
+        </div>
+        <div className="mini-list">
+          <div><strong>Expected routes</strong><span>{routeContract.expected_count ?? "Not reported"}</span></div>
+          <div><strong>All registered Flask routes</strong><span>{routeContract.registered_route_count ?? "Not reported"}</span></div>
+          <div><strong>Missing routes</strong><span>{routeContract.missing_routes?.join(", ") || "None reported"}</span></div>
         </div>
       </article>
 
