@@ -1,3 +1,4 @@
+import AccountEvidenceSummary from "@/components/AccountEvidenceSummary";
 import AccountSummary from "@/components/AccountSummary";
 import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import ProfileDashboard from "@/components/ProfileDashboard";
@@ -13,6 +14,11 @@ const accountAreas = [
     title: "Check visa power",
     detail: "Enter visas you already hold and see possible travel benefits, source links, conditions, and safety notes.",
     href: "/visa-power",
+  },
+  {
+    title: "Organize your evidence",
+    detail: "Keep private document metadata, build route-specific evidence packs, track expiry, and prepare refusal-repair tasks without uploading raw documents.",
+    href: "/evidence-pack",
   },
   {
     title: "Save routes you care about",
@@ -52,14 +58,20 @@ const accountAreas = [
 ];
 
 const trustControls = [
-  "Your private profile, reports, planning history, commercial quotes, and support requests are not public.",
+  "Your private profile, evidence metadata, reports, planning history, commercial quotes, and support requests are not public.",
+  "Evidence Center stores metadata and readiness results only; it does not accept raw passports, bank statements, certificates, refusal letters, passwords, OTPs, card details, or private keys.",
   "MoveReady asks for consent before contact, alerts, timeline storage, support requests, quotes, or provider handoff.",
-  "Reports, Passport Index, Visa Power, Study Planner, Journey Planner, and Trip Planner show source status, risk labels, warnings, or generated dates.",
+  "Reports, Passport Index, Visa Power, Evidence Center, Study Planner, Journey Planner, and Trip Planner show source status, risk labels, warnings, or generated dates.",
   "Provider approval is separate from public publication; privacy, pricing, refund, handling, and disclosure controls must pass first.",
   "A quote or payment does not promise approval, admission, jobs, lottery selection, booking inventory, provider performance, boarding, refund, or travel entry.",
 ];
 
 const nextFeatures = [
+  {
+    status: "Available after migration 027",
+    title: "Evidence inventory and evidence packs",
+    detail: "Store document metadata, calculate expiry and completeness, organize route-specific requirements, and prepare refusal-repair tasks under the verified account.",
+  },
   {
     status: "Available now",
     title: "Verified account workspace",
@@ -101,7 +113,7 @@ export default function DashboardPage() {
                 Use one profile for your whole relocation plan.
               </h1>
               <p className="section-intro" style={{ marginBottom: 0 }}>
-                Save your details once. Then use the same verified account for route checks, Passport Index, Visa Power, reports, saved routes, alerts, timelines, planning history, support requests, and commercial quotes.
+                Save your details once. Then use the same verified account for route checks, Passport Index, Visa Power, evidence packs, reports, saved routes, alerts, timelines, planning history, support requests, and commercial quotes.
               </p>
             </div>
             <span className="status-dot">Profile first</span>
@@ -112,6 +124,7 @@ export default function DashboardPage() {
             <a className="btn" href="/route-checker">Check route</a>
             <a className="btn" href="/passport-index">Passport</a>
             <a className="btn" href="/visa-power">Visa Power</a>
+            <a className="btn" href="/evidence-pack">Evidence</a>
             <a className="btn" href="/journey-plans">Plans</a>
             <a className="btn" href="/my-reports">Reports</a>
             <a className="btn" href="/billing">Quotes</a>
@@ -123,11 +136,12 @@ export default function DashboardPage() {
       <BeginnerFriendlyGuide
         compact
         title="Use your account without confusion"
-        intro="Start by keeping only one active profile. That profile should feed route checks, passport and visa checks, reports, alerts, saved routes, planning history, timeline, support requests, and quotes."
+        intro="Start by keeping only one active profile. That profile should feed route checks, passport and visa checks, evidence packs, reports, alerts, saved routes, planning history, timeline, support requests, and quotes."
       />
 
       <section className="section no-top-pad" id="account-summary">
         <AccountSummary />
+        <AccountEvidenceSummary />
       </section>
 
       <section className="section">
@@ -136,10 +150,10 @@ export default function DashboardPage() {
             <p className="overline">Start here</p>
             <h2>What your account connects</h2>
             <p className="section-intro">
-              Start with a profile. After that, saved routes, reports, alerts, timeline events, planning runs, visa-benefit checks, support requests, and quotes can stay connected to the same verified email.
+              Start with a profile. After that, evidence metadata, saved routes, reports, alerts, timeline events, planning runs, visa-benefit checks, support requests, and quotes can stay connected to the same verified email.
             </p>
           </div>
-          <span className="status-dot">Available now</span>
+          <span className="status-dot">Controlled account workspace</span>
         </div>
 
         <div className="grid">
@@ -156,7 +170,7 @@ export default function DashboardPage() {
         <div className="live-workspace">
           <article className="workflow-panel">
             <p className="overline">Simple flow</p>
-            <h2>Profile → route → passport → visa power → report → plan → alert → quote → support</h2>
+            <h2>Profile → route → passport → visa power → evidence → report → plan → alert → quote → support</h2>
             <p className="section-intro">
               MoveReady should feel like a guided workspace, not a collection of separate forms. Use the steps below as the normal path.
             </p>
@@ -164,11 +178,12 @@ export default function DashboardPage() {
               <div><strong>1. Save or load your profile</strong><span>Add your contact, country, target country, goal, money available, family count, and timeline.</span></div>
               <div><strong>2. Check the route you care about</strong><span>Use your active profile to see whether the route looks sensible before spending money.</span></div>
               <div><strong>3. Check your passport and held visas</strong><span>Use Passport Index and Visa Power for destination rules, existing-visa benefits, and personal-history safety gates.</span></div>
-              <div><strong>4. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, source status, and next actions.</span></div>
-              <div><strong>5. Build the execution plan</strong><span>Use Study, Journey, and Trip planners for admission, documents, family, appointments, travel, and post-arrival preparation.</span></div>
-              <div><strong>6. Create alerts and timeline actions</strong><span>Track dates, source changes, deadlines, and reminders only when you opt in.</span></div>
-              <div><strong>7. Request and review a quote</strong><span>Check scope, deliverables, exclusions, provider, service amount, platform fee, total, expiry, and refund terms before accepting.</span></div>
-              <div><strong>8. Pay or ask for support only when ready</strong><span>Checkout remains separate from acceptance and is available only after an approved payment process is enabled.</span></div>
+              <div><strong>4. Build your evidence pack</strong><span>Record document metadata, expiry, translation, legalization, missing items, and refusal-repair tasks without uploading raw documents.</span></div>
+              <div><strong>5. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, source status, and next actions.</span></div>
+              <div><strong>6. Build the execution plan</strong><span>Use Study, Journey, and Trip planners for admission, documents, family, appointments, travel, and post-arrival preparation.</span></div>
+              <div><strong>7. Create alerts and timeline actions</strong><span>Track dates, source changes, deadlines, and reminders only when you opt in.</span></div>
+              <div><strong>8. Request and review a quote</strong><span>Check scope, deliverables, exclusions, provider, service amount, platform fee, total, expiry, and refund terms before accepting.</span></div>
+              <div><strong>9. Pay or ask for support only when ready</strong><span>Checkout remains separate from acceptance and is available only after an approved payment process is enabled.</span></div>
             </div>
           </article>
 
@@ -207,7 +222,7 @@ export default function DashboardPage() {
             <p className="overline">Your relocation profile</p>
             <h2>Save your details or load your saved profile</h2>
             <p className="section-intro">
-              Use the same verified email. After saving, you can check routes, passport access, Visa Power, generate reports, save routes, create alerts, build plans, add timeline events, request support, or review issued quotes.
+              Use the same verified email. After saving, you can check routes, passport access, Visa Power, organize evidence, generate reports, save routes, create alerts, build plans, add timeline events, request support, or review issued quotes.
             </p>
           </div>
           <span className="status-dot">Verified account</span>
