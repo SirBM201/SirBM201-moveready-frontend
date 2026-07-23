@@ -1,6 +1,6 @@
 const mobileLinks = [
   { label: "Home", href: "/", icon: "⌂" },
-  { label: "Start", href: "/onboarding", icon: "1" },
+  { label: "Actions", href: "/action-center", icon: "✓" },
   { label: "Applications", href: "/applications", icon: "A" },
   { label: "Alerts", href: "/application-alerts", icon: "!" },
   { label: "Account", href: "/dashboard", icon: "●" },
