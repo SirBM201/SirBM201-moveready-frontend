@@ -21,6 +21,10 @@ type QueueItem = {
   score?: number;
   summary?: string | null;
   report_ref?: string | null;
+  quote_ref?: string | null;
+  total_amount?: number | null;
+  currency?: string | null;
+  provider_name?: string | null;
   detail_href?: string | null;
 };
 
@@ -54,6 +58,7 @@ const ADMIN_KEY_STORAGE = "moveready_admin_key";
 const ACTIONS: Record<string, ActionConfig> = {
   review_task: { endpoint: (id) => `admin/review-tasks/${id}`, options: ["in_progress", "approved", "rejected", "dismissed"] },
   service_request: { endpoint: (id) => `admin/service-requests/${id}`, options: ["reviewing", "contacted", "closed", "spam"] },
+  commercial_quote: { endpoint: (id) => `admin/commercial-quotes/${id}`, options: ["sent", "cancelled", "fulfilled", "refunded", "disputed"] },
   generated_report: { endpoint: (id) => `admin/generated-reports/${id}`, options: ["paid", "delivered", "stale", "archived"] },
   partner_application: { endpoint: (id) => `admin/partner-applications/${id}`, options: ["screening", "approved", "rejected", "suspended", "spam"] },
   user_profile: { endpoint: (id) => `admin/user-profiles/${id}`, options: ["reviewing", "contacted", "active", "closed", "spam"] },
@@ -79,6 +84,16 @@ function formatKind(kind: string) {
   return kind.replace(/_/g, " ");
 }
 
+function formatMoney(item: QueueItem) {
+  if (item.total_amount === null || item.total_amount === undefined) return null;
+  const currency = item.currency || "USD";
+  try {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(Number(item.total_amount));
+  } catch {
+    return `${currency} ${Number(item.total_amount).toLocaleString()}`;
+  }
+}
+
 function compactContact(item: QueueItem) {
   return item.email || item.phone || item.full_name || "No contact shown";
 }
@@ -86,6 +101,7 @@ function compactContact(item: QueueItem) {
 function detailHref(item: QueueItem) {
   if (item.detail_href) return item.detail_href;
   if (item.kind === "generated_report" && item.report_ref) return `/report-detail?ref=${encodeURIComponent(item.report_ref)}`;
+  if (item.kind === "commercial_quote") return "/admin#commercial-quotes";
   if (item.kind === "service_request") return "/service-requests";
   if (item.kind === "saved_route") return "/saved-routes";
   if (item.kind === "watchlist") return "/watchlist";
@@ -111,7 +127,7 @@ export default function AdminReviewConsole() {
         void loadQueue(stored, true);
       }
     } catch {
-      // ignore storage failures
+      // Ignore storage failures.
     }
   }, []);
 
@@ -139,7 +155,7 @@ export default function AdminReviewConsole() {
       try {
         localStorage.setItem(ADMIN_KEY_STORAGE, key);
       } catch {
-        // ignore storage failures
+        // Ignore storage failures.
       }
     } catch (error) {
       const apiError = error as ApiError;
@@ -189,7 +205,7 @@ export default function AdminReviewConsole() {
     try {
       localStorage.removeItem(ADMIN_KEY_STORAGE);
     } catch {
-      // ignore storage failures
+      // Ignore storage failures.
     }
   }
 
@@ -211,7 +227,7 @@ export default function AdminReviewConsole() {
           <span className="status-dot">Protected</span>
         </div>
         <p>
-          This console reads protected admin endpoints. Keep service requests, reports, profiles, alerts, and provider applications under review before any handoff or delivery action.
+          Keep service requests, commercial quotes, payment records, reports, profiles, planning runs, alerts, and provider applications under review before any handoff, checkout, or delivery action.
         </p>
         <div className="field">
           <label htmlFor="admin_queue_key">Admin key</label>
@@ -262,6 +278,7 @@ export default function AdminReviewConsole() {
               <div className="result-stack compact-stack">
                 {visibleItems.map((item) => {
                   const action = ACTIONS[item.kind];
+                  const amount = formatMoney(item);
                   return (
                     <article className="result-block" key={`${item.kind}-${item.id || item.title}`}>
                       <div className="panel-heading">
@@ -276,6 +293,9 @@ export default function AdminReviewConsole() {
                         {item.priority ? <span className="badge">Priority: {item.priority}</span> : null}
                         {item.risk_level ? <span className="badge">Risk: {item.risk_level}</span> : null}
                         {item.report_ref ? <span className="badge">{item.report_ref}</span> : null}
+                        {item.quote_ref ? <span className="badge">{item.quote_ref}</span> : null}
+                        {amount ? <span className="badge">Total: {amount}</span> : null}
+                        {item.provider_name ? <span className="badge">Provider: {item.provider_name}</span> : null}
                         {item.target_country ? <span className="badge">Target: {item.target_country}</span> : null}
                         {item.route_category ? <span className="badge">Route: {item.route_category}</span> : null}
                         <span className="badge">{formatDate(item.created_at)}</span>
