@@ -52,6 +52,16 @@ export const platformModules: PlatformModule[] = [
     href: "/visa-power",
   },
   {
+    slug: "trip-planner",
+    title: "Trip Readiness and Booking Planner",
+    category: "Travel planning",
+    availability: "available",
+    summary: "Check passport, visa, authorization, transit, insurance, accommodation, funds, family, medical, and immigration-history risks before comparing travel bookings.",
+    readiness: "The live neutral planner generates booking readiness, warnings, a five-stage booking sequence, fraud checks, affiliate disclosure, and approved-provider handoff without claiming live inventory or entry permission.",
+    launchScope: "Flights, hotels, short stays, airport pickup, intercity transport, insurance, total-cost comparison, flexible booking, fraud controls, and screened provider requests.",
+    href: "/trip-planner",
+  },
+  {
     slug: "documents",
     title: "Document readiness and name consistency",
     category: "Readiness",
@@ -166,9 +176,9 @@ export const platformModules: PlatformModule[] = [
     title: "Partner and expert review network",
     category: "Marketplace",
     availability: "partner_approval_pending",
-    summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, and settlement providers.",
+    summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, settlement, and travel providers.",
     readiness: "Provider application capture and admin screening are available. Public listings stay hidden until approval.",
-    launchScope: "Provider vetting, expert review, service requests, commission tracking, handoff notes, and user support workflow.",
+    launchScope: "Provider vetting, expert review, service requests, commission disclosure, handoff notes, and user support workflow.",
     href: "/providers",
   },
 ];
