@@ -37,6 +37,7 @@ const ACCOUNT_WRITE_PREFIXES = [
   "relocation/reports",
   "journey",
   "readiness",
+  "education",
 ];
 
 function isPlainObject(v: any) {
