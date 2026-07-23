@@ -16,6 +16,7 @@ type BillingStatus = {
   commercial_quotes_enabled?: boolean;
   payment_links_enabled?: boolean;
   checkout_mode?: string;
+  quote_terms_version?: string;
   safety_controls?: string[];
 };
 
@@ -43,6 +44,10 @@ type CommercialQuote = {
   paid_at?: string;
   fulfilled_at?: string;
   created_at?: string;
+  acceptance_required?: boolean;
+  acceptance_terms_version?: string;
+  acceptance_confirmations?: string[];
+  acceptance_recorded?: boolean;
   commercial_notice?: string;
 };
 
@@ -61,6 +66,17 @@ const FALLBACK_CATALOG: CatalogItem[] = [
   { slug: "legalization", title: "Document legalization support", pricing_mode: "quote_required", summary: "Translation, notarization, authentication, apostille, or embassy-legalization support." },
   { slug: "settlement", title: "Post-arrival settlement support", pricing_mode: "quote_required", summary: "Accommodation, pickup, registration, banking, school, transport, and arrival support." },
 ];
+
+const ACCEPTANCE_CONFIRMATIONS = {
+  scope_reviewed: true,
+  deliverables_reviewed: true,
+  exclusions_reviewed: true,
+  total_price_reviewed: true,
+  expiry_reviewed: true,
+  refund_terms_reviewed: true,
+  no_outcome_guarantee_understood: true,
+  payment_is_separate_understood: true,
+};
 
 function requestedServiceFromUrl() {
   try {
@@ -103,6 +119,7 @@ export default function BillingWorkspace() {
   const [loading, setLoading] = useState(false);
   const [updatingRef, setUpdatingRef] = useState("");
   const [serviceSlug, setServiceSlug] = useState("readiness_report");
+  const [acceptedTerms, setAcceptedTerms] = useState<Record<string, boolean>>({});
 
   async function loadPublicBilling() {
     try {
@@ -199,12 +216,27 @@ export default function BillingWorkspace() {
 
   async function quoteAction(quote: CommercialQuote, action: "accept" | "decline" | "checkout") {
     if (!quote.quote_ref) return;
+    if (action === "accept" && !acceptedTerms[quote.quote_ref]) {
+      setMessage("Review the quote and confirm the acceptance statement before accepting.");
+      return;
+    }
+
     setUpdatingRef(quote.quote_ref);
     setMessage(`${action === "checkout" ? "Preparing" : action === "accept" ? "Accepting" : "Declining"} quote ${quote.quote_ref}...`);
     try {
+      const body = action === "decline"
+        ? { reason: "Declined from verified account workspace" }
+        : action === "accept"
+          ? {
+              accept_terms: true,
+              terms_version: quote.acceptance_terms_version || billingStatus?.quote_terms_version,
+              confirmations: ACCEPTANCE_CONFIRMATIONS,
+            }
+          : {};
+
       const data = await apiJson<{ quote?: CommercialQuote; checkout_url?: string }>(`billing/quotes/${quote.quote_ref}/${action}`, {
         method: "POST",
-        body: action === "decline" ? { reason: "Declined from verified account workspace" } : {},
+        body,
         timeoutMs: 20000,
       });
       if (data.quote) {
@@ -213,8 +245,11 @@ export default function BillingWorkspace() {
       if (action === "checkout" && data.checkout_url) {
         window.open(data.checkout_url, "_blank", "noopener,noreferrer");
         setMessage("Approved checkout link opened. Confirm the domain, recipient, amount, currency, and refund terms before paying.");
+      } else if (action === "accept") {
+        setAcceptedTerms((current) => ({ ...current, [quote.quote_ref as string]: false }));
+        setMessage("Quote accepted with an auditable terms record. Payment remains separate and controlled.");
       } else {
-        setMessage(action === "accept" ? "Quote accepted. Payment remains separate and controlled." : "Quote declined.");
+        setMessage("Quote declined.");
       }
     } catch (error) {
       const apiError = error as ApiError;
@@ -284,7 +319,7 @@ export default function BillingWorkspace() {
             <div><p className="overline">Private account quotes</p><h2>My quotes and payments</h2></div>
             <span className="status-dot">{quotes.length}</span>
           </div>
-          <p>Sign in to load quotes issued to your verified email. Acceptance does not collect payment. Checkout appears only after a controlled payment link is enabled.</p>
+          <p>Sign in to load quotes issued to your verified email. Acceptance requires an explicit review confirmation and does not collect payment. Checkout appears only after a controlled payment link is enabled.</p>
           <div className="actions">
             <button className="btn primary" type="button" disabled={loading} onClick={() => loadQuotes(false)}>{loading ? "Loading..." : "Load my quotes"}</button>
             <a className="btn" href="/login">Sign in</a>
@@ -295,36 +330,54 @@ export default function BillingWorkspace() {
 
         {quotes.length ? (
           <div className="result-stack">
-            {quotes.map((quote) => (
-              <article className="result-block" key={quote.quote_ref || quote.id}>
-                <div className="panel-heading">
-                  <div><p className="overline">{quote.quote_ref || "Commercial quote"}</p><h2>{quote.service_title || readable(quote.service_slug)}</h2></div>
-                  <span className="status-dot">{readable(quote.status)}</span>
-                </div>
-                <p>{quote.scope_summary || "No scope summary recorded."}</p>
-                <div className="badge-row">
-                  <span className="badge">Total: {money(quote.total_amount, quote.currency)}</span>
-                  <span className="badge">Service: {money(quote.subtotal_amount, quote.currency)}</span>
-                  <span className="badge">Platform fee: {money(quote.platform_fee_amount, quote.currency)}</span>
-                  {quote.provider_name ? <span className="badge">Provider: {quote.provider_name}</span> : null}
-                  <span className="badge">Expires: {formatDate(quote.expires_at)}</span>
-                </div>
-                <div className="mini-list" style={{ marginTop: 14 }}>
-                  {(quote.deliverables || []).map((item, index) => <div key={`deliverable-${index}`}><strong>Deliverable {index + 1}</strong><span>{item}</span></div>)}
-                  {(quote.exclusions || []).map((item, index) => <div key={`exclusion-${index}`}><strong>Excluded {index + 1}</strong><span>{item}</span></div>)}
-                  <div><strong>Refund terms</strong><span>{quote.refund_terms || "Not recorded"}</span></div>
-                  <div><strong>Issued</strong><span>{formatDate(quote.sent_at || quote.created_at)}</span></div>
-                  <div><strong>Commercial notice</strong><span>{quote.commercial_notice}</span></div>
-                </div>
-                <div className="actions" style={{ marginTop: 14 }}>
-                  {quote.status === "sent" ? <button className="btn primary" type="button" disabled={updatingRef === quote.quote_ref} onClick={() => quoteAction(quote, "accept")}>Accept quote</button> : null}
-                  {quote.status === "sent" || quote.status === "accepted" ? <button className="btn" type="button" disabled={updatingRef === quote.quote_ref} onClick={() => quoteAction(quote, "decline")}>Decline</button> : null}
-                  {quote.status === "accepted" || quote.status === "payment_pending" ? <button className="btn primary" type="button" disabled={updatingRef === quote.quote_ref || !quote.checkout_available} onClick={() => quoteAction(quote, "checkout")}>{quote.checkout_available ? "Open approved checkout" : "Checkout not enabled"}</button> : null}
-                  {quote.status === "paid" ? <span className="badge module-status available">Payment recorded</span> : null}
-                  {quote.status === "fulfilled" ? <span className="badge module-status available">Service fulfilled</span> : null}
-                </div>
-              </article>
-            ))}
+            {quotes.map((quote) => {
+              const quoteKey = quote.quote_ref || quote.id || "quote";
+              return (
+                <article className="result-block" key={quoteKey}>
+                  <div className="panel-heading">
+                    <div><p className="overline">{quote.quote_ref || "Commercial quote"}</p><h2>{quote.service_title || readable(quote.service_slug)}</h2></div>
+                    <span className="status-dot">{readable(quote.status)}</span>
+                  </div>
+                  <p>{quote.scope_summary || "No scope summary recorded."}</p>
+                  <div className="badge-row">
+                    <span className="badge">Total: {money(quote.total_amount, quote.currency)}</span>
+                    <span className="badge">Service: {money(quote.subtotal_amount, quote.currency)}</span>
+                    <span className="badge">Platform fee: {money(quote.platform_fee_amount, quote.currency)}</span>
+                    {quote.provider_name ? <span className="badge">Provider: {quote.provider_name}</span> : null}
+                    <span className="badge">Expires: {formatDate(quote.expires_at)}</span>
+                    {quote.acceptance_recorded ? <span className="badge module-status available">Acceptance recorded</span> : null}
+                  </div>
+                  <div className="mini-list" style={{ marginTop: 14 }}>
+                    {(quote.deliverables || []).map((item, index) => <div key={`deliverable-${index}`}><strong>Deliverable {index + 1}</strong><span>{item}</span></div>)}
+                    {(quote.exclusions || []).map((item, index) => <div key={`exclusion-${index}`}><strong>Excluded {index + 1}</strong><span>{item}</span></div>)}
+                    <div><strong>Refund terms</strong><span>{quote.refund_terms || "Not recorded"}</span></div>
+                    <div><strong>Issued</strong><span>{formatDate(quote.sent_at || quote.created_at)}</span></div>
+                    <div><strong>Commercial notice</strong><span>{quote.commercial_notice}</span></div>
+                  </div>
+
+                  {quote.status === "sent" && quote.quote_ref ? (
+                    <label className="checkbox-field" style={{ marginTop: 14 }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(acceptedTerms[quote.quote_ref])}
+                        onChange={(event) => setAcceptedTerms((current) => ({ ...current, [quote.quote_ref as string]: event.target.checked }))}
+                      />
+                      <span>
+                        I reviewed the scope, deliverables, exclusions, total price, quote expiry, and refund terms. I understand that acceptance is not payment and that this service does not guarantee visa, admission, scholarship, job, booking availability, refund, provider performance, boarding, entry, selection, or approval.
+                      </span>
+                    </label>
+                  ) : null}
+
+                  <div className="actions" style={{ marginTop: 14 }}>
+                    {quote.status === "sent" ? <button className="btn primary" type="button" disabled={updatingRef === quote.quote_ref || !acceptedTerms[quote.quote_ref || ""]} onClick={() => quoteAction(quote, "accept")}>Accept quote</button> : null}
+                    {quote.status === "sent" || quote.status === "accepted" ? <button className="btn" type="button" disabled={updatingRef === quote.quote_ref} onClick={() => quoteAction(quote, "decline")}>Decline</button> : null}
+                    {quote.status === "accepted" || quote.status === "payment_pending" ? <button className="btn primary" type="button" disabled={updatingRef === quote.quote_ref || !quote.checkout_available} onClick={() => quoteAction(quote, "checkout")}>{quote.checkout_available ? "Open approved checkout" : "Checkout not enabled"}</button> : null}
+                    {quote.status === "paid" ? <span className="badge module-status available">Payment recorded</span> : null}
+                    {quote.status === "fulfilled" ? <span className="badge module-status available">Service fulfilled</span> : null}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         ) : null}
       </section>
