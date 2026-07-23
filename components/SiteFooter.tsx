@@ -24,6 +24,7 @@ const footerGroups = [
   {
     title: "Track",
     links: [
+      { label: "Action Center", href: "/action-center" },
       { label: "Applications", href: "/applications" },
       { label: "Application Alerts", href: "/application-alerts" },
       { label: "General Alerts", href: "/watchlist" },
