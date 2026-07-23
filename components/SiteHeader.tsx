@@ -12,16 +12,15 @@ const publicNavigation = [
   { label: "Planner", href: "/journey-planner", title: "Plan documents, family, appointments, and settlement" },
   { label: "Alerts", href: "/watchlist", title: "Create and review route alerts" },
   { label: "Services", href: "/services", title: "Request trusted support" },
-  { label: "Prices", href: "/pricing", title: "Pricing" },
+  { label: "Prices", href: "/pricing", title: "Pricing overview" },
+  { label: "Quotes", href: "/billing", title: "Request and review commercial quotes and payment status" },
   { label: "Account", href: "/dashboard", title: "My Account" },
 ];
-
 
 type SiteHeaderProps = {
   sectionLabel?: string;
   subtitle?: string;
 };
-
 
 export default function SiteHeader({ sectionLabel = "Global relocation readiness platform", subtitle }: SiteHeaderProps) {
   const label = subtitle || sectionLabel;
