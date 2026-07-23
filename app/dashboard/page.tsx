@@ -3,7 +3,6 @@ import BeginnerFriendlyGuide from "@/components/BeginnerFriendlyGuide";
 import ProfileDashboard from "@/components/ProfileDashboard";
 import SiteHeader from "@/components/SiteHeader";
 
-
 const accountAreas = [
   {
     title: "Save your details once",
@@ -22,7 +21,7 @@ const accountAreas = [
   },
   {
     title: "Get alerts for changes",
-    detail: "Choose the routes you want to watch. MoveReady stores your alert preference and keeps it advisory.",
+    detail: "Choose the routes you want to watch and review current in-app source alerts from your verified account.",
     href: "/watchlist",
   },
   {
@@ -32,7 +31,7 @@ const accountAreas = [
   },
   {
     title: "Plan application to arrival",
-    detail: "Use Journey Planner for legalization, family relocation, appointment preparation, and the first 90 days after arrival.",
+    detail: "Use Study, Journey, and Trip planners for admission, documents, family, appointments, travel, and first-90-days preparation.",
     href: "/journey-plans",
   },
   {
@@ -41,31 +40,30 @@ const accountAreas = [
     href: "/my-reports",
   },
   {
+    title: "Review quotes and payments",
+    detail: "Request a scope-based quote, review deliverables, exclusions, fees, expiry, and refund terms before accepting or paying.",
+    href: "/billing",
+  },
+  {
     title: "Ask for support",
-    detail: "Request expert or document review only when you want help and consent has been captured.",
+    detail: "Request expert, document, admission, travel, courier, insurance, or settlement support only when you want help and consent has been captured.",
     href: "/service-requests",
   },
 ];
 
-
 const trustControls = [
-  "Your private profile, reports, journey plans, and support requests are not public.",
-  "MoveReady asks for consent before contact, alerts, timeline storage, or support requests.",
-  "Reports, Passport Index, Visa Power, and Journey Planner show source status, risk labels, warnings, or generated dates.",
-  "MoveReady gives readiness guidance; it does not promise approval, admission, jobs, lottery selection, ballot success, appointments, or travel entry.",
+  "Your private profile, reports, planning history, commercial quotes, and support requests are not public.",
+  "MoveReady asks for consent before contact, alerts, timeline storage, support requests, quotes, or provider handoff.",
+  "Reports, Passport Index, Visa Power, Study Planner, Journey Planner, and Trip Planner show source status, risk labels, warnings, or generated dates.",
+  "Provider approval is separate from public publication; privacy, pricing, refund, handling, and disclosure controls must pass first.",
+  "A quote or payment does not promise approval, admission, jobs, lottery selection, booking inventory, provider performance, boarding, refund, or travel entry.",
 ];
-
 
 const nextFeatures = [
   {
     status: "Available now",
-    title: "Email or phone lookup",
-    detail: "You can save and retrieve your profile, routes, alerts, timelines, reports, and requests with the same contact details.",
-  },
-  {
-    status: "Available now",
-    title: "Email sign in",
-    detail: "Use email login to connect account records on the same device and reduce repeated lookups.",
+    title: "Verified account workspace",
+    detail: "Save and retrieve profiles, routes, alerts, timelines, reports, plans, support requests, and commercial quotes under the same email account.",
   },
   {
     status: "Available now",
@@ -74,16 +72,20 @@ const nextFeatures = [
   },
   {
     status: "Available now",
-    title: "Journey Planner history",
-    detail: "Run document, family, appointment, and settlement planners while signed in, then return to the stored plans from your account.",
+    title: "Study, Journey, and Trip planning history",
+    detail: "Run admission, document, family, appointment, settlement, and trip-readiness planners while signed in, then return to the stored plans.",
+  },
+  {
+    status: "Available now",
+    title: "Commercial quote review",
+    detail: "Request and review scope, deliverables, exclusions, service amount, platform fee, total, expiry, and refund terms from a verified account.",
   },
   {
     status: "Controlled rollout",
-    title: "Paid account and partner features",
-    detail: "Premium monitoring, expert review, provider handoff, messaging, and partner quotes remain behind clear consent, screening, and operational setup.",
+    title: "Checkout and external provider delivery",
+    detail: "Payment links, external messaging, and provider execution remain disabled until credentials, approved links, verification, refund handling, and operational controls are ready.",
   },
 ];
-
 
 export default function DashboardPage() {
   return (
@@ -99,7 +101,7 @@ export default function DashboardPage() {
                 Use one profile for your whole relocation plan.
               </h1>
               <p className="section-intro" style={{ marginBottom: 0 }}>
-                Save your details once. Then use the same verified account for route checks, Passport Index, Visa Power, reports, saved routes, alerts, timeline actions, journey plans, and support.
+                Save your details once. Then use the same verified account for route checks, Passport Index, Visa Power, reports, saved routes, alerts, timelines, planning history, support requests, and commercial quotes.
               </p>
             </div>
             <span className="status-dot">Profile first</span>
@@ -110,8 +112,9 @@ export default function DashboardPage() {
             <a className="btn" href="/route-checker">Check route</a>
             <a className="btn" href="/passport-index">Passport</a>
             <a className="btn" href="/visa-power">Visa Power</a>
-            <a className="btn" href="/journey-plans">Journey plans</a>
+            <a className="btn" href="/journey-plans">Plans</a>
             <a className="btn" href="/my-reports">Reports</a>
+            <a className="btn" href="/billing">Quotes</a>
             <a className="btn" href="/login">Sign in</a>
           </div>
         </div>
@@ -120,7 +123,7 @@ export default function DashboardPage() {
       <BeginnerFriendlyGuide
         compact
         title="Use your account without confusion"
-        intro="Start by keeping only one active profile. That profile should feed route checks, passport and visa checks, reports, alerts, saved routes, journey plans, timeline, and support requests."
+        intro="Start by keeping only one active profile. That profile should feed route checks, passport and visa checks, reports, alerts, saved routes, planning history, timeline, support requests, and quotes."
       />
 
       <section className="section no-top-pad" id="account-summary">
@@ -133,7 +136,7 @@ export default function DashboardPage() {
             <p className="overline">Start here</p>
             <h2>What your account connects</h2>
             <p className="section-intro">
-              Start with a profile. After that, saved routes, reports, alerts, timeline events, journey plans, visa-benefit checks, and support requests can stay connected to the same verified email.
+              Start with a profile. After that, saved routes, reports, alerts, timeline events, planning runs, visa-benefit checks, support requests, and quotes can stay connected to the same verified email.
             </p>
           </div>
           <span className="status-dot">Available now</span>
@@ -153,19 +156,19 @@ export default function DashboardPage() {
         <div className="live-workspace">
           <article className="workflow-panel">
             <p className="overline">Simple flow</p>
-            <h2>Profile → route → passport → visa power → report → plan → alert → support</h2>
+            <h2>Profile → route → passport → visa power → report → plan → alert → quote → support</h2>
             <p className="section-intro">
               MoveReady should feel like a guided workspace, not a collection of separate forms. Use the steps below as the normal path.
             </p>
             <div className="mini-list">
               <div><strong>1. Save or load your profile</strong><span>Add your contact, country, target country, goal, money available, family count, and timeline.</span></div>
               <div><strong>2. Check the route you care about</strong><span>Use your active profile to see whether the route looks sensible before spending money.</span></div>
-              <div><strong>3. Check your passport</strong><span>Use Passport Index to understand your passport baseline and open destination-specific rules.</span></div>
-              <div><strong>4. Check visas you already hold</strong><span>Use Visa Power when a Canada, U.S., UK, Schengen, Australia, or Japan visa may create extra travel options.</span></div>
-              <div><strong>5. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, and next actions.</span></div>
-              <div><strong>6. Build the execution plan</strong><span>Use Journey Planner for document legalization, family members, appointments, and post-arrival settlement.</span></div>
-              <div><strong>7. Create alerts and timeline actions</strong><span>Track dates, source changes, deadlines, and reminders only when you opt in.</span></div>
-              <div><strong>8. Ask for support when needed</strong><span>Request expert, document, insurance, courier, admission, or settlement review after you understand the route and plan.</span></div>
+              <div><strong>3. Check your passport and held visas</strong><span>Use Passport Index and Visa Power for destination rules, existing-visa benefits, and personal-history safety gates.</span></div>
+              <div><strong>4. Generate a readiness report</strong><span>See document gaps, funds pressure, risk flags, source status, and next actions.</span></div>
+              <div><strong>5. Build the execution plan</strong><span>Use Study, Journey, and Trip planners for admission, documents, family, appointments, travel, and post-arrival preparation.</span></div>
+              <div><strong>6. Create alerts and timeline actions</strong><span>Track dates, source changes, deadlines, and reminders only when you opt in.</span></div>
+              <div><strong>7. Request and review a quote</strong><span>Check scope, deliverables, exclusions, provider, service amount, platform fee, total, expiry, and refund terms before accepting.</span></div>
+              <div><strong>8. Pay or ask for support only when ready</strong><span>Checkout remains separate from acceptance and is available only after an approved payment process is enabled.</span></div>
             </div>
           </article>
 
@@ -204,7 +207,7 @@ export default function DashboardPage() {
             <p className="overline">Your relocation profile</p>
             <h2>Save your details or load your saved profile</h2>
             <p className="section-intro">
-              Use the same verified email. After saving, you can check a route, passport, Visa Power, generate a report, save a route, create an alert, build a journey plan, add timeline events, or request support.
+              Use the same verified email. After saving, you can check routes, passport access, Visa Power, generate reports, save routes, create alerts, build plans, add timeline events, request support, or review issued quotes.
             </p>
           </div>
           <span className="status-dot">Verified account</span>
