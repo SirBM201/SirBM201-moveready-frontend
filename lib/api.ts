@@ -35,6 +35,8 @@ const ACCOUNT_WRITE_PREFIXES = [
   "timeline",
   "platform/service-interest",
   "relocation/reports",
+  "journey",
+  "readiness",
 ];
 
 function isPlainObject(v: any) {
@@ -78,7 +80,7 @@ export function clearStoredAuthToken() {
       sessionStorage.removeItem(key);
     });
   } catch {
-    // ignore storage failures
+    // Ignore storage failures.
   }
 }
 
@@ -105,6 +107,9 @@ export async function apiJson<T = any>(path: string, init: ApiInit = {}, token?:
     ...(init.headers as Record<string, string>),
   };
 
+  // Account-owned writes always receive the locally stored session token when
+  // available. This protects verified ownership even when a public planner can
+  // also run anonymously.
   const forceAccountToken = shouldAttachAccountToken(path, method);
   const effectiveToken = init.useAuthToken === false && !forceAccountToken ? null : (token || safeGetLocalToken());
   if (effectiveToken) headers.Authorization = `Bearer ${effectiveToken}`;
