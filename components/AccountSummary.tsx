@@ -15,6 +15,8 @@ type AccountCounts = {
   journey_plans?: number;
   readiness_checks?: number;
   commercial_quotes?: number;
+  service_handoffs?: number;
+  support_cases?: number;
   service_requests?: number;
 };
 
@@ -72,7 +74,9 @@ const summaryTiles = [
   { key: "journey_plans", label: "Study and journey plans", helper: "Saved planning runs", href: "/journey-plans" },
   { key: "readiness_checks", label: "Readiness checks", helper: "Risk and evidence checks", href: "/readiness" },
   { key: "commercial_quotes", label: "Quotes", helper: "Scope and payment status", href: "/billing" },
-  { key: "service_requests", label: "Support requests", helper: "Private help requests", href: "/service-requests" },
+  { key: "service_handoffs", label: "Provider handoffs", helper: "Consent and delivery status", href: "/support-center" },
+  { key: "support_cases", label: "Private cases", helper: "Complaints, refunds, and disputes", href: "/support-center" },
+  { key: "service_requests", label: "Service requests", helper: "Help and provider requests", href: "/service-requests" },
 ] as const;
 
 function formatDate(value?: string) {
@@ -191,7 +195,7 @@ export default function AccountSummary() {
       });
       setActiveProfile(profile.id, profileName(profile));
       setActiveProfileId(profile.id);
-      setMessage(`${profileName(profile)} is now your active profile. Route Checker, Saved Routes, Alerts, Reports, Planning, Timeline, Quotes, and Support will use this account context first.`);
+      setMessage(`${profileName(profile)} is now your active profile. Route Checker, Saved Routes, Alerts, Reports, Planning, Timeline, Quotes, Provider Handoffs, and Support will use this account context first.`);
       await loadSummary();
     } catch (error) {
       const apiError = error as ApiError;
@@ -218,7 +222,7 @@ export default function AccountSummary() {
       return;
     }
 
-    const confirmHide = typeof window === "undefined" || window.confirm(`Hide old profile: ${profileName(profile)}? This only removes it from your active account list. It does not delete reports, plans, or quotes already created.`);
+    const confirmHide = typeof window === "undefined" || window.confirm(`Hide old profile: ${profileName(profile)}? This only removes it from your active account list. It does not delete reports, plans, quotes, handoffs, or support cases already created.`);
     if (!confirmHide) {
       setMessage("No profile was hidden.");
       return;
@@ -266,8 +270,8 @@ export default function AccountSummary() {
 
       <p>
         {summary
-          ? "This is your account home. Pick one active profile first, then use it for route checks, reports, saved routes, alerts, timeline, planning history, quotes, and support requests."
-          : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, planning history, quotes, and service requests under one account."}
+          ? "This is your account home. Pick one active profile first, then use it for route checks, reports, saved routes, alerts, timeline, planning history, quotes, provider handoffs, and private support cases."
+          : "Email login helps MoveReady connect profiles, saved routes, reports, alerts, timelines, planning history, quotes, handoffs, and support cases under one account."}
       </p>
 
       {summary ? (
@@ -304,6 +308,7 @@ export default function AccountSummary() {
               <a className="btn" href="/journey-plans">Open plans</a>
               <a className="btn" href="/my-reports">Open reports</a>
               <a className="btn" href="/billing">Open quotes</a>
+              <a className="btn" href="/support-center">Open handoffs and cases</a>
             </div>
           </article>
 
@@ -378,6 +383,7 @@ export default function AccountSummary() {
         <a className="btn" href="/journey-plans">My plans</a>
         <a className="btn" href="/my-reports">My reports</a>
         <a className="btn" href="/billing">My quotes</a>
+        <a className="btn" href="/support-center">Provider handoffs and cases</a>
         <a className="btn" href="/saved-routes">Saved routes</a>
         {summary ? <button className="btn" type="button" onClick={switchAccount}>Switch email account</button> : null}
       </div>
