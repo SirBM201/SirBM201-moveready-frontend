@@ -15,6 +15,7 @@ const publicNavigation = [
   { label: "Prices", href: "/pricing", title: "Pricing overview" },
   { label: "Quotes", href: "/billing", title: "Request and review commercial quotes and payment status" },
   { label: "Support", href: "/support-center", title: "Review provider handoffs and open private support cases" },
+  { label: "Status", href: "/deployment-status", title: "Verify the live backend revision and operational contract" },
   { label: "Account", href: "/dashboard", title: "My Account" },
 ];
 
