@@ -22,6 +22,12 @@ type PartnerApplication = {
   preferred_contact_channel: string;
   consent_to_contact?: boolean;
   status: string;
+  public_listing_enabled?: boolean;
+  privacy_reviewed?: boolean;
+  pricing_reviewed?: boolean;
+  refund_policy_reviewed?: boolean;
+  sensitive_document_handling_reviewed?: boolean;
+  affiliate_relationship?: boolean;
   internal_notes?: string | null;
   source_page?: string | null;
   created_at?: string;
@@ -33,7 +39,7 @@ type ApiList = {
 };
 
 const statusOptions = ["new", "screening", "approved", "rejected", "waitlist", "suspended", "spam"];
-const providerTypes = ["courier", "insurance", "legalization", "translation", "expert_review", "admission_support", "accommodation", "airport_pickup", "settlement", "other"];
+const providerTypes = ["courier", "insurance", "legalization", "translation", "expert_review", "admission_support", "accommodation", "airport_pickup", "settlement", "travel_booking", "transport", "telecom", "other"];
 
 function formatDate(value?: string) {
   if (!value) return "Unknown date";
@@ -57,7 +63,7 @@ export default function AdminPartnerApplications() {
     try {
       setAdminKey(localStorage.getItem("moveready_admin_key") || "");
     } catch {
-      // ignore storage failure
+      // Ignore storage failure.
     }
   }, []);
 
@@ -93,7 +99,7 @@ export default function AdminPartnerApplications() {
       setMessage(data.partner_applications?.length ? "Partner applications loaded." : "No partner applications found for this filter.");
     } catch (error) {
       const apiError = error as ApiError;
-      setMessage(apiError?.status === 401 ? "Admin key rejected." : "Unable to load partner applications. Confirm SQL 011 has been run and backend has redeployed.");
+      setMessage(apiError?.status === 401 ? "Admin key rejected." : "Unable to load partner applications. Confirm migrations 011 and 023 are applied and the backend has redeployed.");
     } finally {
       setLoading(false);
     }
@@ -115,7 +121,7 @@ export default function AdminPartnerApplications() {
         useAuthToken: false,
       });
       setItems((rows) => rows.map((item) => (item.id === id ? data.partner_application : item)));
-      setMessage("Partner application status updated.");
+      setMessage(status === "approved" ? "Application approved for internal use. Public publication still requires the separate publication controls." : "Partner application status updated.");
     } catch {
       setMessage("Unable to update partner application status.");
     }
@@ -126,7 +132,7 @@ export default function AdminPartnerApplications() {
       <div className="section-heading-row">
         <div>
           <h2>Partner applications</h2>
-          <p className="section-intro">Review providers applying for courier, insurance, legalization, translation, expert review, admission, accommodation, airport pickup, and settlement workflows.</p>
+          <p className="section-intro">Review providers applying for courier, insurance, legalization, translation, expert review, admission, travel booking, accommodation, transport, airport pickup, telecom, and settlement workflows.</p>
         </div>
         <div className="badge-row admin-counts">
           {statusOptions.map((status) => <span className="badge" key={status}>{status}: {counts[status] || 0}</span>)}
@@ -149,7 +155,7 @@ export default function AdminPartnerApplications() {
           <label htmlFor="partner_type">Provider type</label>
           <select id="partner_type" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
             <option value="">All provider types</option>
-            {providerTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+            {providerTypes.map((type) => <option key={type} value={type}>{type.replaceAll("_", " ")}</option>)}
           </select>
         </div>
         <div className="field">
@@ -165,15 +171,15 @@ export default function AdminPartnerApplications() {
           <article className="request-card" key={item.id}>
             <div className="request-card-main">
               <div>
-                <span className={`badge module-status ${item.status === "approved" ? "available" : item.status === "new" || item.status === "screening" ? "partner_approval_pending" : "coming_soon"}`}>{item.status}</span>
+                <span className={`badge module-status ${item.public_listing_enabled ? "available" : item.status === "approved" ? "partner_approval_pending" : item.status === "new" || item.status === "screening" ? "partner_approval_pending" : "coming_soon"}`}>{item.public_listing_enabled ? "approved and public" : item.status}</span>
                 <h3>{item.business_name}</h3>
                 <p>{item.service_summary || "No service summary provided."}</p>
               </div>
               <div className="request-meta">
                 <span>{formatDate(item.created_at)}</span>
-                <span>{item.provider_type}</span>
+                <span>{item.provider_type.replaceAll("_", " ")}</span>
                 <span>{item.preferred_contact_channel}</span>
-                {item.consent_to_contact ? <span>Consent confirmed</span> : null}
+                {item.consent_to_contact ? <span>Consent confirmed</span> : <span>Consent missing</span>}
               </div>
             </div>
 
@@ -187,12 +193,15 @@ export default function AdminPartnerApplications() {
               <span><strong>Credentials:</strong> {item.credentials_summary || "Not provided"}</span>
               <span><strong>Compliance:</strong> {item.compliance_notes || "Not provided"}</span>
               <span><strong>Pricing:</strong> {item.pricing_notes || "Not provided"}</span>
+              <span><strong>Publication checks:</strong> privacy {item.privacy_reviewed ? "yes" : "no"}; pricing {item.pricing_reviewed ? "yes" : "no"}; refund {item.refund_policy_reviewed ? "yes" : "no"}; handling {item.sensitive_document_handling_reviewed ? "yes" : "no"}</span>
+              <span><strong>Affiliate relationship:</strong> {item.affiliate_relationship ? "Yes — disclosure required" : "No / not recorded"}</span>
             </div>
 
             <div className="badge-row">
               {statusOptions.map((status) => (
                 <button className="status-button" key={status} type="button" disabled={item.status === status} onClick={() => updateStatus(item.id, status)}>{status}</button>
               ))}
+              <a className="btn" href="#provider-publication">Open publication controls</a>
             </div>
           </article>
         ))}
