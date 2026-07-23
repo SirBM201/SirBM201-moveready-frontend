@@ -1,6 +1,7 @@
 const publicNavigation = [
   { label: "Home", href: "/", title: "Home page" },
   { label: "Start", href: "/onboarding", title: "Guided verified-account setup" },
+  { label: "My Journey", href: "/my-journey", title: "Review private end-to-end journey progress" },
   { label: "Actions", href: "/action-center", title: "Review ranked private next actions" },
   { label: "Decide", href: "/decision-center", title: "Choose your direction" },
   { label: "Countries", href: "/country-comparison", title: "Compare countries" },
