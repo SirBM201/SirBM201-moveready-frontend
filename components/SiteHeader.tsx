@@ -8,6 +8,7 @@ const publicNavigation = [
   { label: "Routes", href: "/compare", title: "Compare relocation routes" },
   { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
   { label: "Study", href: "/study-planner", title: "Plan admission and study visa preparation" },
+  { label: "Trip", href: "/trip-planner", title: "Check trip readiness before comparing bookings" },
   { label: "Planner", href: "/journey-planner", title: "Plan documents, family, appointments, and settlement" },
   { label: "Alerts", href: "/watchlist", title: "Create and review route alerts" },
   { label: "Services", href: "/services", title: "Request trusted support" },
