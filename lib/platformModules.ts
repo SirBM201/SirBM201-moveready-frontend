@@ -9,7 +9,6 @@ export type PlatformModule = {
   href: string;
 };
 
-
 export const platformModules: PlatformModule[] = [
   {
     slug: "opportunities",
@@ -112,6 +111,16 @@ export const platformModules: PlatformModule[] = [
     href: "/journey-planner",
   },
   {
+    slug: "billing",
+    title: "Commercial Quotes and Payment Controls",
+    category: "Commercial operations",
+    availability: "available",
+    summary: "Request and review scope-based quotes with deliverables, exclusions, provider, separated service and platform fees, expiry, refund terms, acceptance, and payment status.",
+    readiness: "Verified account quote review, acceptance, decline, admin issuance, audit events, and manual payment verification are implemented. Checkout links remain disabled until approved payment setup is explicitly enabled.",
+    launchScope: "Quote requests, service scope, deliverables, exclusions, provider assignment, service fee, platform fee, total, refund terms, acceptance, payment reference, and fulfillment status.",
+    href: "/billing",
+  },
+  {
     slug: "legalization",
     title: "Notarization, apostille, and legalization",
     category: "Execution services",
@@ -127,8 +136,8 @@ export const platformModules: PlatformModule[] = [
     category: "Execution services",
     availability: "partner_approval_pending",
     summary: "Coordinate trusted handling for passports, certificates, embassy submissions, and notarization or legalization pickups.",
-    readiness: "The service request form is live for user interest, and provider applications can be captured for admin review.",
-    launchScope: "Courier partners, tracking, insurance options, destination handling rules, special instructions, and pricing.",
+    readiness: "The service request form is live. Provider applications remain hidden until screening and separate public-publication controls pass.",
+    launchScope: "Courier partners, tracking, insurance options, destination handling rules, special instructions, pricing, refunds, privacy, and custody controls.",
     href: "/courier",
   },
   {
@@ -137,7 +146,7 @@ export const platformModules: PlatformModule[] = [
     category: "Execution services",
     availability: "available",
     summary: "Show travel, health, student, family, Schengen-style, and work-route insurance requirements.",
-    readiness: "The insurance guide and backend insurance requirement endpoint are live. Partner quotes require approved providers.",
+    readiness: "The insurance guide and backend insurance requirement endpoint are live. Partner quotes require an approved and published provider.",
     launchScope: "Route-aware requirements, quote partners, comparison, coverage notes, and purchase handoff where approved.",
     href: "/insurance-guide",
   },
@@ -167,7 +176,7 @@ export const platformModules: PlatformModule[] = [
     category: "Arrival",
     availability: "available",
     summary: "Continue after approval with housing, connectivity, registration, banking, tax, insurance, school, transport, work, and family tasks.",
-    readiness: "The self-service first-90-days settlement planner is live. Public partner handoff remains restricted to approved providers.",
+    readiness: "The self-service first-90-days settlement planner is live. Public partner handoff remains restricted to approved and published providers.",
     launchScope: "Before-travel, first-72-hours, first-two-weeks, first-90-days, fraud checks, family, medical, work, business, school, and pet tasks.",
     href: "/settlement",
   },
@@ -176,13 +185,12 @@ export const platformModules: PlatformModule[] = [
     title: "Partner and expert review network",
     category: "Marketplace",
     availability: "partner_approval_pending",
-    summary: "Connect users to vetted experts, couriers, insurers, translators, notaries, admission support, settlement, and travel providers.",
-    readiness: "Provider application capture and admin screening are available. Public listings stay hidden until approval.",
-    launchScope: "Provider vetting, expert review, service requests, commission disclosure, handoff notes, and user support workflow.",
+    summary: "Connect users to screened experts, couriers, insurers, translators, notaries, admission support, settlement, travel booking, transport, and telecom providers.",
+    readiness: "Applications and admin screening are live. Public listings require separate privacy, pricing, refund, sensitive-document handling, affiliate-disclosure, and explicit publication controls.",
+    launchScope: "Provider vetting, publication review, expert services, service requests, commission disclosure, handoff terms, user consent, and complaint workflow.",
     href: "/providers",
   },
 ];
-
 
 export function getPlatformModule(slug: string) {
   return platformModules.find((module) => module.slug === slug);
