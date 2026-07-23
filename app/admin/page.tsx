@@ -1,4 +1,5 @@
 import AdminCommercialQuotes from "@/components/AdminCommercialQuotes";
+import AdminOperationsStatus from "@/components/AdminOperationsStatus";
 import AdminOpportunities from "@/components/AdminOpportunities";
 import AdminPartnerApplications from "@/components/AdminPartnerApplications";
 import AdminProviderPublication from "@/components/AdminProviderPublication";
@@ -11,6 +12,7 @@ import AdminUserProfiles from "@/components/AdminUserProfiles";
 import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscriptions";
 
 const adminModules = [
+  ["Operations status", "Check configuration, core schemas, provider publication, commercial quotes, payment audit, and controlled external integrations.", "#operations-status"],
   ["Review queue", "Unified workload for service requests, high-risk reports, partner applications, profiles, saved routes, timelines, alerts, and commercial records that need attention.", "#review-queue"],
   ["Commercial quotes", "Issue scope-controlled quotes, separate service and platform fees, record refund terms, and verify payments without promising outcomes.", "#commercial-quotes"],
   ["Provider publication", "Keep application approval separate from public listing. Record privacy, pricing, refund, handling, affiliate, and handoff controls.", "#provider-publication"],
@@ -38,6 +40,7 @@ export default function AdminPage() {
           <span>Admin</span>
         </a>
         <nav className="nav">
+          <a href="#operations-status">Operations</a>
           <a href="#review-queue">Queue</a>
           <a href="#commercial-quotes">Quotes</a>
           <a href="#provider-publication">Provider Controls</a>
@@ -53,7 +56,7 @@ export default function AdminPage() {
       </header>
       <section className="section">
         <h2>Admin workspace</h2>
-        <p className="section-intro">Admin tools protect the trust system: profiles, official opportunities, saved routes, timelines, partner screening, public publication, service requests, commercial quotes, payment records, watchlists, sources, route versions, review tasks, readiness checks, and report freshness.</p>
+        <p className="section-intro">Admin tools protect the trust system: production diagnostics, profiles, official opportunities, saved routes, timelines, partner screening, public publication, service requests, commercial quotes, payment records, watchlists, sources, route versions, review tasks, readiness checks, and report freshness.</p>
         <div className="grid">
           {adminModules.map(([title, text, href]) => (
             <article className="card" key={title}>
@@ -64,6 +67,7 @@ export default function AdminPage() {
           ))}
         </div>
       </section>
+      <div id="operations-status"><AdminOperationsStatus /></div>
       <div id="review-queue"><AdminReviewConsole /></div>
       <div id="commercial-quotes"><AdminCommercialQuotes /></div>
       <div id="provider-publication"><AdminProviderPublication /></div>
