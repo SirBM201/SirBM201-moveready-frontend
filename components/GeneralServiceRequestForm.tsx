@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { apiJson } from "@/lib/api";
 
+
 type ServiceOption = {
   slug: string;
   title: string;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const serviceOptions: ServiceOption[] = [
+  { slug: "travel_booking", title: "Travel booking support", description: "Screened help with flights, hotels, short stays, airport pickup, intercity transport, and trip arrangements after readiness checks." },
   { slug: "courier", title: "Passport and document courier", description: "Trusted handling for passports, certificates, embassy documents, and route evidence." },
   { slug: "legalization", title: "Notarization, apostille, and legalization", description: "Document authentication, embassy legalization, translation, and attestation support." },
   { slug: "insurance", title: "Travel and health insurance", description: "Travel, student, family, Schengen-style, work-route, and arrival insurance requests." },
@@ -29,32 +31,48 @@ const serviceOptions: ServiceOption[] = [
   { slug: "other", title: "Other relocation support", description: "Use this for relocation needs that do not fit the listed service categories." },
 ];
 
-function getService(slug: string) {
-  return serviceOptions.find((item) => item.slug === slug) || serviceOptions[0];
+const serviceAliases: Record<string, string> = {
+  admission: "admission_support",
+  scholarship: "admission_support",
+  hotel: "travel_booking",
+  flight: "travel_booking",
+  transport: "travel_booking",
+  trip: "travel_booking",
+};
+
+function normalizeServiceSlug(slug?: string | null) {
+  const clean = String(slug || "").trim();
+  return serviceAliases[clean] || clean;
 }
 
-function validService(slug?: string) {
-  return !!slug && serviceOptions.some((item) => item.slug === slug);
+function getService(slug: string) {
+  return serviceOptions.find((item) => item.slug === normalizeServiceSlug(slug)) || serviceOptions[0];
+}
+
+function validService(slug?: string | null) {
+  const normalized = normalizeServiceSlug(slug);
+  return !!normalized && serviceOptions.some((item) => item.slug === normalized);
 }
 
 export default function GeneralServiceRequestForm({ defaultService }: Props) {
-  const [serviceSlug, setServiceSlug] = useState(validService(defaultService) ? defaultService! : serviceOptions[0].slug);
+  const normalizedDefault = normalizeServiceSlug(defaultService);
+  const [serviceSlug, setServiceSlug] = useState(validService(normalizedDefault) ? normalizedDefault : serviceOptions[0].slug);
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("Ready to submit a service request.");
 
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
-      const service = params.get("service") || params.get("type");
-      if (validService(service || undefined)) {
-        setServiceSlug(service!);
-      } else if (validService(defaultService)) {
-        setServiceSlug(defaultService!);
+      const service = normalizeServiceSlug(params.get("service") || params.get("type"));
+      if (validService(service)) {
+        setServiceSlug(service);
+      } else if (validService(normalizedDefault)) {
+        setServiceSlug(normalizedDefault);
       }
     } catch {
-      if (validService(defaultService)) setServiceSlug(defaultService!);
+      if (validService(normalizedDefault)) setServiceSlug(normalizedDefault);
     }
-  }, [defaultService]);
+  }, [normalizedDefault]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -100,12 +118,12 @@ export default function GeneralServiceRequestForm({ defaultService }: Props) {
         useAuthToken: false,
       });
       setState("success");
-      setMessage(response.stored === false ? "Request received. Storage will activate after backend setup is complete." : "Request saved. MoveReady will contact you with next steps.");
+      setMessage(response.stored === false ? "Request received. Storage will activate after backend setup is complete." : "Request saved for admin review. MoveReady will contact you only after a suitable approved provider or support path is confirmed.");
       form.reset();
-      setServiceSlug(validService(defaultService) ? defaultService! : serviceOptions[0].slug);
+      setServiceSlug(validService(normalizedDefault) ? normalizedDefault : serviceOptions[0].slug);
     } catch {
       setState("error");
-      setMessage("Unable to submit this request right now. If Railway is still blocked, try again after the backend redeploys.");
+      setMessage("Unable to submit this request right now. Try again after the backend deployment finishes.");
     }
   }
 
@@ -115,8 +133,8 @@ export default function GeneralServiceRequestForm({ defaultService }: Props) {
     <form className="interest-form" onSubmit={handleSubmit}>
       <div>
         <span className="overline">Service request</span>
-        <h3>Request trusted relocation support</h3>
-        <p>Select the service you need and submit enough context for admin review and follow-up.</p>
+        <h3>Request trusted relocation or travel support</h3>
+        <p>Select the service you need and submit enough context for admin review. MoveReady does not guarantee provider availability or outcomes.</p>
       </div>
 
       <div className="form-grid two-col">
@@ -165,15 +183,15 @@ export default function GeneralServiceRequestForm({ defaultService }: Props) {
 
       <div className="field">
         <label htmlFor="route_or_goal">Route or goal</label>
-        <input id="route_or_goal" name="route_or_goal" placeholder="Example: Estonia startup, DV lottery, Finland D visa, scholarship route" />
+        <input id="route_or_goal" name="route_or_goal" placeholder="Example: visitor trip, Finland startup, study route, airport pickup" />
       </div>
       <div className="field">
         <label htmlFor="message">What do you need?</label>
-        <textarea id="message" name="message" rows={5} placeholder="Add document type, destination country, deadline, service need, family context, or any special handling note." />
+        <textarea id="message" name="message" rows={5} placeholder="Add dates, traveller count, document type, destination, deadline, service need, family context, budget range, or special handling note." />
       </div>
       <label className="checkbox-field">
         <input type="checkbox" name="consent_to_contact" />
-        <span>I agree that MoveReady may contact me about this service request.</span>
+        <span>I agree that MoveReady may contact me about this service request. I understand that only approved providers should receive a handoff.</span>
       </label>
       <button className="btn primary" type="submit" disabled={state === "submitting"}>
         {state === "submitting" ? "Submitting..." : "Submit service request"}
