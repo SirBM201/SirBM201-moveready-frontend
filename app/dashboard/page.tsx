@@ -11,6 +11,16 @@ const accountAreas = [
     href: "/onboarding",
   },
   {
+    title: "Review your complete journey",
+    detail: "See which stages are recorded, active, incomplete, or in need of attention from profile through decision and settlement.",
+    href: "/my-journey",
+  },
+  {
+    title: "See what needs attention next",
+    detail: "Review ranked deadlines, application risks, document expiry, evidence gaps, timeline tasks, quotes, handoffs, support, and privacy actions.",
+    href: "/action-center",
+  },
+  {
     title: "Save your details once",
     detail: "Add your country, target country, goal, timeline, available money, family count, and contact details once.",
     href: "#profile-dashboard",
@@ -78,13 +88,14 @@ const accountAreas = [
 ];
 
 const trustControls = [
-  "Your profile, evidence metadata, application cases, alerts, activity, reports, planning history, quotes, privacy requests, and support records are private account data.",
+  "Your profile, journey overview, next actions, evidence metadata, application cases, alerts, activity, reports, planning history, quotes, privacy requests, and support records are private account data.",
   "Evidence Center and Application Center reject raw passports, statements, certificates, refusal letters, full reference numbers, passwords, OTPs, card details, and private keys.",
+  "My Journey reflects saved records only, and the Action Center ranks existing records without creating a duplicate data store.",
   "MoveReady records separate consent for storage, contact, alerts, external channels, timeline tasks, quotes, provider handoffs, marketing, and privacy requests.",
   "Reports, Passport Index, Visa Power, Evidence Center, Application Center, planners, and alerts show source status, risk labels, warnings, generated dates, or review requirements.",
   "A saved email or WhatsApp preference does not activate delivery until provider credentials, templates, opt-in, unsubscribe, audit, and production tests pass.",
   "Provider approval is separate from public publication, quote issuance, payment, handoff, and service completion.",
-  "A quote, payment, report, readiness score, or application record does not promise approval, admission, employment, booking inventory, boarding, entry, provider performance, or refund.",
+  "A quote, payment, report, readiness score, journey stage, or application record does not promise approval, admission, employment, booking inventory, boarding, entry, provider performance, or refund.",
 ];
 
 const featureStatus = [
@@ -105,8 +116,8 @@ const featureStatus = [
   },
   {
     status: "Available after migration 030",
-    title: "Guided setup, activity, settings, security, and privacy",
-    detail: "Save onboarding progress, accessibility and notification choices, review sessions, export account data, and submit reviewed privacy requests.",
+    title: "Guided setup, My Journey, Action Center, activity, settings, security, and privacy",
+    detail: "Save onboarding progress, review truthful journey stages and ranked next actions, manage accessibility and notification choices, review sessions, export account data, and submit privacy requests.",
   },
   {
     status: "Available now",
@@ -140,7 +151,9 @@ export default function DashboardPage() {
             <span className="status-dot">Guided and private</span>
           </div>
           <div className="actions" style={{ marginTop: 14 }}>
-            <a className="btn primary" href="/onboarding">Continue guided setup</a>
+            <a className="btn primary" href="/my-journey">Open My Journey</a>
+            <a className="btn" href="/action-center">Action Center</a>
+            <a className="btn" href="/onboarding">Guided setup</a>
             <a className="btn" href="#account-summary">Account summary</a>
             <a className="btn" href="/applications">Applications</a>
             <a className="btn" href="/application-alerts">App alerts</a>
@@ -241,7 +254,7 @@ export default function DashboardPage() {
             <p className="overline">Your relocation profile</p>
             <h2>Save your details or load your active profile</h2>
             <p className="section-intro">
-              Use the same verified email. After saving, continue through routes, passport access, Visa Power, evidence, reports, applications, alerts, plans, timeline events, quotes, provider handoffs, support, activity, settings, and privacy controls.
+              Use the same verified email. After saving, continue through My Journey, Action Center, routes, passport access, Visa Power, evidence, reports, applications, alerts, plans, timeline events, quotes, provider handoffs, support, activity, settings, and privacy controls.
             </p>
           </div>
           <span className="status-dot">Verified account</span>
