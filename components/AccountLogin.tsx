@@ -10,7 +10,23 @@ type RequestCodeResponse = {
   email: string;
   expires_at?: string;
   delivery_status?: string;
+  delivery_provider?: string;
   dev_code?: string;
+};
+
+type AuthHealth = {
+  ok: boolean;
+  email_delivery_enabled?: boolean;
+  email_delivery_configured?: boolean;
+  email_delivery_provider?: string;
+  dev_code_allowed?: boolean;
+  otp_expires_minutes?: number;
+  request_limits?: {
+    cooldown_seconds?: number;
+    window_minutes?: number;
+    max_per_email?: number;
+    max_per_ip?: number;
+  };
 };
 
 type Session = {
@@ -71,13 +87,22 @@ function formatDate(value?: string) {
   }
 }
 
+function readable(value?: string) {
+  return String(value || "not configured").replace(/_/g, " ");
+}
+
 export default function AccountLogin() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [session, setSession] = useState<Session | null>(null);
-  const [message, setMessage] = useState("Enter your email to request a secure login code.");
+  const [authHealth, setAuthHealth] = useState<AuthHealth | null>(null);
+  const [readinessLoading, setReadinessLoading] = useState(true);
+  const [message, setMessage] = useState("Checking secure email login readiness...");
   const [loading, setLoading] = useState(false);
   const redirectStarted = useRef(false);
+
+  const loginAvailable = Boolean(authHealth?.email_delivery_configured || authHealth?.dev_code_allowed);
+  const readinessLabel = readinessLoading ? "Checking" : loginAvailable ? "Available" : "Controlled rollout";
 
   function redirectAfterLogin(reason: "verified" | "existing") {
     if (redirectStarted.current) return;
@@ -93,8 +118,33 @@ export default function AccountLogin() {
     }, 350);
   }
 
+  async function loadReadiness(silent = false) {
+    if (!silent) setMessage("Refreshing secure login readiness...");
+    setReadinessLoading(true);
+    try {
+      const data = await apiJson<AuthHealth>("auth/health", { timeoutMs: 10000, useAuthToken: false });
+      setAuthHealth(data);
+      const ready = Boolean(data.email_delivery_configured || data.dev_code_allowed);
+      if (!silent) {
+        setMessage(ready
+          ? "Secure login is ready. Enter your email to request a one-time code."
+          : "Public email login is not active yet. MoveReady must verify its OTP email provider before accepting code requests.");
+      } else if (!ready) {
+        setMessage("Public email login is not active yet. MoveReady must verify its OTP email provider before accepting code requests.");
+      } else {
+        setMessage("Enter your email to request a secure one-time login code.");
+      }
+    } catch {
+      setAuthHealth(null);
+      setMessage("Unable to verify login readiness. Code requests remain disabled until the backend status can be confirmed.");
+    } finally {
+      setReadinessLoading(false);
+    }
+  }
+
   useEffect(() => {
-    async function loadSession() {
+    async function loadPage() {
+      await loadReadiness(true);
       try {
         const data = await apiJson<MeResponse>("auth/me", { timeoutMs: 10000 });
         setSession(data.session);
@@ -104,11 +154,15 @@ export default function AccountLogin() {
         // No active session yet.
       }
     }
-    loadSession();
+    void loadPage();
   }, []);
 
   async function requestCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!loginAvailable) {
+      setMessage("Login code requests are not enabled until MoveReady verifies its email provider.");
+      return;
+    }
     if (!email.trim()) {
       setMessage("Enter your email address first.");
       return;
@@ -119,20 +173,24 @@ export default function AccountLogin() {
       const data = await apiJson<RequestCodeResponse>("auth/request-code", {
         method: "POST",
         body: { email: email.trim(), source_page: sourcePage() },
-        timeoutMs: 15000,
+        timeoutMs: 20000,
         useAuthToken: false,
       });
       if (data.dev_code) {
         setCode(data.dev_code);
         setMessage(`Development login code received. Code expires at ${formatDate(data.expires_at)}.`);
-      } else if (data.delivery_status === "email_delivery_not_configured") {
-        setMessage("Login code was created, but email delivery is not configured yet. Connect an approved email provider before public login.");
       } else {
-        setMessage(`Login code requested. Check your email. Code expires at ${formatDate(data.expires_at)}.`);
+        setMessage(`Login code sent through ${readable(data.delivery_provider)}. Check your email. Code expires at ${formatDate(data.expires_at)}.`);
       }
     } catch (error) {
       const apiError = error as ApiError;
-      setMessage(apiError?.data?.hint || apiError?.message || "Unable to request login code.");
+      const retryAfter = apiError?.data?.retry_after_seconds;
+      if (apiError?.status === 429 && retryAfter) {
+        setMessage(`Too many login-code requests. Try again in about ${retryAfter} seconds.`);
+      } else {
+        setMessage(apiError?.data?.hint || apiError?.data?.error || apiError?.message || "Unable to request login code.");
+      }
+      void loadReadiness(true);
     } finally {
       setLoading(false);
     }
@@ -141,7 +199,7 @@ export default function AccountLogin() {
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.trim() || !code.trim()) {
-      setMessage("Enter your email and login code.");
+      setMessage("Enter your email and six-digit login code.");
       return;
     }
     setLoading(true);
@@ -159,7 +217,7 @@ export default function AccountLogin() {
     } catch (error) {
       const apiError = error as ApiError;
       const attempts = apiError?.data?.attempts_remaining;
-      setMessage(attempts !== undefined ? `Invalid code. Attempts remaining: ${attempts}.` : apiError?.message || "Unable to verify login code.");
+      setMessage(attempts !== undefined ? `Invalid code. Attempts remaining: ${attempts}.` : apiError?.data?.error || apiError?.message || "Unable to verify login code.");
     } finally {
       setLoading(false);
     }
@@ -195,7 +253,17 @@ export default function AccountLogin() {
             <p className="overline">Email login</p>
             <h2>Sign in to MoveReady</h2>
           </div>
-          <span className="status-dot">Available now</span>
+          <span className="status-dot">{readinessLabel}</span>
+        </div>
+
+        <div className="result-block soft" style={{ marginBottom: 16 }}>
+          <div className="mini-list">
+            <div><strong>Email provider</strong><span>{readable(authHealth?.email_delivery_provider)}</span></div>
+            <div><strong>Delivery configured</strong><span>{authHealth?.email_delivery_configured ? "Yes" : "No"}</span></div>
+            <div><strong>Code validity</strong><span>{authHealth?.otp_expires_minutes ? `${authHealth.otp_expires_minutes} minutes` : "Not confirmed"}</span></div>
+            <div><strong>Request protection</strong><span>{authHealth?.request_limits?.cooldown_seconds ? `${authHealth.request_limits.cooldown_seconds}-second resend cooldown` : "Backend-controlled"}</span></div>
+          </div>
+          <button className="btn" type="button" disabled={readinessLoading || loading} onClick={() => loadReadiness(false)}>{readinessLoading ? "Checking..." : "Refresh login status"}</button>
         </div>
 
         <form className="form-grid" onSubmit={requestCode}>
@@ -203,15 +271,15 @@ export default function AccountLogin() {
             <label htmlFor="login_email">Email address</label>
             <input id="login_email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
           </div>
-          <button className="btn primary full" type="submit" disabled={loading}>{loading ? "Please wait..." : "Request login code"}</button>
+          <button className="btn primary full" type="submit" disabled={loading || readinessLoading || !loginAvailable}>{loading ? "Please wait..." : loginAvailable ? "Request login code" : "Login email not active"}</button>
         </form>
 
         <form className="form-grid" onSubmit={verifyCode}>
           <div className="field">
             <label htmlFor="login_code">Login code</label>
-            <input id="login_code" inputMode="numeric" value={code} onChange={(event) => setCode(event.target.value)} placeholder="6-digit code" />
+            <input id="login_code" inputMode="numeric" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="6-digit code" />
           </div>
-          <button className="btn full" type="submit" disabled={loading}>{loading ? "Verifying..." : "Verify and sign in"}</button>
+          <button className="btn full" type="submit" disabled={loading || code.length !== 6}>{loading ? "Verifying..." : "Verify and sign in"}</button>
         </form>
 
         <p className="form-status">{message}</p>
@@ -223,7 +291,7 @@ export default function AccountLogin() {
             <p className="overline">Session status</p>
             <h2>{session ? "Signed in" : "Not signed in yet"}</h2>
             <p>
-              Login connects profiles, saved routes, reports, alerts, timeline events, and service requests under one verified account.
+              Login connects profiles, saved routes, reports, alerts, timeline events, quotes, provider handoffs, and private support cases under one verified account.
             </p>
             {session ? (
               <div className="mini-list">
@@ -243,7 +311,9 @@ export default function AccountLogin() {
             <h2>What login should and should not do</h2>
             <div className="mini-list">
               <div><strong>Do</strong><span>Use verified identity to connect user-owned records safely.</span></div>
-              <div><strong>Do</strong><span>Keep service requests, reports, and private user records protected.</span></div>
+              <div><strong>Do</strong><span>Rate-limit code requests and expire previous unused codes.</span></div>
+              <div><strong>Do</strong><span>Keep service requests, reports, handoffs, cases, and private user records protected.</span></div>
+              <div><strong>Do not</strong><span>Ask users to send OTP codes to MoveReady staff or providers.</span></div>
               <div><strong>Do not</strong><span>Turn login into a promise of visa, admission, job, lottery, or ballot approval.</span></div>
             </div>
           </article>
