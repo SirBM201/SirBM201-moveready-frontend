@@ -1,4 +1,5 @@
 import AdminCommercialQuotes from "@/components/AdminCommercialQuotes";
+import AdminEvidenceReview from "@/components/AdminEvidenceReview";
 import AdminOperationsStatus from "@/components/AdminOperationsStatus";
 import AdminOpportunities from "@/components/AdminOpportunities";
 import AdminPartnerApplications from "@/components/AdminPartnerApplications";
@@ -16,6 +17,7 @@ import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscription
 const adminModules = [
   ["Operations status", "Check configuration, account login, core schemas, evidence storage, provider publication, quotes, payment audit, handoffs, support cases, and controlled external integrations.", "#operations-status"],
   ["Source governance", "Review overdue official sources and route versions, record snapshots, and create review-due alerts without silently changing route facts.", "#source-governance"],
+  ["Evidence review", "Review high-risk evidence packs, missing categories, official-source notes, and expired or expiring document metadata without accessing raw files.", "#evidence-review"],
   ["Review queue", "Unified workload for evidence packs, service requests, quotes, handoffs, complaints, refunds, disputes, high-risk reports, providers, profiles, timelines, and alerts.", "#review-queue"],
   ["Commercial quotes", "Issue scope-controlled quotes, separate service and platform fees, record refund terms, and verify payments without promising outcomes.", "#commercial-quotes"],
   ["Provider handoffs and cases", "Prepare consent-based provider handoffs and manage complaints, refunds, disputes, privacy issues, provider issues, and technical cases.", "#service-handoffs"],
@@ -47,6 +49,7 @@ export default function AdminPage() {
         <nav className="nav">
           <a href="#operations-status">Operations</a>
           <a href="#source-governance">Source Governance</a>
+          <a href="#evidence-review">Evidence Review</a>
           <a href="#review-queue">Queue</a>
           <a href="#commercial-quotes">Quotes</a>
           <a href="#service-handoffs">Handoffs & Cases</a>
@@ -77,6 +80,7 @@ export default function AdminPage() {
       </section>
       <div id="operations-status"><AdminOperationsStatus /></div>
       <div id="source-governance"><AdminSourceGovernance /></div>
+      <div id="evidence-review"><AdminEvidenceReview /></div>
       <div id="review-queue"><AdminReviewConsole /></div>
       <div id="commercial-quotes"><AdminCommercialQuotes /></div>
       <div id="service-handoffs"><AdminServiceHandoffs /></div>
