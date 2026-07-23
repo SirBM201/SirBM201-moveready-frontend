@@ -173,8 +173,9 @@ export default function MyJourneyOverview() {
     const hasReport = (counts.reports || 0) > 0;
     const hasPlan = (counts.journey_plans || 0) > 0 || (counts.timeline || 0) > 0;
     const hasApplication = (counts.application_cases || 0) > 0;
-    const terminalStage = ["approved", "refused", "withdrawn", "expired", "closed"].includes(String(application?.application_stage || ""));
-    const hasSettlement = hasPlan && terminalStage;
+    const applicationStage = String(application?.application_stage || "");
+    const terminalStage = ["approved", "refused", "withdrawn", "expired", "closed"].includes(applicationStage);
+    const approvedStage = applicationStage === "approved";
     const applicationAttention = application?.status === "attention_required"
       || ["high", "critical"].includes(String(application?.risk_level || ""));
 
@@ -240,7 +241,7 @@ export default function MyJourneyOverview() {
         number: 7,
         title: "Decision and next route",
         detail: "Record the factual decision and prepare approval, refusal-repair, withdrawal, expiry, or closure actions.",
-        status: terminalStage ? application?.application_stage === "refused" ? "attention" : "complete" : hasApplication ? "active" : "not_started",
+        status: terminalStage ? applicationStage === "refused" ? "attention" : "complete" : hasApplication ? "active" : "not_started",
         href: "/applications",
         evidence: terminalStage ? `${readable(application?.application_stage)} · ${application?.decision_date || "decision date not recorded"}` : "No terminal decision recorded",
       },
@@ -249,9 +250,11 @@ export default function MyJourneyOverview() {
         number: 8,
         title: "Travel and settlement",
         detail: "Booking readiness, entry conditions, accommodation, insurance, registration, tax, school, work, and first 90 days.",
-        status: hasSettlement ? "active" : terminalStage && application?.application_stage === "approved" ? "active" : "not_started",
+        status: approvedStage ? "active" : "not_started",
         href: "/journey-planner#settlement",
-        evidence: hasSettlement ? "Settlement planning records exist" : "Settlement begins only after the route and decision support it",
+        evidence: approvedStage
+          ? hasPlan ? "Approval and planning records exist; confirm travel, entry, and settlement requirements." : "Approval is recorded; create the travel and settlement plan."
+          : terminalStage ? `Settlement is not activated for a ${readable(applicationStage)} application.` : "Settlement begins only after an approval is recorded.",
       },
     ];
   }, [counts, profile, application, evidencePack, report]);
@@ -336,7 +339,7 @@ export default function MyJourneyOverview() {
 
       <article className="result-block soft">
         <p className="overline">Truthful progress</p>
-        <p>Journey progress reflects records saved in MoveReady, not an immigration authority’s assessment. Missing records are not assumed complete, and an approved-looking readiness stage is not a visa, admission, residence, travel-entry, job, booking, or provider guarantee.</p>
+        <p>Journey progress reflects records saved in MoveReady, not an immigration authority’s assessment. Missing records are not assumed complete. Settlement remains inactive unless the latest application case explicitly records approval, and no readiness stage is a visa, admission, residence, travel-entry, job, booking, or provider guarantee.</p>
       </article>
     </div>
   );
