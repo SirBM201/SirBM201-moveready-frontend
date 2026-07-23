@@ -32,10 +32,11 @@ export default function JourneyPlannerPage() {
           <span className="eyebrow">Application to arrival</span>
           <h1>Plan the steps that sit between eligibility and a successful move.</h1>
           <p className="lede">
-            MoveReady now provides practical self-service planners for document handling, family relocation, appointments, and post-arrival settlement. Every result remains advisory and source-confirmation first.
+            MoveReady provides practical self-service planners for document handling, family relocation, appointments, and post-arrival settlement. Every result remains advisory and source-confirmation first.
           </p>
           <div className="actions">
             <a className="btn primary" href="#journey-tools">Open journey tools</a>
+            <a className="btn" href="/journey-plans">My saved plans</a>
             <a className="btn" href="/route-checker">Check relocation route</a>
             <a className="btn" href="/readiness">Use readiness tools</a>
             <a className="btn" href="/timeline">Open timeline</a>
