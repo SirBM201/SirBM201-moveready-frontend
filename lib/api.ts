@@ -48,6 +48,38 @@ function isPlainObject(v: any) {
   return proto === Object.prototype || proto === null;
 }
 
+function apiErrorMessage(data: any, status: number) {
+  const fallback = `Request failed with status ${status}`;
+
+  if (typeof data === "string") {
+    return data.trim() || fallback;
+  }
+
+  if (!isPlainObject(data)) return fallback;
+
+  const candidates = [data.message, data.error, data.detail];
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+
+    if (isPlainObject(candidate)) {
+      const nestedCandidates = [
+        candidate.message,
+        candidate.error,
+        candidate.detail,
+        candidate.code,
+      ];
+      const nestedMessage = nestedCandidates.find(
+        (value) => typeof value === "string" && value.trim(),
+      );
+      if (typeof nestedMessage === "string") return nestedMessage.trim();
+    }
+  }
+
+  return fallback;
+}
+
 function cleanApiPath(path: string) {
   let cleanPath = path.startsWith("/") ? path.slice(1) : path;
   if (cleanPath.startsWith("api/")) cleanPath = cleanPath.slice(4);
@@ -151,7 +183,7 @@ export async function apiJson<T = any>(path: string, init: ApiInit = {}, token?:
     const data = contentType.includes("application/json") ? await response.json() : await response.text();
 
     if (!response.ok) {
-      const message = isPlainObject(data) && data.error ? String(data.error) : `Request failed with status ${response.status}`;
+      const message = apiErrorMessage(data, response.status);
       throw new ApiError(response.status, message, data);
     }
 
