@@ -1436,6 +1436,22 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.jobs-company-card.is-target {
+  border-color: #9bcac4;
+}
+
+.jobs-company-card > .actions {
+  margin-top: 16px;
+}
+
+.jobs-company-card .jobs-form-intro {
+  margin: 16px 0 0;
+}
+
+.jobs-company-grid .jobs-empty .actions {
+  justify-content: center;
+}
+
 .jobs-company-facts {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
