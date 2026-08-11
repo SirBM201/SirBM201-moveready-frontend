@@ -132,12 +132,14 @@ export default function JobsDashboard() {
     }
     setSaving(true);
     try {
-      await apiJson("jobs/applications", {
+      const response = await apiJson<{ ok: boolean; created?: boolean; message?: string }>("jobs/applications", {
         method: "POST",
         body: { job_id: job.id, company_id: job.company_id, recruiter_id: job.recruiter_id, status: "saved" },
         timeoutMs: 20000,
       });
-      setMessage(`${job.job_title} moved into Applications as Saved.`);
+      setMessage(response.created === false
+        ? response.message || `${job.job_title} is already in Applications.`
+        : `${job.job_title} moved into Applications as Saved.`);
       await load();
     } catch (error) {
       setMessage(errorMessage(error, "Unable to create the application record."));

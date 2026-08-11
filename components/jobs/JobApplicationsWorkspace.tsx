@@ -94,7 +94,7 @@ export default function JobApplicationsWorkspace() {
     const data = new FormData(form);
     setSavingId("new");
     try {
-      const response = await apiJson<{ ok: boolean; application: JobApplication }>("jobs/applications", {
+      const response = await apiJson<{ ok: boolean; application: JobApplication; created?: boolean; message?: string }>("jobs/applications", {
         method: "POST",
         body: {
           job_id: optionalFormValue(data, "job_id"),
@@ -114,7 +114,9 @@ export default function JobApplicationsWorkspace() {
         timeoutMs: 20000,
       });
       form.reset();
-      setMessage(`${response.application.job_title} at ${response.application.company_name} added to Applications.`);
+      setMessage(response.created === false
+        ? response.message || `${response.application.job_title} is already in Applications.`
+        : `${response.application.job_title} at ${response.application.company_name} added to Applications.`);
       await load();
     } catch (error) {
       setMessage(messageFrom(error));
