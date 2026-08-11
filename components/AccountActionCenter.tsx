@@ -41,6 +41,8 @@ const kindLabels: Record<string, string> = {
   handoff: "Provider handoff",
   support_case: "Support case",
   privacy_request: "Privacy request",
+  job_application_follow_up: "Job application follow-up",
+  job_recruiter_follow_up: "Recruiter follow-up",
 };
 
 function readable(value?: string) {
@@ -74,7 +76,7 @@ export default function AccountActionCenter() {
 
   async function load() {
     setLoading(true);
-    setMessage("Ranking deadlines, application risks, evidence gaps, documents, quotes, handoffs, support, and privacy actions...");
+    setMessage("Ranking deadlines, relocation risks, job-search follow-ups, evidence gaps, documents, quotes, handoffs, support, and privacy actions...");
     try {
       const response = await apiJson<ActionResponse>("account/action-center", {
         query: { limit: 250 },
@@ -188,7 +190,7 @@ export default function AccountActionCenter() {
           {filtered.length === 0 && (
             <div>
               <strong>No matching action</strong>
-              <span>{data?.empty_state || "Change the filters or refresh after updating your application, evidence, documents, timeline, quotes, handoffs, support, or privacy records."}</span>
+              <span>{data?.empty_state || "Change the filters or refresh after updating your relocation, Jobs, evidence, document, timeline, quote, handoff, support, or privacy records."}</span>
             </div>
           )}
           {filtered.map((item, index) => (

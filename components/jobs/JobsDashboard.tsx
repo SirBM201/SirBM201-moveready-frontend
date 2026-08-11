@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { ApiError, apiJson } from "@/lib/api";
 import {
   JobCompany,
+  JobAction,
   JobLead,
   JobRecruiter,
   JobsSummary,
@@ -27,6 +28,14 @@ function errorMessage(error: unknown, fallback: string) {
   const apiError = error as ApiError;
   if (apiError?.status === 401) return "Sign in to open your private Jobs workspace.";
   return apiError?.message || fallback;
+}
+
+function actionDueLabel(action: JobAction) {
+  const days = action.days_until_due;
+  if (days === undefined) return formatJobDate(action.due_at);
+  if (days < 0) return `Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"}`;
+  if (days === 0) return "Due today";
+  return `Due in ${days} day${days === 1 ? "" : "s"}`;
 }
 
 export default function JobsDashboard() {
@@ -178,12 +187,12 @@ export default function JobsDashboard() {
         <a href="/jobs/recruiters" className="jobs-metric"><strong>{counts.recruiters}</strong><span>Recruiters</span></a>
         <a href="/jobs/applications" className="jobs-metric"><strong>{counts.applications}</strong><span>Applications</span></a>
         <a href="/jobs/resume-vault" className="jobs-metric"><strong>{counts.resume_documents}</strong><span>Resume files</span></a>
-        <a href="/jobs/applications" className={`jobs-metric ${counts.follow_ups_due ? "attention" : ""}`}><strong>{counts.follow_ups_due}</strong><span>Follow-ups due</span></a>
+        <a href="#jobs-action-center" className={`jobs-metric ${counts.follow_ups_due ? "attention" : ""}`}><strong>{counts.follow_ups_due}</strong><span>Actions due</span></a>
       </section>
 
       <section className="section jobs-section">
         <div className="section-heading-row">
-          <div><p className="overline">Recommended jobs</p><h2>Your recorded opportunities, ranked against your profile</h2><p className="section-intro">Sprint 1 uses transparent role, skill, location, experience, and sponsorship signals. It does not predict hiring or visa approval.</p></div>
+          <div><p className="overline">Recommended jobs</p><h2>Your recorded opportunities, ranked against your profile</h2><p className="section-intro">MoveReady uses transparent role, skill, location, experience, and sponsorship signals. It does not predict hiring or visa approval.</p></div>
           <span className="status-dot">{summary?.recommended_jobs?.length || 0} active leads</span>
         </div>
         <div className="jobs-card-grid">
@@ -222,12 +231,13 @@ export default function JobsDashboard() {
           <button className="btn primary" type="submit" disabled={saving}>{saving ? "Saving..." : "Save and score job"}</button>
         </form>
 
-        <aside className="jobs-pipeline-panel">
+        <aside className="jobs-pipeline-panel" id="jobs-action-center">
           <div className="panel-heading"><div><p className="overline">Application pipeline</p><h2>Status at a glance</h2></div><span className="status-dot">Live</span></div>
           <div className="jobs-pipeline-list">{Object.entries(summary?.applications_by_status || {}).map(([status, count]) => <a href={`/jobs/applications?status=${status}`} key={status}><span>{jobLabel(status)}</span><strong>{count}</strong></a>)}</div>
-          <h3>Upcoming follow-ups</h3>
-          {(summary?.follow_ups || []).map((item) => <a className="jobs-follow-up" href="/jobs/applications" key={item.id}><strong>{item.job_title}</strong><span>{item.company_name} · {formatJobDate(item.follow_up_date)}</span></a>)}
-          {!summary?.follow_ups?.length ? <p>No application follow-up is due in the next 14 days.</p> : null}
+          <div className="panel-heading"><h3>Priority work queue</h3><span className="status-dot">{summary?.action_counts?.overdue || 0} overdue</span></div>
+          {(summary?.action_items || []).map((item) => <a className="jobs-follow-up" href={item.href} key={`${item.kind}-${item.id}`}><strong>{jobLabel(item.priority)} · {item.title}</strong><span>{item.summary} · {actionDueLabel(item)}</span></a>)}
+          {!summary?.action_items?.length ? <p>No recruiter or application follow-up is due in the next 14 days.</p> : null}
+          <a className="text-link" href="/action-center">Open the full MoveReady Action Center</a>
         </aside>
       </section>
 

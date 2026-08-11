@@ -112,6 +112,19 @@ export type JobApplication = {
   updated_at?: string;
 };
 
+export type JobAction = {
+  kind: "job_application_follow_up" | "job_recruiter_follow_up" | string;
+  id?: string;
+  title: string;
+  summary: string;
+  priority: "medium" | "high" | "critical" | string;
+  status?: string;
+  due_at?: string;
+  days_until_due?: number;
+  score?: number;
+  href: string;
+};
+
 export type ResumeDocument = {
   id: string;
   document_type: string;
@@ -138,6 +151,13 @@ export type JobsSummary = {
   };
   applications_by_status: Record<string, number>;
   recommended_jobs: JobLead[];
+  action_counts?: {
+    overdue: number;
+    due_today: number;
+    upcoming: number;
+    total: number;
+  };
+  action_items?: JobAction[];
   follow_ups: JobApplication[];
   privacy_note?: string;
 };
