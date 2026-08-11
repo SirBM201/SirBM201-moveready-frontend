@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function JobsLayout({ children }: { children: ReactNode }) {
   return (
     <main className="page-shell jobs-shell">
-      <SiteHeader sectionLabel="AI relocation execution platform" />
+      <SiteHeader sectionLabel="Guided relocation and job-search platform" />
       <JobsNav />
       {children}
     </main>

@@ -44,10 +44,13 @@ export default function JobsDashboard() {
   const [recruiters, setRecruiters] = useState<JobRecruiter[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("Loading your private job-search command center...");
+  const [signedOut, setSignedOut] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [message, setMessage] = useState("Loading your private job search...");
 
   async function load() {
     setLoading(true);
+    setLoadFailed(false);
     try {
       const [summaryResponse, companyResponse, recruiterResponse] = await Promise.all([
         apiJson<JobsSummary & { ok: boolean }>("jobs/summary", { timeoutMs: 20000 }),
@@ -57,11 +60,15 @@ export default function JobsDashboard() {
       setSummary(summaryResponse);
       setCompanies(companyResponse.companies || []);
       setRecruiters(recruiterResponse.recruiters || []);
+      setSignedOut(false);
       setMessage(summaryResponse.profile
         ? "Your personal job-search workspace is ready."
         : "Complete four short setup steps to activate job matching with your own experience and goals.");
     } catch (error) {
+      const apiError = error as ApiError;
       setSummary(null);
+      setSignedOut(apiError?.status === 401);
+      setLoadFailed(apiError?.status !== 401);
       setMessage(errorMessage(error, "Unable to load the Jobs workspace."));
     } finally {
       setLoading(false);
@@ -132,6 +139,103 @@ export default function JobsDashboard() {
 
   const counts = summary?.counts || emptyCounts;
   const profile = summary?.profile;
+  const journeySteps = [
+    {
+      title: "Create your job profile",
+      detail: "Tell MoveReady about your real experience, skills, target work, and destination.",
+      complete: Boolean(profile),
+      href: profile ? "/jobs/profile" : "/jobs/setup",
+      action: profile ? "Review profile" : "Start setup",
+    },
+    {
+      title: "Choose target companies",
+      detail: "Shortlist employers you genuinely want to research and approach.",
+      complete: counts.target_companies > 0,
+      href: "/jobs/companies",
+      action: counts.target_companies > 0 ? "Review companies" : "Choose companies",
+    },
+    {
+      title: "Prepare your resume",
+      detail: "Keep the resume or cover letter you will use for applications in one private place.",
+      complete: counts.resume_documents > 0,
+      href: "/jobs/resume-vault",
+      action: counts.resume_documents > 0 ? "Open Resume Vault" : "Add a resume",
+    },
+    {
+      title: "Record a real vacancy",
+      detail: "Save the original job link and compare its requirements with your profile.",
+      complete: counts.recommended_jobs > 0,
+      href: "#add-job-lead",
+      action: counts.recommended_jobs > 0 ? "Add another vacancy" : "Add a vacancy",
+    },
+    {
+      title: "Track your application",
+      detail: "Record when you apply, what you sent, and when you should follow up.",
+      complete: counts.applications > 0,
+      href: "/jobs/applications",
+      action: counts.applications > 0 ? "Review applications" : "Open applications",
+    },
+  ];
+  const completedJourneySteps = journeySteps.filter((item) => item.complete).length;
+  const journeyProgress = Math.round((completedJourneySteps / journeySteps.length) * 100);
+  const firstIncompleteStep = journeySteps.find((item) => !item.complete);
+  const nextAction = counts.follow_ups_due > 0 && !firstIncompleteStep
+    ? {
+        title: "Review the actions that are due",
+        detail: `${counts.follow_ups_due} recruiter or application follow-up${counts.follow_ups_due === 1 ? " is" : "s are"} waiting for you.`,
+        href: "#jobs-action-center",
+        action: "Review actions due",
+      }
+    : firstIncompleteStep || {
+        title: "Keep your applications moving",
+        detail: "Your job-search foundation is complete. Review applications and keep every follow-up date current.",
+        href: "/jobs/applications",
+        action: "Review applications",
+      };
+
+  if (loading && !summary && !signedOut) {
+    return (
+      <section className="section jobs-section">
+        <article className="jobs-empty jobs-sign-in-card" aria-live="polite">
+          <span className="eyebrow">Private Jobs workspace</span>
+          <h1>Opening your job-search plan...</h1>
+          <p>MoveReady is checking your profile, saved employers, resume files, applications, and follow-ups.</p>
+        </article>
+      </section>
+    );
+  }
+
+  if (signedOut) {
+    return (
+      <section className="section jobs-section">
+        <article className="jobs-empty jobs-sign-in-card">
+          <span className="eyebrow">Private Jobs workspace</span>
+          <h1>Sign in to continue your job search.</h1>
+          <p>Your profile, target employers, resume files, applications, and follow-ups are protected under your verified email account.</p>
+          <div className="actions">
+            <a className="btn primary" href="/login?next=/jobs">Sign in with email</a>
+            <a className="btn" href="/">Return home</a>
+          </div>
+        </article>
+      </section>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <section className="section jobs-section">
+        <article className="jobs-empty jobs-sign-in-card">
+          <span className="eyebrow">Jobs workspace unavailable</span>
+          <h1>We could not open your job-search plan.</h1>
+          <p>{message} Your saved information has not been changed.</p>
+          <div className="actions">
+            <button className="btn primary" type="button" onClick={load} disabled={loading}>{loading ? "Trying again..." : "Try again"}</button>
+            <a className="btn" href="/dashboard">Open Dashboard</a>
+          </div>
+        </article>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -141,10 +245,8 @@ export default function JobsDashboard() {
           <h1>Turn job research into a clear relocation plan.</h1>
           <p className="lede">Set your job goal, choose employers, record real vacancies, prepare the right resume, track applications, and keep follow-ups visible.</p>
           <div className="actions">
-            {!profile ? <a className="btn primary" href="/jobs/setup">Set up my job search</a> : null}
-            {profile ? <a className="btn" href="/jobs/profile">Edit job profile</a> : null}
-            <a className="btn primary" href="/jobs/companies">Open target companies</a>
-            <a className="btn" href="/jobs/resume-vault">Open Resume Vault</a>
+            <a className="btn primary" href={nextAction.href}>{nextAction.action}</a>
+            <a className="btn" href="/jobs/applications">My applications</a>
             <button className="btn" type="button" onClick={load} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
           </div>
           <p className="form-status" aria-live="polite">{message}</p>
@@ -164,6 +266,37 @@ export default function JobsDashboard() {
             </>
           ) : <><p>Answer four short questions about your experience, target roles, destination, skills, and current work status.</p><a className="text-link" href="/jobs/setup">Start guided setup</a></>}
         </aside>
+      </section>
+
+      <section className="section jobs-section jobs-journey-section" aria-labelledby="jobs-journey-title">
+        <div className="jobs-next-action">
+          <div>
+            <p className="overline">Recommended next step</p>
+            <h2>{nextAction.title}</h2>
+            <p>{nextAction.detail}</p>
+          </div>
+          <a className="btn primary" href={nextAction.href}>{nextAction.action}</a>
+        </div>
+        <div className="jobs-journey-heading">
+          <div>
+            <p className="overline">Your job-search journey</p>
+            <h2 id="jobs-journey-title">One clear step at a time</h2>
+          </div>
+          <div className="jobs-progress-summary">
+            <strong>{completedJourneySteps} of {journeySteps.length} complete</strong>
+            <div className="jobs-progress-track" role="progressbar" aria-label="Job-search setup progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={journeyProgress}>
+              <span style={{ width: `${journeyProgress}%` }} />
+            </div>
+          </div>
+        </div>
+        <ol className="jobs-journey-steps">
+          {journeySteps.map((item, index) => (
+            <li className={item.complete ? "complete" : firstIncompleteStep === item ? "current" : ""} key={item.title}>
+              <span className="jobs-step-number" aria-hidden="true">{item.complete ? "✓" : index + 1}</span>
+              <div><strong>{item.title}</strong><p>{item.detail}</p><a href={item.href}>{item.action}</a></div>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="jobs-metric-grid" aria-label="Job search pipeline totals">
@@ -197,24 +330,32 @@ export default function JobsDashboard() {
         </div>
       </section>
 
-      <section className="section jobs-section jobs-two-column">
-        <form className="jobs-form" onSubmit={addJob}>
+      <section className="section jobs-section jobs-two-column" id="add-job-lead">
+        {profile ? <form className="jobs-form" onSubmit={addJob}>
           <div className="panel-heading"><div><p className="overline">Capture a vacancy</p><h2>Add a real job lead</h2></div><span className="status-dot">Private</span></div>
+          <p className="jobs-form-intro">Start with the four important details. Open the optional section only when you have more information from the vacancy.</p>
           <div className="form-grid two-col">
             <div className="field"><label htmlFor="job_title">Job title</label><input id="job_title" name="job_title" placeholder="Production Supervisor" required /></div>
             <div className="field"><label htmlFor="job_company">Company</label><select id="job_company" name="company_id" defaultValue=""><option value="">Select a target company</option>{companies.map((company) => <option value={company.id} key={company.id}>{company.company_name}</option>)}</select></div>
-            <div className="field"><label htmlFor="job_recruiter">Recruiter</label><select id="job_recruiter" name="recruiter_id" defaultValue=""><option value="">Not linked</option>{recruiters.map((recruiter) => <option value={recruiter.id} key={recruiter.id}>{recruiter.recruiter_name}</option>)}</select></div>
             <div className="field"><label htmlFor="job_country">Country</label><input id="job_country" name="country" defaultValue="Canada" required /></div>
-            <div className="field"><label htmlFor="job_province">Province</label><input id="job_province" name="province" placeholder="Ontario" /></div>
-            <div className="field"><label htmlFor="job_city">City</label><input id="job_city" name="city" placeholder="Brampton" /></div>
             <div className="field"><label htmlFor="job_url">Vacancy URL</label><input id="job_url" name="job_url" type="url" placeholder="https://company.example/jobs/..." /></div>
-            <div className="field"><label htmlFor="job_source">Source</label><input id="job_source" name="source_name" placeholder="Official career page" /></div>
-            <div className="field"><label htmlFor="job_sponsorship">Sponsorship evidence</label><select id="job_sponsorship" name="visa_sponsorship_status" defaultValue="unknown"><option value="unknown">Unknown</option><option value="not_verified">Not verified</option><option value="possible">Possible</option><option value="confirmed">Confirmed on vacancy</option><option value="not_available">Not available</option></select></div>
-            <div className="field"><label htmlFor="job_skills">Skills, comma separated</label><input id="job_skills" name="skills" placeholder="PET preforms, Husky, troubleshooting" /></div>
           </div>
-          <div className="field"><label htmlFor="job_summary">Short vacancy summary</label><textarea id="job_summary" name="description_summary" rows={4} placeholder="Record the requirements that matter for matching and application preparation." /></div>
+          <details className="jobs-form-more">
+            <summary>Add matching details <span>Optional but helpful</span></summary>
+            <div className="jobs-form-more-fields">
+              <div className="form-grid two-col">
+                <div className="field"><label htmlFor="job_recruiter">Recruiter</label><select id="job_recruiter" name="recruiter_id" defaultValue=""><option value="">Not linked</option>{recruiters.map((recruiter) => <option value={recruiter.id} key={recruiter.id}>{recruiter.recruiter_name}</option>)}</select></div>
+                <div className="field"><label htmlFor="job_province">Province, state, or region</label><input id="job_province" name="province" placeholder="Ontario" /></div>
+                <div className="field"><label htmlFor="job_city">City</label><input id="job_city" name="city" placeholder="Brampton" /></div>
+                <div className="field"><label htmlFor="job_source">Where you found it</label><input id="job_source" name="source_name" placeholder="Official career page" /></div>
+                <div className="field"><label htmlFor="job_sponsorship">What the vacancy says about sponsorship</label><select id="job_sponsorship" name="visa_sponsorship_status" defaultValue="unknown"><option value="unknown">It does not say</option><option value="not_verified">Not verified</option><option value="possible">Sponsorship may be possible</option><option value="confirmed">Sponsorship stated on vacancy</option><option value="not_available">Sponsorship not available</option></select></div>
+                <div className="field"><label htmlFor="job_skills">Important skills</label><input id="job_skills" name="skills" placeholder="PET preforms, Husky, troubleshooting" /><small>Separate skills with commas.</small></div>
+              </div>
+              <div className="field"><label htmlFor="job_summary">Short vacancy summary</label><textarea id="job_summary" name="description_summary" rows={4} placeholder="Record the requirements that matter for matching and application preparation." /></div>
+            </div>
+          </details>
           <button className="btn primary" type="submit" disabled={saving}>{saving ? "Saving..." : "Save and score job"}</button>
-        </form>
+        </form> : <article className="jobs-empty jobs-profile-required"><span className="eyebrow">Complete setup first</span><h2>Create your job profile before adding a vacancy.</h2><p>This keeps job scores personal and prevents MoveReady from comparing vacancies with an empty profile.</p><a className="btn primary" href="/jobs/setup">Set up my job search</a></article>}
 
         <aside className="jobs-pipeline-panel" id="jobs-action-center">
           <div className="panel-heading"><div><p className="overline">Application pipeline</p><h2>Status at a glance</h2></div><span className="status-dot">Live</span></div>
