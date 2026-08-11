@@ -1,6 +1,7 @@
 const links = [
   { label: "Dashboard", href: "/jobs" },
-  { label: "Job Profile", href: "/jobs/profile" },
+  { label: "Quick Setup", href: "/jobs/setup" },
+  { label: "Profile", href: "/jobs/profile" },
   { label: "Companies", href: "/jobs/companies" },
   { label: "Recruiters", href: "/jobs/recruiters" },
   { label: "Applications", href: "/jobs/applications" },

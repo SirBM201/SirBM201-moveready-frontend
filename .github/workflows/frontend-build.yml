@@ -49,7 +49,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # NODE_ENV=production is required for the build, but npm would otherwise
+        # omit declared build-time devDependencies such as @tailwindcss/postcss.
+        run: npm ci --include=dev
 
       - name: Build Next.js application
         run: npm run build

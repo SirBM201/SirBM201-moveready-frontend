@@ -58,8 +58,8 @@ export default function JobsDashboard() {
       setCompanies(companyResponse.companies || []);
       setRecruiters(recruiterResponse.recruiters || []);
       setMessage(summaryResponse.profile
-        ? "Your Canadian manufacturing search is ready for execution."
-        : "Create your approved Canadian PET manufacturing search profile to activate target companies and matching.");
+        ? "Your personal job-search workspace is ready."
+        : "Complete four short setup steps to activate job matching with your own experience and goals.");
     } catch (error) {
       setSummary(null);
       setMessage(errorMessage(error, "Unable to load the Jobs workspace."));
@@ -71,24 +71,6 @@ export default function JobsDashboard() {
   useEffect(() => {
     void load();
   }, []);
-
-  async function bootstrap() {
-    setSaving(true);
-    setMessage("Creating your Canadian plastics-manufacturing search profile and Tier-1 targets...");
-    try {
-      const response = await apiJson<{ ok: boolean; target_companies_added: number; message: string }>("jobs/profile/bootstrap", {
-        method: "POST",
-        body: {},
-        timeoutMs: 30000,
-      });
-      setMessage(`${response.message} ${response.target_companies_added} target companies added.`);
-      await load();
-    } catch (error) {
-      setMessage(errorMessage(error, "Unable to create the founder search profile."));
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function addJob(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -155,11 +137,11 @@ export default function JobsDashboard() {
     <>
       <section className="jobs-hero">
         <div>
-          <span className="eyebrow">Founder-first execution</span>
-          <h1>Turn job research into a controlled relocation pipeline.</h1>
-          <p className="lede">Target Canadian plastics manufacturers, record verified vacancies, prepare the right resume, track every application, and keep follow-ups visible.</p>
+          <span className="eyebrow">Your job search, in one place</span>
+          <h1>Turn job research into a clear relocation plan.</h1>
+          <p className="lede">Set your job goal, choose employers, record real vacancies, prepare the right resume, track applications, and keep follow-ups visible.</p>
           <div className="actions">
-            {!profile ? <button className="btn primary" type="button" onClick={bootstrap} disabled={saving || loading}>Set up my Canadian search</button> : null}
+            {!profile ? <a className="btn primary" href="/jobs/setup">Set up my job search</a> : null}
             {profile ? <a className="btn" href="/jobs/profile">Edit job profile</a> : null}
             <a className="btn primary" href="/jobs/companies">Open target companies</a>
             <a className="btn" href="/jobs/resume-vault">Open Resume Vault</a>
@@ -169,7 +151,7 @@ export default function JobsDashboard() {
         </div>
         <aside className="jobs-profile-card">
           <p className="overline">Active job profile</p>
-          <h2>{profile?.headline || "Canadian PET manufacturing profile not activated"}</h2>
+          <h2>{profile?.headline || "Create your personal job-search profile"}</h2>
           {profile ? (
             <>
               <div className="jobs-profile-facts">
@@ -180,7 +162,7 @@ export default function JobsDashboard() {
               <p>{profile.current_employer || "Current employer not recorded"} · Previously {profile.previous_employer || "not recorded"}</p>
               <div className="badge-row">{(profile.target_roles || []).slice(0, 4).map((role) => <span className="badge" key={role}>{role}</span>)}</div>
             </>
-          ) : <p>Use the approved founder profile to load your experience, role families, target countries, and Tier‑1 companies without overstating your qualification.</p>}
+          ) : <><p>Answer four short questions about your experience, target roles, destination, skills, and current work status.</p><a className="text-link" href="/jobs/setup">Start guided setup</a></>}
         </aside>
       </section>
 

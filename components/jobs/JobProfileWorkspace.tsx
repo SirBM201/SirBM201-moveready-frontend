@@ -3,75 +3,14 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
-import { JobProfile, jobLabel } from "@/lib/jobs";
-
-type ProfileDraft = {
-  display_name: string;
-  headline: string;
-  years_experience: string;
-  education_level: string;
-  current_employer: string;
-  previous_employer: string;
-  target_roles: string;
-  skills: string;
-  primary_country: string;
-  later_countries: string;
-  preferred_provinces: string;
-  work_authorization_status: string;
-};
-
-const emptyDraft: ProfileDraft = {
-  display_name: "",
-  headline: "",
-  years_experience: "",
-  education_level: "",
-  current_employer: "",
-  previous_employer: "",
-  target_roles: "",
-  skills: "",
-  primary_country: "Canada",
-  later_countries: "",
-  preferred_provinces: "",
-  work_authorization_status: "requires_sponsorship",
-};
-
-const authorizationStatuses = [
-  "citizen",
-  "permanent_resident",
-  "open_permit",
-  "employer_specific_permit",
-  "requires_sponsorship",
-  "not_recorded",
-];
-
-function listText(value?: string[]) {
-  return (value || []).join("\n");
-}
-
-function textList(value: string) {
-  return value
-    .split(/[\n,]+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function toDraft(profile: JobProfile | null): ProfileDraft {
-  if (!profile) return emptyDraft;
-  return {
-    display_name: profile.display_name || "",
-    headline: profile.headline || "",
-    years_experience: profile.years_experience === undefined ? "" : String(profile.years_experience),
-    education_level: profile.education_level || "",
-    current_employer: profile.current_employer || "",
-    previous_employer: profile.previous_employer || "",
-    target_roles: listText(profile.target_roles),
-    skills: listText(profile.skills),
-    primary_country: profile.primary_country || "Canada",
-    later_countries: listText(profile.later_countries),
-    preferred_provinces: listText(profile.preferred_provinces),
-    work_authorization_status: profile.work_authorization_status || "not_recorded",
-  };
-}
+import {
+  JobProfileDraft as ProfileDraft,
+  emptyJobProfileDraft,
+  jobProfileToDraft as toDraft,
+  parseJobProfileList as textList,
+  workAuthorizationChoices,
+} from "@/lib/jobProfile";
+import { JobProfile } from "@/lib/jobs";
 
 function messageFrom(error: unknown) {
   const apiError = error as ApiError;
@@ -81,7 +20,7 @@ function messageFrom(error: unknown) {
 
 export default function JobProfileWorkspace() {
   const [profile, setProfile] = useState<JobProfile | null>(null);
-  const [draft, setDraft] = useState<ProfileDraft>(emptyDraft);
+  const [draft, setDraft] = useState<ProfileDraft>(() => emptyJobProfileDraft());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("Loading your job-search profile...");
@@ -94,7 +33,7 @@ export default function JobProfileWorkspace() {
       setDraft(toDraft(response.profile));
       setMessage(response.profile
         ? "Your matching profile is ready to review."
-        : "No job-search profile exists yet. Load the approved founder profile to begin.");
+        : "No job-search profile exists yet. Complete the short guided setup to begin.");
     } catch (error) {
       setMessage(messageFrom(error));
     } finally {
@@ -108,24 +47,6 @@ export default function JobProfileWorkspace() {
 
   function update(field: keyof ProfileDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
-  }
-
-  async function bootstrap() {
-    setSaving(true);
-    setMessage("Loading the approved Canadian PET manufacturing profile and Tier-1 targets...");
-    try {
-      const response = await apiJson<{ ok: boolean; message: string; target_companies_added: number }>("jobs/profile/bootstrap", {
-        method: "POST",
-        body: {},
-        timeoutMs: 30000,
-      });
-      setMessage(`${response.message} ${response.target_companies_added} target companies added.`);
-      await load();
-    } catch (error) {
-      setMessage(messageFrom(error));
-    } finally {
-      setSaving(false);
-    }
   }
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -173,9 +94,9 @@ export default function JobProfileWorkspace() {
       {!profile && !loading ? (
         <section className="section jobs-section">
           <article className="jobs-empty">
-            <h2>Activate your approved founder profile</h2>
-            <p>This loads the truthful Canadian manufacturing baseline: nearly 20 years of experience, OND Mechanical Engineering Technology, Genoa Plastic Industries, Sonnex Packaging, approved role families, machine skills, and Tier-1 companies.</p>
-            <button className="btn primary" type="button" onClick={bootstrap} disabled={saving}>{saving ? "Setting up..." : "Set up my Canadian search"}</button>
+            <h2>Create your job-search profile</h2>
+            <p>Use the guided setup to add your own experience, target roles, destination, real skills, and current right-to-work position. Nothing is copied from another user.</p>
+            <a className="btn primary" href="/jobs/setup">Start guided setup</a>
           </article>
         </section>
       ) : null}
@@ -192,7 +113,7 @@ export default function JobProfileWorkspace() {
               <div className="field"><label htmlFor="profile_current_employer">Current employer</label><input id="profile_current_employer" value={draft.current_employer} onChange={(event) => update("current_employer", event.target.value)} /></div>
               <div className="field"><label htmlFor="profile_previous_employer">Previous employer</label><input id="profile_previous_employer" value={draft.previous_employer} onChange={(event) => update("previous_employer", event.target.value)} /></div>
               <div className="field"><label htmlFor="profile_primary_country">Primary country</label><input id="profile_primary_country" value={draft.primary_country} onChange={(event) => update("primary_country", event.target.value)} required /></div>
-              <div className="field"><label htmlFor="profile_authorization">Work authorization</label><select id="profile_authorization" value={draft.work_authorization_status} onChange={(event) => update("work_authorization_status", event.target.value)}>{authorizationStatuses.map((status) => <option value={status} key={status}>{jobLabel(status)}</option>)}</select></div>
+              <div className="field"><label htmlFor="profile_authorization">Work authorization</label><select id="profile_authorization" value={draft.work_authorization_status} onChange={(event) => update("work_authorization_status", event.target.value)}>{workAuthorizationChoices.map((choice) => <option value={choice.value} key={choice.value}>{choice.label}</option>)}</select></div>
             </div>
             <div className="field"><label htmlFor="profile_roles">Target roles, one per line</label><textarea id="profile_roles" rows={6} value={draft.target_roles} onChange={(event) => update("target_roles", event.target.value)} /></div>
             <div className="field"><label htmlFor="profile_skills">Skills and machine knowledge, one per line</label><textarea id="profile_skills" rows={8} value={draft.skills} onChange={(event) => update("skills", event.target.value)} /></div>
