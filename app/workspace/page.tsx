@@ -14,6 +14,12 @@ const workflows = [
     summary: "Save one active profile and connect reports, saved routes, alerts, timeline, Visa Power checks, and support requests.",
   },
   {
+    title: "Jobs execution center",
+    status: "Available after migration 031",
+    href: "/jobs",
+    summary: "Target employers, record vacancies and recruiters, manage resume versions, track applications and follow-ups, and prepare interviews.",
+  },
+  {
     title: "Route readiness",
     status: "Available",
     href: "/route-checker",

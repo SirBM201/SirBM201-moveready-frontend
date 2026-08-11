@@ -470,7 +470,7 @@ export default function ProfileDashboard() {
   const snapshot = profile?.readiness_snapshot || {};
 
   return (
-    <div className="live-workspace">
+    <div className="live-workspace" id="profiles">
       <form className="workflow-panel live-form" onSubmit={saveProfile}>
         <div className="panel-heading">
           <div>

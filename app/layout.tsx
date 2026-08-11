@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: "Project MoveReady",
     template: "%s | Project MoveReady",
   },
-  description: "Source-backed visa, relocation, study, document, evidence, application, funds, scholarship, insurance, travel, and settlement readiness in one controlled workflow.",
+  description: "Source-backed relocation, jobs, visa, study, documents, applications, travel, and settlement execution in one controlled workflow.",
   applicationName: "Project MoveReady",
   category: "travel",
   keywords: [
@@ -23,6 +23,8 @@ export const metadata: Metadata = {
     "travel readiness",
     "immigration documents",
     "application tracking",
+    "international job search",
+    "resume tracking",
     "evidence pack",
     "country comparison",
   ],

@@ -16,6 +16,7 @@ const publicRoutes = [
   "/trip-planner",
   "/journey-planner",
   "/evidence-pack",
+  "/jobs",
   "/source-health",
   "/opportunities",
   "/services",

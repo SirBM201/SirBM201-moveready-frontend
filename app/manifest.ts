@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Project MoveReady",
     short_name: "MoveReady",
-    description: "Source-backed relocation, visa, travel, evidence, application, and settlement readiness.",
+    description: "Source-backed relocation, job search, visa, travel, evidence, application, and settlement execution.",
     start_url: "/onboarding",
     display: "standalone",
     background_color: "#f8fafc",

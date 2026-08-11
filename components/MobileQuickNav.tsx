@@ -1,9 +1,9 @@
 const mobileLinks = [
-  { label: "Home", href: "/", icon: "⌂" },
-  { label: "Actions", href: "/action-center", icon: "✓" },
-  { label: "Applications", href: "/applications", icon: "A" },
-  { label: "Alerts", href: "/application-alerts", icon: "!" },
-  { label: "Account", href: "/dashboard", icon: "●" },
+  { label: "Dashboard", href: "/dashboard", icon: "⌂" },
+  { label: "Countries", href: "/country-comparison", icon: "◎" },
+  { label: "Routes", href: "/compare", icon: "↗" },
+  { label: "Jobs", href: "/jobs", icon: "▣" },
+  { label: "Profile", href: "/dashboard#profiles", icon: "●" },
 ];
 
 export default function MobileQuickNav() {

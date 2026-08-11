@@ -1,18 +1,24 @@
-const publicNavigation = [
+const primaryNavigation = [
+  { label: "Dashboard", href: "/dashboard", title: "Open your MoveReady dashboard" },
+  { label: "Countries", href: "/country-comparison", title: "Compare countries" },
+  { label: "Routes", href: "/compare", title: "Compare relocation routes" },
+  { label: "Jobs", href: "/jobs", title: "Run your private international job search" },
+  { label: "Documents", href: "/evidence-pack", title: "Organize private documents and evidence" },
+  { label: "Profile", href: "/dashboard#profiles", title: "Review your active relocation profile" },
+];
+
+const secondaryNavigation = [
   { label: "Home", href: "/", title: "Home page" },
   { label: "Start", href: "/onboarding", title: "Guided verified-account setup" },
   { label: "My Journey", href: "/my-journey", title: "Review private end-to-end journey progress" },
   { label: "Actions", href: "/action-center", title: "Review ranked private next actions" },
   { label: "Decide", href: "/decision-center", title: "Choose your direction" },
-  { label: "Countries", href: "/country-comparison", title: "Compare countries" },
   { label: "Passport", href: "/passport-index", title: "Check what your passport can do" },
   { label: "Visa Power", href: "/visa-power", title: "Check travel benefits from visas you already hold" },
-  { label: "Routes", href: "/compare", title: "Compare relocation routes" },
   { label: "Check Route", href: "/route-checker", title: "Check your route and generate a report" },
   { label: "Study", href: "/study-planner", title: "Plan admission and study visa preparation" },
   { label: "Trip", href: "/trip-planner", title: "Check trip readiness before comparing bookings" },
   { label: "Planner", href: "/journey-planner", title: "Plan documents, family, appointments, and settlement" },
-  { label: "Evidence", href: "/evidence-pack", title: "Organize private document metadata, evidence packs, and refusal repair" },
   { label: "Applications", href: "/applications", title: "Track a real application from research to decision" },
   { label: "App Alerts", href: "/application-alerts", title: "Review private application deadline and risk alerts" },
   { label: "Source Health", href: "/source-health", title: "Review source freshness and confidence" },
@@ -42,9 +48,17 @@ export default function SiteHeader({ sectionLabel = "Global relocation readiness
         <span>{label}</span>
       </a>
       <nav className="nav" aria-label="Main navigation">
-        {publicNavigation.map((item) => (
+        {primaryNavigation.map((item) => (
           <a href={item.href} key={item.href} title={item.title}>{item.label}</a>
         ))}
+        <details className="nav-more">
+          <summary>More</summary>
+          <div className="nav-more-menu">
+            {secondaryNavigation.map((item) => (
+              <a href={item.href} key={item.href} title={item.title}>{item.label}</a>
+            ))}
+          </div>
+        </details>
       </nav>
     </header>
   );

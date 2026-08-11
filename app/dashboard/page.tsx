@@ -36,6 +36,11 @@ const accountAreas = [
     href: "/visa-power",
   },
   {
+    title: "Run your international job search",
+    detail: "Target companies, record recruiters and vacancies, store resume versions, track applications, schedule follow-ups, and prepare truthful interview evidence.",
+    href: "/jobs",
+  },
+  {
     title: "Organize your evidence",
     detail: "Keep private document metadata, build route-specific evidence packs, track expiry, and prepare refusal-repair tasks without uploading raw documents.",
     href: "/evidence-pack",
@@ -120,6 +125,11 @@ const featureStatus = [
     detail: "Save onboarding progress, review truthful journey stages and ranked next actions, manage accessibility and notification choices, review sessions, export account data, and submit privacy requests.",
   },
   {
+    status: "Available after migration 031",
+    title: "Private Jobs execution center",
+    detail: "Use a reusable employer directory with private company targeting, recruiter contacts, recorded vacancies, transparent job matching, application tracking, resume files, and interview preparation.",
+  },
+  {
     status: "Available now",
     title: "Passport Index, Visa Power, and planners",
     detail: "Use passport access, held-visa checks, route readiness, study, journey, trip, legalization, family, appointment, and settlement tools with safety gates.",
@@ -156,6 +166,7 @@ export default function DashboardPage() {
             <a className="btn" href="/onboarding">Guided setup</a>
             <a className="btn" href="#account-summary">Account summary</a>
             <a className="btn" href="/applications">Applications</a>
+            <a className="btn" href="/jobs">Jobs</a>
             <a className="btn" href="/application-alerts">App alerts</a>
             <a className="btn" href="/activity">Activity</a>
             <a className="btn" href="/settings">Settings</a>
