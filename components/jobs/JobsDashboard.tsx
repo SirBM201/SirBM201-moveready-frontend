@@ -160,6 +160,7 @@ export default function JobsDashboard() {
           <p className="lede">Target Canadian plastics manufacturers, record verified vacancies, prepare the right resume, track every application, and keep follow-ups visible.</p>
           <div className="actions">
             {!profile ? <button className="btn primary" type="button" onClick={bootstrap} disabled={saving || loading}>Set up my Canadian search</button> : null}
+            {profile ? <a className="btn" href="/jobs/profile">Edit job profile</a> : null}
             <a className="btn primary" href="/jobs/companies">Open target companies</a>
             <a className="btn" href="/jobs/resume-vault">Open Resume Vault</a>
             <button className="btn" type="button" onClick={load} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
