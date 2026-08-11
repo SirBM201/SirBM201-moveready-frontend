@@ -1554,6 +1554,53 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.jobs-vault-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: 20px;
+  align-items: center;
+  padding-top: 18px;
+  padding-bottom: 26px;
+  border-top: 0;
+}
+
+.jobs-vault-progress {
+  text-align: left;
+}
+
+.jobs-vault-category.has-active-document {
+  border-color: #9bcac4;
+}
+
+.jobs-vault-category .jobs-document-summary {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.jobs-vault-category .jobs-document-summary span,
+.jobs-vault-empty-copy {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.jobs-vault-empty-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 11px;
+  background: #fbfdff;
+}
+
+.jobs-vault-empty-copy strong {
+  color: var(--ink);
+  line-height: 1.45;
+}
+
 .jobs-vault-list {
   display: grid;
   gap: 10px;
@@ -1582,6 +1629,17 @@ h1 {
 
 .jobs-vault-list small {
   color: var(--muted);
+}
+
+.jobs-vault-new-version {
+  margin-top: 16px;
+}
+
+.jobs-form .field > small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .jobs-question-list {
@@ -1914,7 +1972,8 @@ h1 {
 
   .jobs-hero,
   .jobs-page-heading,
-  .jobs-two-column {
+  .jobs-two-column,
+  .jobs-vault-summary {
     grid-template-columns: 1fr;
   }
 
@@ -1989,7 +2048,8 @@ h1 {
   }
 
   .jobs-safety-strip,
-  .jobs-vault-list > div {
+  .jobs-vault-list > div,
+  .jobs-vault-empty-copy {
     align-items: flex-start;
     flex-direction: column;
   }
