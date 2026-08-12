@@ -9,6 +9,7 @@ export type JobProfileDraft = {
   previous_employer: string;
   target_roles: string;
   skills: string;
+  career_facts: string;
   primary_country: string;
   later_countries: string;
   preferred_provinces: string;
@@ -34,6 +35,7 @@ export function emptyJobProfileDraft(): JobProfileDraft {
     previous_employer: "",
     target_roles: "",
     skills: "",
+    career_facts: "",
     primary_country: "",
     later_countries: "",
     preferred_provinces: "",
@@ -70,6 +72,7 @@ export function founderJobProfileDraft(): JobProfileDraft {
       "Operator training",
       "Startup and restart optimization",
     ].join("\n"),
+    career_facts: "",
     primary_country: "Canada",
     later_countries: ["Portugal", "Finland", "Germany", "Australia", "New Zealand"].join("\n"),
     preferred_provinces: ["Ontario", "Manitoba"].join("\n"),
@@ -99,6 +102,7 @@ export function jobProfileToDraft(profile: JobProfile | null): JobProfileDraft {
     previous_employer: profile.previous_employer || "",
     target_roles: jobProfileListText(profile.target_roles),
     skills: jobProfileListText(profile.skills),
+    career_facts: jobProfileListText(profile.career_facts),
     primary_country: profile.primary_country || "",
     later_countries: jobProfileListText(profile.later_countries),
     preferred_provinces: jobProfileListText(profile.preferred_provinces),

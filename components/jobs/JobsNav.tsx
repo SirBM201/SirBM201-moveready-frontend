@@ -3,6 +3,7 @@ const links = [
   { label: "Companies", href: "/jobs/companies" },
   { label: "Applications", href: "/jobs/applications" },
   { label: "Resume", href: "/jobs/resume-vault" },
+  { label: "Automation", href: "/jobs/automation" },
 ];
 
 const supportingLinks = [
