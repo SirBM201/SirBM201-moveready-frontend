@@ -65,6 +65,7 @@ export default function JobProfileWorkspace() {
           previous_employer: draft.previous_employer,
           target_roles: textList(draft.target_roles),
           skills: textList(draft.skills),
+          career_facts: textList(draft.career_facts),
           primary_country: draft.primary_country,
           later_countries: textList(draft.later_countries),
           preferred_provinces: textList(draft.preferred_provinces),
@@ -117,6 +118,7 @@ export default function JobProfileWorkspace() {
             </div>
             <div className="field"><label htmlFor="profile_roles">Target roles, one per line</label><textarea id="profile_roles" rows={6} value={draft.target_roles} onChange={(event) => update("target_roles", event.target.value)} /></div>
             <div className="field"><label htmlFor="profile_skills">Skills and machine knowledge, one per line</label><textarea id="profile_skills" rows={8} value={draft.skills} onChange={(event) => update("skills", event.target.value)} /></div>
+            <div className="field"><label htmlFor="profile_career_facts">Verified career achievements, one per line</label><textarea id="profile_career_facts" rows={8} value={draft.career_facts} onChange={(event) => update("career_facts", event.target.value)} placeholder="Reduced a documented process delay by 15%." /><small>Use only facts you can defend in an interview. MoveReady may reorder or rewrite these facts for a vacancy, but it will not invent achievements.</small></div>
             <div className="form-grid two-col">
               <div className="field"><label htmlFor="profile_provinces">Preferred provinces, one per line</label><textarea id="profile_provinces" rows={5} value={draft.preferred_provinces} onChange={(event) => update("preferred_provinces", event.target.value)} /></div>
               <div className="field"><label htmlFor="profile_later_countries">Later countries, one per line</label><textarea id="profile_later_countries" rows={5} value={draft.later_countries} onChange={(event) => update("later_countries", event.target.value)} /></div>
@@ -131,6 +133,7 @@ export default function JobProfileWorkspace() {
               <li>Role, skill, country, province, experience, and sponsorship match reasons.</li>
               <li>Transparent starter scores for vacancies you record.</li>
               <li>The professional facts used by future resume and interview tools.</li>
+              <li>Verified achievements used in tailored resume and cover-letter drafts.</li>
               <li>No automatic claim that an employer sponsors visas or has a current LMIA.</li>
               <li>No degree title unless you genuinely hold that qualification.</li>
             </ul>

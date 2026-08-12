@@ -246,6 +246,7 @@ export default function JobsDashboard() {
           <p className="lede">Set your job goal, choose employers, record real vacancies, prepare the right resume, track applications, and keep follow-ups visible.</p>
           <div className="actions">
             <a className="btn primary" href={nextAction.href}>{nextAction.action}</a>
+            <a className="btn" href="/jobs/automation">Automatic vacancy search</a>
             <a className="btn" href="/jobs/applications">My applications</a>
             <button className="btn" type="button" onClick={load} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
           </div>

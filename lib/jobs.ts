@@ -8,6 +8,7 @@ export type JobProfile = {
   previous_employer?: string;
   target_roles?: string[];
   skills?: string[];
+  career_facts?: string[];
   primary_country?: string;
   later_countries?: string[];
   preferred_provinces?: string[];
@@ -87,9 +88,90 @@ export type JobLead = {
   expires_at?: string;
   status: string;
   source_status?: string;
+  source_fingerprint?: string;
+  source_content_hash?: string;
+  first_seen_at?: string;
+  last_seen_at?: string;
+  last_checked_at?: string;
   match_score?: number;
   match_reasons?: string[];
   updated_at?: string;
+};
+
+export type JobWatch = {
+  id: string;
+  company_id: string;
+  company_name?: string;
+  watch_name: string;
+  source_url: string;
+  source_type: string;
+  keywords?: string[];
+  country: string;
+  province?: string;
+  cadence: string;
+  min_match_score: number;
+  email_alerts: boolean;
+  is_active: boolean;
+  last_scan_at?: string;
+  next_scan_at?: string;
+  last_scan_status: string;
+  last_error?: string;
+  last_result_count?: number;
+};
+
+export type JobAutomationAlert = {
+  id: string;
+  watch_id?: string;
+  job_id?: string;
+  alert_type: string;
+  severity: string;
+  title: string;
+  summary: string;
+  source_url?: string;
+  status: string;
+  delivery_status?: string;
+  created_at?: string;
+};
+
+export type JobDocumentDraft = {
+  id: string;
+  job_id: string;
+  application_id?: string;
+  source_resume_asset_id?: string;
+  draft_type: "tailored_resume" | "cover_letter";
+  title: string;
+  content: string;
+  status: string;
+  generation_method: string;
+  truth_basis?: Record<string, any>;
+  warnings?: string[];
+  user_confirmations?: Record<string, boolean>;
+  approved_at?: string;
+  exported_at?: string;
+  updated_at?: string;
+};
+
+export type ApplicationReadinessCheck = {
+  code: string;
+  label: string;
+  passed: boolean;
+};
+
+export type JobApplicationAssistance = {
+  id: string;
+  application_id: string;
+  job_id: string;
+  status: string;
+  readiness?: {
+    ready: boolean;
+    checks: ApplicationReadinessCheck[];
+    official_url?: string;
+    safety_note?: string;
+  };
+  last_handoff_at?: string;
+  submission_confirmed_at?: string;
+  submission_reference_hint?: string;
+  notes?: string;
 };
 
 export type JobApplication = {
