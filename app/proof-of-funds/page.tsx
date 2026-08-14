@@ -1,23 +1,14 @@
-const fundChecks = [
-  "Official minimum amount for the selected route",
-  "How long funds must be held before application",
-  "Accepted bank statement format",
-  "Sponsor rules and relationship evidence",
-  "Scholarship or funding-letter acceptance",
-  "Family-member amount adjustment",
+import SiteHeader from "../../components/SiteHeader";
+
+const checks=[
+ ["Official amount","Verify the exact minimum for the selected route, applicant count and current application date. MoveReady must not infer an immigration threshold from general relocation costs."],
+ ["Holding period","Confirm whether the authority requires funds to have been held for a defined period and whether large recent deposits need explanation."],
+ ["Statement evidence","Check required statement period, account ownership, bank identification, transaction history, balance format and certification rules."],
+ ["Source of funds","Prepare a coherent evidence trail for salary, savings, business income, asset sale, gift or other lawful funding source."],
+ ["Sponsor or family support","Confirm whether sponsorship is permitted and what relationship, undertaking, identity and sponsor-finance evidence is required."],
+ ["Scholarship or institutional funding","Confirm whether an award letter can replace or reduce personal funds and whether tuition and living-cost coverage are treated separately."],
+ ["Family adjustment","Recalculate requirements for spouse, children or other dependants instead of assuming the principal-applicant figure applies to everyone."],
+ ["Currency and access","Use the authority's accepted currency/conversion basis and confirm the money is genuinely available to the applicant when required."],
 ];
 
-export default function ProofOfFundsPage() {
-  return (
-    <main className="page-shell">
-      <header className="topbar"><a className="brand" href="/"><strong>Project MoveReady</strong><span>Proof of funds</span></a><nav className="nav"><a href="/budget-calculator">Budget</a><a href="/document-checklist">Documents</a><a href="/report-preview">Report</a></nav></header>
-      <section className="section">
-        <h2>Proof-of-funds readiness</h2>
-        <p className="section-intro">This module should help users know whether their available funds, bank history, sponsor evidence, or scholarship support may be enough for a selected route.</p>
-        <div className="grid">
-          {fundChecks.map((item) => <article className="card" key={item}><h3>{item}</h3><p>Needs country and route-specific source review before production guidance.</p></article>)}
-        </div>
-      </section>
-    </main>
-  );
-}
+export default function ProofOfFundsPage(){return <main className="page-shell"><SiteHeader sectionLabel="Proof-of-funds readiness"/><section className="hero-band compact-hero"><div className="hero-copy"><span className="eyebrow">QUALIFY · EVIDENCE</span><h1>Prove the money, not just the balance.</h1><p className="lede">A strong financial file connects the required amount to account history, lawful source, accessibility and the exact route rule. Estimated relocation spending is not automatically the same as an official proof-of-funds threshold.</p><div className="hero-actions"><a className="btn primary" href="/budget-calculator">Run financial readiness</a><a className="btn secondary" href="/evidence-pack">Organize evidence</a></div></div></section><section className="section no-top-pad"><h2>Evidence checks before relying on your funds</h2><div className="grid">{checks.map(([title,detail])=><article className="card" key={title}><h3>{title}</h3><p>{detail}</p></article>)}</div></section><section className="section"><article className="card"><h2>Decision rule</h2><p>Do not label a user financially eligible merely because available funds exceed MoveReady&apos;s estimated relocation-cost range. Eligibility requires a current, route-specific official requirement and acceptable evidence. Where that rule is not verified, the product should show the requirement as unresolved.</p><div className="hero-actions"><a className="btn primary" href="/source-health">Check source health</a><a className="btn secondary" href="/route-checker">Check route</a></div></article></section></main>}
