@@ -67,15 +67,22 @@ export default function JobProfileWorkspace() {
           later_countries: textList(draft.later_countries),
           preferred_provinces: textList(draft.preferred_provinces),
           work_authorization_status: draft.work_authorization_status,
-          search_scope: draft.search_scope,
-          current_country: draft.current_country,
-          work_authorized_countries: textList(draft.work_authorized_countries),
           is_active: true,
         },
         timeoutMs: 20000,
       });
-      setProfile(response.profile);
-      setDraft(toDraft(response.profile));
+      const scopeResponse = await apiJson<{ ok: boolean; profile: JobProfile }>("jobs/profile/search-scope", {
+        method: "PATCH",
+        body: {
+          search_scope: draft.search_scope,
+          current_country: draft.current_country,
+          work_authorized_countries: textList(draft.work_authorized_countries),
+        },
+        timeoutMs: 20000,
+      });
+      const savedProfile = scopeResponse.profile || response.profile;
+      setProfile(savedProfile);
+      setDraft(toDraft(savedProfile));
       setMessage("Job-search profile saved. Local and international leads will now use the correct authorization rules.");
     } catch (error) {
       setMessage(messageFrom(error));
