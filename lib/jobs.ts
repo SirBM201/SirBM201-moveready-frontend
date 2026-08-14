@@ -1,47 +1,31 @@
 export type JobProfile = {
-  id: string;
-  display_name?: string;
-  headline: string;
-  years_experience?: number;
-  education_level?: string;
-  current_employer?: string;
-  previous_employer?: string;
-  target_roles?: string[];
-  skills?: string[];
-  career_facts?: string[];
-  primary_country?: string;
-  later_countries?: string[];
-  preferred_provinces?: string[];
-  work_authorization_status?: string;
-  search_scope?: "local" | "international" | "both";
-  current_country?: string;
-  work_authorized_countries?: string[];
-  updated_at?: string;
+  id: string; display_name?: string; headline: string; years_experience?: number; education_level?: string; current_employer?: string; previous_employer?: string; target_roles?: string[]; skills?: string[]; career_facts?: string[]; primary_country?: string; later_countries?: string[]; preferred_provinces?: string[]; work_authorization_status?: string; search_scope?: "local" | "international" | "both"; current_country?: string; work_authorized_countries?: string[]; updated_at?: string;
 };
-
 export type CompanyTracking = { id?: string; priority: string; status: string; notes?: string; updated_at?: string };
 export type JobCompany = { id: string; company_name: string; industry: string; country: string; province?: string; website?: string; career_page?: string; visa_sponsorship_status?: string; lmia_history_status?: string; salary_min?: number; salary_max?: number; salary_currency?: string; source_status?: string; last_verified_at?: string; record_status?: string; tracking?: CompanyTracking | null; recruiter?: Pick<JobRecruiter, "id" | "recruiter_name" | "connection_status" | "specialization"> | null; recruiter_count?: number };
 export type JobRecruiter = { id: string; company_id?: string; recruiter_name: string; recruitment_company?: string; province?: string; specialization?: string; linkedin_url?: string; website?: string; email_address?: string; phone?: string; connected?: boolean; connection_status?: string; last_contacted_at?: string; follow_up_date?: string; notes?: string; updated_at?: string };
-
 export type JobLead = {
-  id: string; company_id?: string; recruiter_id?: string; company_name?: string; recruiter_name?: string;
-  job_title: string; country: string; province?: string; city?: string; employment_type?: string; workplace_type?: string;
-  job_url?: string; source_name?: string; description_summary?: string; skills?: string[];
-  salary_min?: number; salary_max?: number; salary_currency?: string;
-  visa_sponsorship_status?: string;
-  work_authorization_requirement?: "unknown" | "existing_required" | "employer_support_possible" | "employer_support_confirmed";
-  relocation_support_status?: "unknown" | "not_available" | "possible" | "confirmed";
-  sponsorship_evidence?: string;
-  posted_at?: string; expires_at?: string; status: string; source_status?: string; source_fingerprint?: string; source_content_hash?: string;
-  first_seen_at?: string; last_seen_at?: string; last_checked_at?: string;
-  match_score?: number; match_reasons?: string[];
-  application_viability_score?: number; application_priority_score?: number; application_priority?: string; viability_reasons?: string[];
-  search_scope_classification?: "local" | "international";
-  updated_at?: string;
+  id: string; company_id?: string; recruiter_id?: string; company_name?: string; recruiter_name?: string; job_title: string; country: string; province?: string; city?: string; employment_type?: string; workplace_type?: string; job_url?: string; source_name?: string; description_summary?: string; skills?: string[]; salary_min?: number; salary_max?: number; salary_currency?: string; visa_sponsorship_status?: string;
+  work_authorization_requirement?: "unknown" | "existing_required" | "employer_support_possible" | "employer_support_confirmed"; relocation_support_status?: "unknown" | "not_available" | "possible" | "confirmed"; sponsorship_evidence?: string;
+  posted_at?: string; expires_at?: string; status: string; source_status?: string; source_fingerprint?: string; source_content_hash?: string; first_seen_at?: string; last_seen_at?: string; last_checked_at?: string; match_score?: number; match_reasons?: string[]; application_viability_score?: number; application_priority_score?: number; application_priority?: string; viability_reasons?: string[]; search_scope_classification?: "local" | "international"; updated_at?: string;
 };
-
 export type JobWatch = { id: string; company_id: string; company_name?: string; watch_name: string; source_url: string; source_type: string; keywords?: string[]; country: string; province?: string; cadence: string; min_match_score: number; email_alerts: boolean; is_active: boolean; last_scan_at?: string; next_scan_at?: string; last_scan_status: string; last_error?: string; last_result_count?: number };
 export type JobAutomationAlert = { id: string; watch_id?: string; job_id?: string; alert_type: string; severity: string; title: string; summary: string; source_url?: string; status: string; delivery_status?: string; created_at?: string };
 export type JobDocumentDraft = { id: string; job_id: string; application_id?: string; source_resume_asset_id?: string; draft_type: "tailored_resume" | "cover_letter"; title: string; content: string; status: string; generation_method: string; truth_basis?: Record<string, any>; warnings?: string[]; user_confirmations?: Record<string, boolean>; approved_at?: string; exported_at?: string; updated_at?: string };
 export type ApplicationReadinessCheck = { code: string; label: string; passed: boolean };
-export type JobApplicationAssistance = { application?: Record<string, any>; job?: JobLead; drafts?: JobDocumentDraft[]; readiness?: ApplicationReadinessCheck[]; ready_to_handoff?: boolean; handoff_url?: string; warnings?: string[] };
+export type JobApplicationAssistance = { id: string; application_id: string; job_id: string; status: string; readiness?: { ready: boolean; checks: ApplicationReadinessCheck[]; official_url?: string; safety_note?: string }; last_handoff_at?: string; submission_confirmed_at?: string; submission_reference_hint?: string; notes?: string };
+export type JobApplication = { id: string; job_id?: string; company_id?: string; recruiter_id?: string; job_title: string; company_name: string; country: string; province?: string; job_url?: string; status: string; date_applied?: string; follow_up_date?: string; interview_date?: string; documents_used?: string[]; notes?: string; created_at?: string; updated_at?: string };
+export type JobAction = { kind: "job_application_follow_up" | "job_recruiter_follow_up" | string; id?: string; title: string; summary: string; priority: "medium" | "high" | "critical" | string; status?: string; due_at?: string; days_until_due?: number; score?: number; href: string };
+export type ResumeDocument = { id: string; document_type: string; title: string; original_file_name: string; mime_type: string; size_bytes: number; version: number; is_active: boolean; notes?: string; created_at?: string; updated_at?: string };
+export type JobsSummary = { profile: JobProfile | null; counts: { recommended_jobs: number; target_companies: number; recruiters: number; applications: number; resume_documents: number; follow_ups_due: number }; applications_by_status: Record<string, number>; recommended_jobs: JobLead[]; action_counts?: { overdue: number; due_today: number; upcoming: number; total: number }; action_items?: JobAction[]; follow_ups: JobApplication[]; privacy_note?: string };
+
+export const applicationStatuses = ["saved", "applied", "interview", "rejected", "offer", "visa"];
+export const companyPriorities = ["high", "medium", "low", "watch"];
+export const companyStatuses = ["researching", "targeting", "contacted", "applied", "interview", "offer", "paused", "archived"];
+export const connectionStatuses = ["not_contacted", "connection_requested", "connected", "contacted", "responded", "follow_up", "inactive"];
+export const documentTypes = ["executive_resume", "ats_resume", "cover_letter", "manufacturing_portfolio"];
+export function jobLabel(value?: string | null, fallback = "Not recorded") { const cleaned = String(value || "").trim(); if (!cleaned) return fallback; return cleaned.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+export function formatJobDate(value?: string | null, includeTime = false) { if (!value) return "Not set"; try { return new Intl.DateTimeFormat(undefined, includeTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(new Date(value)); } catch { return value; } }
+export function formatFileSize(bytes?: number) { if (!bytes) return "0 KB"; if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`; return `${(bytes / (1024 * 1024)).toFixed(1)} MB`; }
+export function formValue(form: FormData, name: string) { return String(form.get(name) || "").trim(); }
+export function optionalFormValue(form: FormData, name: string) { return formValue(form, name) || undefined; }
