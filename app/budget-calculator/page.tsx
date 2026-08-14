@@ -1,38 +1,43 @@
+import SiteHeader from "@/components/SiteHeader";
+
 const budgetItems = [
-  ["Application and visa fees", "100 - 600"],
-  ["Document preparation", "50 - 400"],
-  ["Insurance", "80 - 600"],
-  ["Flight and first arrival", "500 - 1,500"],
-  ["Initial accommodation", "800 - 2,500"],
-  ["Settlement buffer", "500 - 2,000"],
+  ["Official proof-of-funds", "Use the current requirement for the selected pathway and family size. Never substitute a generic estimate for an official threshold."],
+  ["Application & government fees", "Track fees separately from proof-of-funds because fees are money you spend, not settlement funds you merely demonstrate."],
+  ["Documents & compliance", "Budget for translations, certification, legalization, medicals, police records or other route-specific preparation where required."],
+  ["Travel & arrival", "Estimate flights, airport transport, temporary accommodation and first-arrival essentials."],
+  ["Settlement reserve", "Keep a practical buffer beyond mandatory funds so an approval does not leave the move financially fragile."],
+];
+
+const readiness = [
+  ["Available funds", "What you can legitimately evidence today."],
+  ["Known official requirement", "Route-specific proof-of-funds or settlement requirement, with source and rule date."],
+  ["Execution budget", "Expected relocation and application costs."],
+  ["Funding gap", "Target funds minus available funds. Unknown official requirements remain Needs assessment."],
 ];
 
 export default function BudgetCalculatorPage() {
   return (
     <main className="page-shell">
-      <header className="topbar"><a className="brand" href="/"><strong>Project MoveReady</strong><span>Budget calculator</span></a><nav className="nav"><a href="/route-checker">Route Checker</a><a href="/proof-of-funds">Proof of Funds</a><a href="/report-preview">Report</a></nav></header>
-      <section className="hero-band">
-        <div className="hero-copy">
-          <span className="eyebrow">Starter estimate</span>
-          <h1>Estimate the money pressure before applying.</h1>
-          <p className="lede">The first calculator separates application costs from proof-of-funds expectations. This avoids the common mistake of treating visa fee as the only relocation cost.</p>
+      <SiteHeader sectionLabel="Financial readiness" />
+      <section className="section no-top-pad" style={{ paddingTop: 22 }}>
+        <div className="result-block featured" style={{ boxShadow: "none" }}>
+          <p className="overline">MOVE · Financial Readiness</p>
+          <h1 style={{ fontSize: "clamp(30px, 3.5vw, 44px)", lineHeight: 1.08, margin: "4px 0 10px" }}>Know the full money target before you commit.</h1>
+          <p className="section-intro">MoveReady separates official proof-of-funds from the money you will actually spend to apply, relocate and settle. A route is not financially ready merely because the application fee is affordable.</p>
+          <div className="actions" style={{ marginTop: 14 }}><a className="btn primary" href="/proof-of-funds">Check proof of funds</a><a className="btn" href="/route-checker">Opportunity Finder</a><a className="btn" href="/my-journey">My Journey</a></div>
         </div>
-        <aside className="workflow-panel">
-          <h2>Budget inputs</h2>
-          <div className="form-grid">
-            <div className="field"><label>Currency</label><select defaultValue="EUR"><option>EUR</option><option>USD</option><option>GBP</option><option>NGN</option><option>KWD</option></select></div>
-            <div className="field"><label>Family members</label><input placeholder="0" /></div>
-            <div className="field"><label>Route category</label><select defaultValue="startup"><option>startup</option><option>study</option><option>work</option><option>visit</option></select></div>
-            <a className="btn primary" href="/report-preview">Add to report</a>
-          </div>
-        </aside>
+      </section>
+      <section className="section no-top-pad">
+        <div className="section-heading-row"><div><p className="overline">Readiness model</p><h2>One financial picture, four distinct inputs</h2></div><span className="status-dot">No invented thresholds</span></div>
+        <div className="grid">{readiness.map(([name, detail]) => <article className="card" key={name}><h3>{name}</h3><p>{detail}</p></article>)}</div>
       </section>
       <section className="section">
-        <h2>Starter budget buckets</h2>
-        <div className="grid">
-          {budgetItems.map(([name, range]) => <article className="card" key={name}><h3>{name}</h3><p>Starter range: {range}. Replace with route-specific official/market data after review.</p></article>)}
+        <div className="live-workspace">
+          <article className="workflow-panel"><p className="overline">Planning inputs</p><h2>Build your relocation budget</h2><div className="form-grid"><div className="field"><label>Planning currency</label><select defaultValue="EUR"><option>EUR</option><option>USD</option><option>CAD</option><option>GBP</option><option>NGN</option><option>KWD</option></select></div><div className="field"><label>Family members relocating</label><input inputMode="numeric" placeholder="1" /></div><div className="field"><label>Pathway category</label><select defaultValue="work"><option>work</option><option>skilled PR</option><option>study</option><option>startup / business</option><option>family</option><option>job seeker</option><option>digital nomad</option></select></div><div className="actions"><a className="btn primary" href="/proof-of-funds">Continue to funds check</a></div></div></article>
+          <article className="result-panel"><div className="result-block featured"><p className="overline">Important</p><h2>Unknown is not zero.</h2><p>If MoveReady does not yet have a verified official funds requirement for the selected pathway, the result should say <strong>Needs assessment</strong>. It must not report 100% financial readiness from missing data.</p><p className="muted">Material funds rules should carry official-source provenance and a checked/updated date before the user relies on them.</p></div></article>
         </div>
       </section>
+      <section className="section"><div className="section-heading-row"><div><p className="overline">Budget structure</p><h2>What the target should include</h2></div></div><div className="grid">{budgetItems.map(([name, detail]) => <article className="card" key={name}><h3>{name}</h3><p>{detail}</p></article>)}</div></section>
     </main>
   );
 }
