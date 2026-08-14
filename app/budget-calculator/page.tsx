@@ -1,38 +1,13 @@
-const budgetItems = [
-  ["Application and visa fees", "100 - 600"],
-  ["Document preparation", "50 - 400"],
-  ["Insurance", "80 - 600"],
-  ["Flight and first arrival", "500 - 1,500"],
-  ["Initial accommodation", "800 - 2,500"],
-  ["Settlement buffer", "500 - 2,000"],
-];
+"use client";
 
-export default function BudgetCalculatorPage() {
-  return (
-    <main className="page-shell">
-      <header className="topbar"><a className="brand" href="/"><strong>Project MoveReady</strong><span>Budget calculator</span></a><nav className="nav"><a href="/route-checker">Route Checker</a><a href="/proof-of-funds">Proof of Funds</a><a href="/report-preview">Report</a></nav></header>
-      <section className="hero-band">
-        <div className="hero-copy">
-          <span className="eyebrow">Starter estimate</span>
-          <h1>Estimate the money pressure before applying.</h1>
-          <p className="lede">The first calculator separates application costs from proof-of-funds expectations. This avoids the common mistake of treating visa fee as the only relocation cost.</p>
-        </div>
-        <aside className="workflow-panel">
-          <h2>Budget inputs</h2>
-          <div className="form-grid">
-            <div className="field"><label>Currency</label><select defaultValue="EUR"><option>EUR</option><option>USD</option><option>GBP</option><option>NGN</option><option>KWD</option></select></div>
-            <div className="field"><label>Family members</label><input placeholder="0" /></div>
-            <div className="field"><label>Route category</label><select defaultValue="startup"><option>startup</option><option>study</option><option>work</option><option>visit</option></select></div>
-            <a className="btn primary" href="/report-preview">Add to report</a>
-          </div>
-        </aside>
-      </section>
-      <section className="section">
-        <h2>Starter budget buckets</h2>
-        <div className="grid">
-          {budgetItems.map(([name, range]) => <article className="card" key={name}><h3>{name}</h3><p>Starter range: {range}. Replace with route-specific official/market data after review.</p></article>)}
-        </div>
-      </section>
-    </main>
-  );
-}
+import { FormEvent, useState } from "react";
+import SiteHeader from "../../components/SiteHeader";
+
+const API_BASE=(process.env.NEXT_PUBLIC_API_BASE_URL||"").replace(/\/$/,"");
+
+type Result={ok:boolean;error?:string;route?:{route_name?:string;country_name?:string;freshness_status?:string;source_confidence?:string};estimated_costs?:{minimum:number;maximum:number;currency:string;items:Array<{name:string;minimum:number;maximum:number;notes?:string}>};assessment?:{status:string;gap_to_estimated_minimum:number|null;reserve_after_estimated_maximum:number|null;currency_mismatch:boolean};proof_of_funds?:{status:string;checks:string[]};safety_note?:string};
+
+export default function BudgetCalculatorPage(){
+ const [result,setResult]=useState<Result|null>(null);const [loading,setLoading]=useState(false);
+ async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setLoading(true);setResult(null);const f=new FormData(e.currentTarget);try{const response=await fetch(`${API_BASE}/api/v1/financial-readiness/check`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({country_code:f.get("country_code"),route_code:f.get("route_code"),available_funds:Number(f.get("available_funds")||0),currency:f.get("currency"),family_members:Number(f.get("family_members")||0)})});setResult(await response.json())}catch{setResult({ok:false,error:"Financial readiness service is temporarily unavailable."})}finally{setLoading(false)}}
+ return <main className="page-shell"><SiteHeader sectionLabel="Financial readiness"/><section className="hero-band"><div className="hero-copy"><span className="eyebrow">QUALIFY · MONEY</span><h1>Know the cost pressure before you commit.</h1><p className="lede">Compare your available funds with MoveReady&apos;s route-specific cost range while keeping proof-of-funds requirements separate. No exchange rate or visa approval is guessed.</p></div><aside className="workflow-panel"><h2>Run a financial check</h2><form className="form-grid" onSubmit={submit}><div className="field"><label>Country</label><select name="country_code" defaultValue="FI"><option value="FI">Finland</option><option value="PT">Portugal</option><option value="EE">Estonia</option></select></div><div className="field"><label>Route</label><select name="route_code" defaultValue="d-visa"><option value="d-visa">Finland D visa / fast-track</option><option value="entrepreneur-independent-work">Portugal entrepreneur / independent work</option><option value="startup-founder">Estonia startup founder</option></select></div><div className="field"><label>Available funds</label><input name="available_funds" type="number" min="0" step="0.01" required/></div><div className="field"><label>Currency</label><select name="currency" defaultValue="EUR"><option>EUR</option><option>USD</option><option>GBP</option><option>NGN</option><option>KWD</option></select></div><div className="field"><label>Additional family members</label><input name="family_members" type="number" min="0" defaultValue="0"/></div><button className="btn primary" disabled={loading}>{loading?"Checking…":"Check readiness"}</button></form></aside></section>{result&&<section className="section"><h2>{result.ok?"Financial readiness result":"Unable to calculate"}</h2>{!result.ok?<article className="card"><p>{result.error}</p></article>:<><div className="grid"><article className="card"><h3>{result.route?.route_name}</h3><p>{result.route?.country_name} · source confidence: {result.route?.source_confidence||"not recorded"} · freshness: {result.route?.freshness_status||"not recorded"}</p></article><article className="card"><h3>Estimated route costs</h3><p>{result.estimated_costs?.currency} {result.estimated_costs?.minimum.toLocaleString()} – {result.estimated_costs?.maximum.toLocaleString()}</p></article><article className="card"><h3>Assessment</h3><p>{result.assessment?.currency_mismatch?"Use the route currency before comparing funds; MoveReady will not invent an exchange rate.":result.assessment?.status.replaceAll("_"," ")}</p>{result.assessment?.gap_to_estimated_minimum? <p>Gap to estimated minimum: {result.estimated_costs?.currency} {result.assessment.gap_to_estimated_minimum.toLocaleString()}</p>:null}</article></div><h2>Cost components</h2><div className="grid">{result.estimated_costs?.items.map(item=><article className="card" key={item.name}><h3>{item.name}</h3><p>{item.estimated_costs}</p><p>{result.estimated_costs?.currency} {item.minimum.toLocaleString()} – {item.maximum.toLocaleString()}</p><p>{item.notes}</p></article>)}</div><h2>Proof-of-funds checks</h2><div className="grid">{result.proof_of_funds?.checks.map(check=><article className="card" key={check}><p>{check}</p></article>)}</div><p className="section-intro">{result.safety_note}</p></>}</section>}</main>}
