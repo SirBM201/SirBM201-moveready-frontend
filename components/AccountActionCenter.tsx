@@ -1,216 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
 import { ApiError, apiJson } from "@/lib/api";
 
-type ActionItem = {
-  kind: string;
-  id?: string;
-  title: string;
-  summary: string;
-  priority: "low" | "medium" | "high" | "critical";
-  status?: string;
-  due_at?: string;
-  hours_until_due?: number | null;
-  href: string;
-  score: number;
-  created_at?: string;
-  metadata?: Record<string, unknown>;
-};
+type ActionItem = { kind:string; id?:string; title:string; summary:string; priority:"low"|"medium"|"high"|"critical"; status?:string; due_at?:string; hours_until_due?:number|null; href:string; score:number; created_at?:string; metadata?:Record<string,unknown> };
+type ActionResponse = { ok:boolean; generated_at?:string; action_count?:number; counts_by_priority?:Record<string,number>; counts_by_section?:Record<string,number>; actions?:ActionItem[]; partial_errors?:Record<string,string>; empty_state?:string|null; safety_note?:string };
+type LanguageAction = { language:string; exam:string; current_target_level:number; profile_level:number; target_gap:number; practice?:{attempted:number;accuracy_percent:number;readiness:string}; action:string; priority:string; href:string };
 
-type ActionResponse = {
-  ok: boolean;
-  generated_at?: string;
-  action_count?: number;
-  counts_by_priority?: Record<string, number>;
-  counts_by_section?: Record<string, number>;
-  actions?: ActionItem[];
-  partial_errors?: Record<string, string>;
-  empty_state?: string | null;
-  safety_note?: string;
-};
+const kindLabels:Record<string,string>={application_alert:"Application alert",application_case:"Application case",timeline:"Timeline task",document:"Document",evidence_pack:"Evidence pack",quote:"Quote or payment",handoff:"Provider handoff",support_case:"Support case",privacy_request:"Privacy request",job_application_follow_up:"Job application follow-up",job_recruiter_follow_up:"Recruiter follow-up",language_qualification:"Language qualification"};
+function readable(value?:string){return String(value||"unknown").replaceAll("_"," ")}
+function formatDate(value?:string){if(!value)return"No date recorded";const parsed=new Date(value);return Number.isNaN(parsed.getTime())?value:parsed.toLocaleString()}
+function dueLabel(hours?:number|null){if(hours===null||hours===undefined)return"No deadline detected";if(hours<0){const days=Math.max(1,Math.ceil(Math.abs(hours)/24));return`Overdue by about ${days} day${days===1?"":"s"}`}if(hours<24)return`${Math.max(1,Math.ceil(hours))} hour${Math.ceil(hours)===1?"":"s"} remaining`;const days=Math.ceil(hours/24);return`${days} day${days===1?"":"s"} remaining`}
 
-const kindLabels: Record<string, string> = {
-  application_alert: "Application alert",
-  application_case: "Application case",
-  timeline: "Timeline task",
-  document: "Document",
-  evidence_pack: "Evidence pack",
-  quote: "Quote or payment",
-  handoff: "Provider handoff",
-  support_case: "Support case",
-  privacy_request: "Privacy request",
-  job_application_follow_up: "Job application follow-up",
-  job_recruiter_follow_up: "Recruiter follow-up",
-};
-
-function readable(value?: string) {
-  return String(value || "unknown").replaceAll("_", " ");
-}
-
-function formatDate(value?: string) {
-  if (!value) return "No date recorded";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
-}
-
-function dueLabel(hours?: number | null) {
-  if (hours === null || hours === undefined) return "No deadline detected";
-  if (hours < 0) {
-    const days = Math.max(1, Math.ceil(Math.abs(hours) / 24));
-    return `Overdue by about ${days} day${days === 1 ? "" : "s"}`;
-  }
-  if (hours < 24) return `${Math.max(1, Math.ceil(hours))} hour${Math.ceil(hours) === 1 ? "" : "s"} remaining`;
-  const days = Math.ceil(hours / 24);
-  return `${days} day${days === 1 ? "" : "s"} remaining`;
-}
-
-export default function AccountActionCenter() {
-  const [data, setData] = useState<ActionResponse | null>(null);
-  const [message, setMessage] = useState("Loading your private next actions...");
-  const [loading, setLoading] = useState(false);
-  const [priority, setPriority] = useState("all");
-  const [kind, setKind] = useState("all");
-  const [query, setQuery] = useState("");
-
-  async function load() {
-    setLoading(true);
-    setMessage("Ranking deadlines, relocation risks, job-search follow-ups, evidence gaps, documents, quotes, handoffs, support, and privacy actions...");
-    try {
-      const response = await apiJson<ActionResponse>("account/action-center", {
-        query: { limit: 250 },
-        timeoutMs: 40000,
-      });
-      setData(response);
-      const partialCount = Object.keys(response.partial_errors || {}).length;
-      setMessage(partialCount
-        ? `Action Center loaded with ${partialCount} unavailable section(s). Missing schemas remain fail-closed.`
-        : response.action_count
-          ? `${response.action_count} account action(s) need review.`
-          : response.empty_state || "No urgent action was detected.");
-    } catch (error) {
-      const apiError = error as ApiError;
-      setData(null);
-      setMessage(apiError?.status === 401
-        ? "Sign in with your verified account to review private next actions."
-        : "Action Center is unavailable until the latest backend deployment and required migrations are active.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    void load();
-  }, []);
-
-  const kinds = useMemo(() => {
-    const values = new Set((data?.actions || []).map((item) => item.kind));
-    return Array.from(values).sort();
-  }, [data]);
-
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return (data?.actions || []).filter((item) => {
-      if (priority !== "all" && item.priority !== priority) return false;
-      if (kind !== "all" && item.kind !== kind) return false;
-      if (!normalized) return true;
-      return [item.title, item.summary, item.status, item.kind, item.due_at]
-        .some((value) => String(value || "").toLowerCase().includes(normalized));
-    });
-  }, [data, priority, kind, query]);
-
-  const priorityCards = ["critical", "high", "medium", "low"].map((value) => ({
-    value,
-    count: data?.counts_by_priority?.[value] || 0,
-  }));
-
-  return (
-    <div className="result-stack">
-      <article className="result-block featured">
-        <div className="panel-heading">
-          <div>
-            <p className="overline">Private Action Center</p>
-            <h2>What needs your attention next</h2>
-          </div>
-          <span className="status-dot">{filtered.length} shown</span>
-        </div>
-        <p>{message}</p>
-        <div className="grid">
-          {priorityCards.map((card) => (
-            <button
-              className="card"
-              type="button"
-              key={card.value}
-              onClick={() => setPriority(priority === card.value ? "all" : card.value)}
-              aria-pressed={priority === card.value}
-              style={{ textAlign: "left" }}
-            >
-              <p className="overline">{readable(card.value)} priority</p>
-              <h3>{card.count}</h3>
-              <p>{card.value === "critical" ? "Overdue or immediate-risk actions" : card.value === "high" ? "Near deadlines or serious gaps" : card.value === "medium" ? "Review before the next step" : "Lower-pressure follow-up"}</p>
-            </button>
-          ))}
-        </div>
-        <div className="form-grid" style={{ marginTop: 18 }}>
-          <label>
-            Priority
-            <select value={priority} onChange={(event) => setPriority(event.target.value)}>
-              <option value="all">All priorities</option>
-              <option value="critical">Critical</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </label>
-          <label>
-            Account area
-            <select value={kind} onChange={(event) => setKind(event.target.value)}>
-              <option value="all">All areas</option>
-              {kinds.map((value) => <option value={value} key={value}>{kindLabels[value] || readable(value)}</option>)}
-            </select>
-          </label>
-          <label>
-            Search actions
-            <input value={query} placeholder="Deadline, country, evidence, payment..." onChange={(event) => setQuery(event.target.value)} />
-          </label>
-        </div>
-        <div className="actions">
-          <button className="btn" type="button" onClick={load} disabled={loading}>{loading ? "Refreshing..." : "Refresh Action Center"}</button>
-          <a className="btn" href="/activity">Activity history</a>
-          <a className="btn" href="/settings">Alert settings</a>
-          <a className="btn" href="/dashboard">Account Center</a>
-        </div>
-      </article>
-
-      <article className="result-block">
-        <p className="overline">Ranked actions</p>
-        <h2>Review the underlying record before acting</h2>
-        <div className="mini-list">
-          {filtered.length === 0 && (
-            <div>
-              <strong>No matching action</strong>
-              <span>{data?.empty_state || "Change the filters or refresh after updating your relocation, Jobs, evidence, document, timeline, quote, handoff, support, or privacy records."}</span>
-            </div>
-          )}
-          {filtered.map((item, index) => (
-            <div key={`${item.kind}-${item.id || index}-${item.created_at || index}`}>
-              <strong>{item.priority.toUpperCase()} · {kindLabels[item.kind] || readable(item.kind)} · {item.title}</strong>
-              <span>
-                {item.summary}<br />
-                Status: {readable(item.status)} · {dueLabel(item.hours_until_due)}
-                {item.due_at ? ` · Recorded due date: ${formatDate(item.due_at)}` : ""}
-              </span>
-              <a className="text-link" href={item.href}>Open underlying workspace</a>
-            </div>
-          ))}
-        </div>
-      </article>
-
-      <article className="result-block soft">
-        <p className="overline">Important boundary</p>
-        <p>{data?.safety_note || "The Action Center ranks existing private records. Confirm the competent authority, current official source, exact deadline, time zone, channel, amount, provider, and decision before acting."}</p>
-      </article>
-    </div>
-  );
+export default function AccountActionCenter(){
+ const[data,setData]=useState<ActionResponse|null>(null),[languageActions,setLanguageActions]=useState<LanguageAction[]>([]),[message,setMessage]=useState("Loading your private next actions..."),[loading,setLoading]=useState(false),[priority,setPriority]=useState("all"),[kind,setKind]=useState("all"),[query,setQuery]=useState("");
+ async function load(){setLoading(true);setMessage("Ranking relocation, career, language, document and deadline priorities...");try{const response=await apiJson<ActionResponse>("account/action-center",{query:{limit:250},timeoutMs:40000});setData(response);try{const language=await apiJson<any>("language-coach/qualification-actions");setLanguageActions(language.actions||[])}catch{setLanguageActions([])}const partialCount=Object.keys(response.partial_errors||{}).length;setMessage(partialCount?`Action Center loaded with ${partialCount} unavailable section(s). Missing schemas remain fail-closed.`:response.action_count?`${response.action_count} account action(s) need review.`:response.empty_state||"No urgent action was detected.")}catch(error){const apiError=error as ApiError;setData(null);setLanguageActions([]);setMessage(apiError?.status===401?"Sign in with your verified account to review private next actions.":"Action Center is unavailable until the latest backend deployment and required migrations are active.")}finally{setLoading(false)}}
+ useEffect(()=>{void load()},[]);
+ const combined=useMemo<ActionItem[]>(()=>{const base=data?.actions||[];const language:ActionItem[]=languageActions.map((a,index)=>({kind:"language_qualification",id:`${a.language}-${index}`,title:`${a.exam}: ${readable(a.action)}`,summary:`${a.language} target ${a.current_target_level}; profile level ${a.profile_level}; practice accuracy ${a.practice?.accuracy_percent||0}%.`,priority:(a.priority==="high"?"high":a.priority==="low"?"low":"medium") as ActionItem["priority"],status:a.practice?.readiness||"building",href:a.href||"/language-coach",score:a.priority==="high"?75:a.priority==="medium"?45:20,metadata:{language:a.language,target_gap:a.target_gap,attempted:a.practice?.attempted||0}}));return[...base,...language].sort((a,b)=>(b.score||0)-(a.score||0))},[data,languageActions]);
+ const kinds=useMemo(()=>Array.from(new Set(combined.map(item=>item.kind))).sort(),[combined]);
+ const filtered=useMemo(()=>{const normalized=query.trim().toLowerCase();return combined.filter(item=>{if(priority!=="all"&&item.priority!==priority)return false;if(kind!=="all"&&item.kind!==kind)return false;if(!normalized)return true;return[item.title,item.summary,item.status,item.kind,item.due_at].some(value=>String(value||"").toLowerCase().includes(normalized))})},[combined,priority,kind,query]);
+ const priorityCards=["critical","high","medium","low"].map(value=>({value,count:combined.filter(item=>item.priority===value).length}));
+ return <div className="result-stack">
+  <article className="result-block featured"><div className="panel-heading"><div><p className="overline">Private Action Center</p><h2>What needs your attention next</h2></div><span className="status-dot">{filtered.length} shown</span></div><p>{message}</p>
+   <div className="grid">{priorityCards.map(card=><button className="card" type="button" key={card.value} onClick={()=>setPriority(priority===card.value?"all":card.value)} aria-pressed={priority===card.value} style={{textAlign:"left"}}><p className="overline">{readable(card.value)} priority</p><h3>{card.count}</h3><p>{card.value==="critical"?"Overdue or immediate-risk actions":card.value==="high"?"Near deadlines or serious qualification gaps":card.value==="medium"?"Review before the next step":"Lower-pressure follow-up"}</p></button>)}</div>
+   <div className="form-grid" style={{marginTop:18}}><label>Priority<select value={priority} onChange={e=>setPriority(e.target.value)}><option value="all">All priorities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label><label>Account area<select value={kind} onChange={e=>setKind(e.target.value)}><option value="all">All areas</option>{kinds.map(value=><option value={value} key={value}>{kindLabels[value]||readable(value)}</option>)}</select></label><label>Search actions<input value={query} placeholder="Language, job, deadline, country, document..." onChange={e=>setQuery(e.target.value)}/></label></div>
+   <div className="actions"><button className="btn" type="button" onClick={load} disabled={loading}>{loading?"Refreshing...":"Refresh Action Center"}</button><a className="btn" href="/language-coach">Language Coach</a><a className="btn" href="/activity">Activity history</a><a className="btn" href="/settings">Alert settings</a><a className="btn" href="/dashboard">Account Center</a></div>
+  </article>
+  {languageActions.length>0&&<article className="result-block"><div className="panel-heading"><div><p className="overline">QUALIFY</p><h2>Language qualification priorities</h2></div><span className="status-dot">{languageActions.length} active</span></div><p>Your saved language choice remains yours. These actions use your target and practice history to identify the next preparation step.</p><div className="mini-list">{languageActions.map((a,index)=><div key={`${a.language}-${index}`}><strong>{String(a.priority).toUpperCase()} · {a.exam}</strong><span>{readable(a.action)} · target {a.current_target_level} · profile level {a.profile_level} · practice {a.practice?.accuracy_percent||0}%</span><a className="text-link" href="/language-coach">Continue in Language Coach</a></div>)}</div></article>}
+  <article className="result-block"><p className="overline">Ranked actions</p><h2>Review the underlying record before acting</h2><div className="mini-list">{filtered.length===0&&<div><strong>No matching action</strong><span>{data?.empty_state||"Change the filters or refresh after updating your relocation, Jobs, language preparation, evidence, documents or timeline."}</span></div>}{filtered.map((item,index)=><div key={`${item.kind}-${item.id||index}-${item.created_at||index}`}><strong>{item.priority.toUpperCase()} · {kindLabels[item.kind]||readable(item.kind)} · {item.title}</strong><span>{item.summary}<br/>Status: {readable(item.status)}{item.kind!=="language_qualification"?` · ${dueLabel(item.hours_until_due)}`:""}{item.due_at?` · Recorded due date: ${formatDate(item.due_at)}`:""}</span><a className="text-link" href={item.href}>Open underlying workspace</a></div>)}</div></article>
+  <article className="result-block soft"><p className="overline">Important boundary</p><p>{data?.safety_note||"The Action Center ranks existing private records and preparation signals. Confirm current official requirements before spending, submitting, booking or making an immigration decision. Language practice readiness is not an official IELTS, TEF, CLB or NCLC result."}</p></article>
+ </div>
 }
