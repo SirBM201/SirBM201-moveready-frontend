@@ -14,7 +14,16 @@ export type JobProfileDraft = {
   later_countries: string;
   preferred_provinces: string;
   work_authorization_status: string;
+  search_scope: "local" | "international" | "both";
+  current_country: string;
+  work_authorized_countries: string;
 };
+
+export const searchScopeChoices = [
+  { value: "local", label: "Local", help: "Show jobs in my current country. Immigration or sponsorship analysis stays out of the way unless it is actually relevant." },
+  { value: "international", label: "International", help: "Show jobs outside my current country and assess work authorization, sponsorship and relocation viability." },
+  { value: "both", label: "Both", help: "Search locally and internationally, while applying immigration checks only to the international opportunities that need them." },
+] as const;
 
 export const workAuthorizationChoices = [
   { value: "citizen", label: "Citizen", help: "I am a citizen of the country where I want to work." },
@@ -40,6 +49,9 @@ export function emptyJobProfileDraft(): JobProfileDraft {
     later_countries: "",
     preferred_provinces: "",
     work_authorization_status: "not_recorded",
+    search_scope: "both",
+    current_country: "",
+    work_authorized_countries: "",
   };
 }
 
@@ -77,6 +89,9 @@ export function founderJobProfileDraft(): JobProfileDraft {
     later_countries: ["Portugal", "Finland", "Germany", "Australia", "New Zealand"].join("\n"),
     preferred_provinces: ["Ontario", "Manitoba"].join("\n"),
     work_authorization_status: "requires_sponsorship",
+    search_scope: "both",
+    current_country: "Kuwait",
+    work_authorized_countries: ["Kuwait"].join("\n"),
   };
 }
 
@@ -93,6 +108,7 @@ export function parseJobProfileList(value: string) {
 
 export function jobProfileToDraft(profile: JobProfile | null): JobProfileDraft {
   if (!profile) return emptyJobProfileDraft();
+  const scope = profile.search_scope;
   return {
     display_name: profile.display_name || "",
     headline: profile.headline || "",
@@ -107,5 +123,8 @@ export function jobProfileToDraft(profile: JobProfile | null): JobProfileDraft {
     later_countries: jobProfileListText(profile.later_countries),
     preferred_provinces: jobProfileListText(profile.preferred_provinces),
     work_authorization_status: profile.work_authorization_status || "not_recorded",
+    search_scope: scope === "local" || scope === "international" || scope === "both" ? scope : "both",
+    current_country: profile.current_country || "",
+    work_authorized_countries: jobProfileListText(profile.work_authorized_countries),
   };
 }
