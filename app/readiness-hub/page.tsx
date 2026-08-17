@@ -1,7 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 
 const lanes=[
- {title:"Route evidence",status:"Start here",text:"Confirm the route checklist and source freshness before building a document pack.",links:[["Check route","/route-checker"],["Compare routes","/compare"],["Source health","/source-health"]]},
+ {title:"Route evidence",status:"B11 linked",text:"Start from a source-aware Finder lead, then confirm the exact route, checklist and source freshness before building a document pack.",links:[["Find route leads","/find"],["Check route","/route-checker"],["Compare routes","/compare"],["Source health","/source-health"]]},
  {title:"Documents",status:"Prepare",text:"Track evidence metadata, expiry, translation and legalization without storing sensitive raw files in the launch workspace.",links:[["Evidence Center","/evidence-pack"],["Legalization","/legalization"],["Translation","/translation"]]},
  {title:"Money",status:"B10 ready",text:"Build a sourced B09 financial scenario while keeping route estimates, user overrides and official proof-of-funds requirements visibly separate.",links:[["Financial readiness","/budget-calculator"],["Proof of funds","/proof-of-funds"]]},
  {title:"Dates & deadlines",status:"Schedule",text:"Work backwards from submission, biometrics, interview, visa-centre or travel dates and keep reminders in the account timeline.",links:[["Timeline","/timeline"],["Journey planner","/journey-planner"],["Alerts","/watchlist"]]},

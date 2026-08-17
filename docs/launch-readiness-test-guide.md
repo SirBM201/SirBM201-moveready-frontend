@@ -110,6 +110,18 @@ $Funds.financial_plan.warnings
 
 This unresolved-source scenario must remain fail-closed. It must not treat a missing official requirement as zero. Add a real current requirement and HTTPS authority reference only when testing a route-specific source you have reviewed.
 
+## B11 Opportunity / Route Finder check
+
+1. Sign in with a saved relocation profile containing a goal and target country.
+2. Open `/find` and confirm the page loads `b11-v1` recommendations.
+3. Confirm the score is labelled profile alignment and qualification remains not determined.
+4. Review one candidate’s evidence, planning cost, timeline/risk notes, freshness and official links.
+5. Select **Check this exact route**.
+6. Confirm Route Checker displays the same country and route before generating a report.
+7. Sign out and confirm the Finder shows a sign-in state rather than profile data.
+
+If the route has no current linked HTTPS official source, the UI must show source review needed. Do not promote the route as verified.
+
 ## Launch acceptance rule
 
 The MVP is launch-ready only when a normal user can understand this order without help:
