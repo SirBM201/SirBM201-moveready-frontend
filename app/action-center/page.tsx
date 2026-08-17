@@ -16,10 +16,10 @@ export default function ActionCenterPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">One ranked next-action view</span>
-          <h1>See what needs attention before a deadline, payment, submission, or provider step is missed.</h1>
+          <span className="eyebrow">B13 · FIND → QUALIFY → MOVE</span>
+          <h1>Start with one next best action, then inspect the records behind the ranking.</h1>
           <p className="lede">
-            The Action Center reads your existing private records and ranks the next review. It does not create a second copy of your application, document, quote, support, or privacy data.
+            The Action Center coordinates Jobs, Route Finder, Passport, Language, Financial Readiness, Documents, and Applications from existing private records. It does not create a second copy of your data.
           </p>
           <div className="actions">
             <a className="btn primary" href="#action-workspace">Review next actions</a>
