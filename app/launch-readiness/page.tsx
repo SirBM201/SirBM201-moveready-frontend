@@ -4,7 +4,7 @@ const launchChecks=[
  {area:"Find",status:"Implemented",title:"Opportunity and pathway discovery",text:"Profile-driven Opportunity Finder, official opportunity catalogue, jobs discovery, study planning, Passport Index and Visa Power are connected. Fit scores are advisory and never treated as eligibility decisions."},
  {area:"Compare",status:"Implemented",title:"Source-aware route comparison",text:"Users can compare launch routes by category, complexity/risk, source confidence, freshness, estimated cost pressure and document burden without a manufactured best-country or approval score."},
  {area:"Qualify",status:"Implemented",title:"Qualification workspace",text:"Language Coach, study planning, evidence, financial readiness, proof-of-funds preparation and route checking are connected under the QUALIFY journey."},
- {area:"Language",status:"Implemented after migration 034",title:"IELTS General and TEF Canada coaching",text:"Profiles, starter practice, attempts, mistakes and daily progress are implemented. Production requires the language schema and reviewed original practice content; scores remain preparation signals rather than official test results."},
+ {area:"Language",status:"Implemented after migration 039",title:"IELTS General and TEF Canada coaching",text:"The private live frontend now connects plans, internal diagnostics, adaptive practice, daily challenges, attempts, mistakes, momentum and qualification actions to the B07 backend. Migration 039 supplies the canonical schema and original starter bank; every score remains a preparation signal rather than an official test result."},
  {area:"Readiness",status:"Implemented",title:"Document, money and deadline command center",text:"The Readiness Hub connects route evidence, document preparation, legalization/translation, financial readiness, timelines, applications and arrival planning. Generic completion never overrides current official instructions."},
  {area:"Money",status:"Implemented",title:"Financial readiness and proof of funds",text:"Route cost ranges can be compared with available funds while official proof-of-funds requirements remain a separate evidence question. Currency conversion is never silently guessed."},
  {area:"Progress",status:"Implemented",title:"Recorded outcomes and progress",text:"Private progress metrics summarize recorded applications, jobs, evidence, documents and timeline work. Percentages are descriptive denominators, not predictive success rates."},
@@ -19,7 +19,7 @@ const launchChecks=[
 ];
 
 const deploymentChecks=[
- "Confirm every required Supabase migration through 034 has been applied successfully in numerical order and no later migration remains pending.",
+ "Confirm every required Supabase migration through 039 has been applied successfully and no later migration remains pending.",
  "Confirm Railway ENV_MODE and FLASK_ENV are production, AUTH_OTP_DEV_MODE is false, and no development OTP appears in an API response.",
  "Compare /api/build-info deployment.commit_sha with the current backend main commit and require route_contract.ok = true.",
  "Confirm the deployment contract contains opportunity-finder/recommendations, financial-readiness/check, route-comparison, account/outcomes and language-coach/profile.",
