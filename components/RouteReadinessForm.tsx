@@ -83,6 +83,23 @@ type AccountSummary = {
   };
 };
 
+type ExactRoute = {
+  id?: string | null;
+  active_version_id?: string | null;
+  route_code?: string | null;
+  route_name?: string | null;
+  route_category?: string | null;
+  country_id?: string | null;
+  country_code?: string | null;
+  country_name?: string | null;
+  summary?: string | null;
+  risk_level?: string | null;
+  source_confidence?: string | null;
+  freshness_status?: string | null;
+  verified_at?: string | null;
+  official_sources?: Array<{ source_name?: string | null; source_url?: string | null }>;
+};
+
 const defaultForm = {
   full_name: "",
   email: "",
@@ -102,14 +119,25 @@ const defaultForm = {
 
 const goalToRouteCategory: Record<string, string> = {
   startup: "startup",
-  business: "startup",
+  business: "business",
   study: "study",
-  scholarship: "study",
+  scholarship: "scholarship",
   work: "work",
   family: "family",
   visit: "visit",
   digital_nomad: "digital_nomad",
   relocation: "relocation",
+};
+
+const routeCategoryToGoal: Record<string, string> = {
+  startup: "startup",
+  business: "business",
+  study: "study",
+  scholarship: "scholarship",
+  work: "work",
+  family: "family",
+  visit: "visit",
+  digital_nomad: "digital_nomad",
 };
 
 function sourcePage() {
@@ -190,6 +218,9 @@ export default function RouteReadinessForm() {
   const [activeProfileName, setActiveProfileName] = useState("");
   const [activeProfileRoute, setActiveProfileRoute] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
+  const [exactRoute, setExactRoute] = useState<ExactRoute | null>(null);
+  const [exactRouteStatus, setExactRouteStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [exactRouteMessage, setExactRouteMessage] = useState("");
   const resultPanelRef = useRef<HTMLElement | null>(null);
 
   function updateField(name: string, value: string) {
@@ -249,8 +280,40 @@ export default function RouteReadinessForm() {
     }
   }
 
+  async function loadExactRouteFromQuery() {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const countryCode = (params.get("country") || "").trim().toUpperCase();
+    const routeCode = (params.get("route") || "").trim();
+    if (!countryCode || !routeCode) return;
+
+    setExactRouteStatus("loading");
+    setExactRouteMessage(`Loading ${countryCode} / ${routeCode} from the reviewed route register…`);
+    try {
+      const response = await apiJson<{ ok: boolean; route: ExactRoute }>(
+        `relocation/routes/by-code/${encodeURIComponent(countryCode)}/${encodeURIComponent(routeCode)}`,
+        { timeoutMs: 12000 },
+      );
+      const route = response.route;
+      setExactRoute(route);
+      setExactRouteStatus("ready");
+      setExactRouteMessage("");
+      setForm((current) => ({
+        ...current,
+        target_country: route.country_name || route.country_code || current.target_country,
+        route_category: route.route_category || current.route_category,
+        goal: routeCategoryToGoal[route.route_category || ""] || current.goal,
+      }));
+      setStatus(`Exact route loaded: ${route.route_name || routeCode}. Review its source status and your details before generating.`);
+    } catch (routeError) {
+      setExactRoute(null);
+      setExactRouteStatus("error");
+      setExactRouteMessage(routeError instanceof Error ? routeError.message : "The exact route record could not be loaded.");
+    }
+  }
+
   useEffect(() => {
-    loadAccountDefaults(false);
+    loadAccountDefaults(false).finally(loadExactRouteFromQuery);
   }, []);
 
   function scrollToResult() {
@@ -328,10 +391,15 @@ export default function RouteReadinessForm() {
       family_members_count: Number(form.family_members_count || 0),
       timeline_months: Number(form.timeline_months || 0),
       has_previous_refusal: form.has_previous_refusal === "true",
+      country_id: exactRoute?.country_id || undefined,
+      route_version_id: exactRoute?.active_version_id || undefined,
       source_page: sourcePage(),
       metadata: {
         active_profile_id: activeProfileId || undefined,
         active_profile_name: activeProfileName || undefined,
+        exact_route_id: exactRoute?.id || undefined,
+        exact_route_code: exactRoute?.route_code || undefined,
+        exact_route_country_code: exactRoute?.country_code || undefined,
         generated_from: activeProfileId ? "route_checker_active_profile" : "route_checker_manual_entry",
       },
     };
@@ -371,6 +439,7 @@ export default function RouteReadinessForm() {
   const reportRef = result?.report?.report_ref || "";
   const quickGenerateLabel = activeProfileName ? "Use active profile and generate report" : "Check my route and save report";
   const nextActionItems = result ? buildNextActions(form, result) : [];
+  const exactOfficialSources = (exactRoute?.official_sources || []).filter((source) => source.source_url?.startsWith("https://"));
 
   return (
     <div className="live-workspace">
@@ -382,6 +451,24 @@ export default function RouteReadinessForm() {
           </div>
           <span className="status-dot">{accountEmail ? "Signed in" : loading ? "Working" : "Ready"}</span>
         </div>
+
+        {exactRouteStatus === "loading" ? <div className="route-binding-card"><strong>Binding exact route</strong><span>{exactRouteMessage}</span></div> : null}
+        {exactRouteStatus === "error" ? <div className="route-binding-card is-warning" role="alert"><strong>Exact route not loaded</strong><span>{exactRouteMessage} The form remains editable, but route-specific IDs will not be submitted.</span></div> : null}
+        {exactRouteStatus === "ready" && exactRoute ? (
+          <article className="route-binding-card">
+            <div>
+              <p className="overline">Exact route selected</p>
+              <h3>{exactRoute.route_name}</h3>
+              <span>{exactRoute.country_name || exactRoute.country_code} · {readableLabel(exactRoute.route_category)} · risk {readableLabel(exactRoute.risk_level, "review required")}</span>
+            </div>
+            <div className="badge-row">
+              <span className="badge">{sourceStatusLabel(exactRoute.freshness_status)}</span>
+              <span className="badge">Confidence: {readableLabel(exactRoute.source_confidence, "review required")}</span>
+            </div>
+            <p>{exactRoute.summary || "Review the exact route facts before acting."}</p>
+            {exactOfficialSources.length ? <div className="actions compact-actions">{exactOfficialSources.map((source) => <a className="btn" href={source.source_url || "#"} target="_blank" rel="noreferrer" key={source.source_url}>{source.source_name || "Official source"}</a>)}</div> : <p className="form-status">No linked HTTPS official source is available. Confirm current requirements independently.</p>}
+          </article>
+        ) : null}
 
         {accountEmail ? (
           <div className="mini-list simple-status-list">
@@ -462,11 +549,15 @@ export default function RouteReadinessForm() {
             <label htmlFor="route_category">Route type</label>
             <select id="route_category" value={form.route_category} onChange={(event) => updateField("route_category", event.target.value)}>
               <option value="startup">Startup / entrepreneur</option>
+              <option value="business">Business</option>
               <option value="study">Study / scholarship</option>
+              <option value="scholarship">Scholarship</option>
               <option value="work">Work</option>
               <option value="family">Family</option>
               <option value="visit">Visit</option>
               <option value="digital_nomad">Digital nomad</option>
+              <option value="permanent_residence">Permanent residence</option>
+              <option value="other">Other reviewed route</option>
               <option value="relocation">General relocation</option>
             </select>
           </div>
