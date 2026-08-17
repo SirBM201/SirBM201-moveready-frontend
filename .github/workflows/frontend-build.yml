@@ -70,5 +70,8 @@ jobs:
       - name: Test B12 Documents, Evidence and Applications contract
         run: npm run test:b12
 
+      - name: Test B13 Dashboard Orchestration contract
+        run: npm run test:b13
+
       - name: Build Next.js application
         run: npm run build
