@@ -1,22 +1,823 @@
 "use client";
-import { useEffect,useMemo,useState } from "react"; import { apiJson } from "@/lib/api";
-type Choice="english"|"french"|"both"; type Q={id:string;language:string;exam:string;skill:string;difficulty:number;prompt:string;choices:string[]}; type M={id:string;question_id:string;mistake_count:number;correct_streak:number;next_review_at:string;mastered_at?:string|null};
-export default function LanguageCoachWorkspace(){
- const[choice,setChoice]=useState<Choice>("english"),[english,setEnglish]=useState(70),[minutes,setMinutes]=useState(20),[targets,setTargets]=useState({english:7,french:7}),[levels,setLevels]=useState({english:0,french:0}),[questions,setQuestions]=useState<Q[]>([]),[mistakes,setMistakes]=useState<M[]>([]),[index,setIndex]=useState(0),[feedback,setFeedback]=useState<any>(null),[loading,setLoading]=useState(false),[message,setMessage]=useState(""),[mode,setMode]=useState("practice"),[sessionLanguage,setSessionLanguage]=useState("english"),[progress,setProgress]=useState<any>(null),[qualification,setQualification]=useState<any>(null);
- const french=choice==="both"?100-english:choice==="french"?100:0; const allocation=useMemo(()=>choice==="english"?{english:100,french:0}:choice==="french"?{english:0,french:100}:{english,french},[choice,english,french]);
- async function refresh(){try{const[m,p,a,profile]=await Promise.all([apiJson<any>("language-coach/mistakes"),apiJson<any>("language-coach/progress"),apiJson<any>("language-coach/qualification-actions"),apiJson<any>("language-coach/profile")]);setMistakes(m.mistakes||[]);setProgress(p);setQualification(a);const x=profile.profile;if(x){setChoice((x.language_selection||"english") as Choice);setEnglish(Number(x.english_allocation??70));setMinutes(Number(x.daily_minutes||20));setTargets({english:Number(x.english_target_level||7),french:Number(x.french_target_level||7)});setLevels({english:Number(x.english_current_level||0),french:Number(x.french_current_level||0)})}}catch{}} useEffect(()=>{refresh()},[]);
- async function save(){setLoading(true);try{await apiJson("language-coach/profile",{method:"PUT",body:{language_selection:choice,allocation,daily_minutes:minutes,diagnostic:levels,targets}});setMessage("Learning plan saved without resetting your diagnostic placement.");await refresh()}catch(e:any){setMessage(e?.message||"Sign in to save your plan.")}finally{setLoading(false)}}
- async function loadSession(language:string,nextMode:string,path:string,query:any={}){setLoading(true);setFeedback(null);setIndex(0);setMode(nextMode);setSessionLanguage(language);try{const r=await apiJson<any>(path,{query:{language,...query}});setQuestions(r.questions||[]);setMessage((r.questions||[]).length?`${nextMode==="adaptive"?`Adaptive level ${r.difficulty}. `:""}${nextMode==="daily"?"1–5 minute challenge ready. ":""}`:"No questions available for this activity yet.")}catch(e:any){setMessage(e?.message||"Unable to load activity.")}finally{setLoading(false)}}
- const start=(language:string,diagnostic=false)=>loadSession(language,diagnostic?"diagnostic":"practice",diagnostic?"language-coach/diagnostic":"language-coach/practice",diagnostic?{}:{difficulty:1});
- const adaptive=(language:string)=>loadSession(language,"adaptive","language-coach/adaptive-practice"); const dailyChallenge=(language:string)=>loadSession(language,"daily","language-coach/daily-challenge");
- async function review(){setLoading(true);try{const r=await apiJson<any>("language-coach/review");setQuestions((r.due||[]).map((x:any)=>x.question).filter(Boolean));setIndex(0);setFeedback(null);setMode("review");setSessionLanguage("review");setMessage((r.due||[]).length?"":"Your review queue is clear for now.")}finally{setLoading(false)}}
- async function answer(value:string){const q=questions[index];if(!q)return;setLoading(true);try{const r=await apiJson<any>("language-coach/attempts",{method:"POST",body:{question_id:q.id,answer:value}});setFeedback(r);await refresh()}catch(e:any){setMessage(e?.message||"Unable to record answer.")}finally{setLoading(false)}}
- async function finish(){if(mode==="diagnostic"&&questions.length){try{const r=await apiJson<any>("language-coach/diagnostic/complete",{method:"POST",body:{language:sessionLanguage,question_ids:questions.map(x=>x.id)}});setMessage(`Diagnostic complete. Internal placement level: ${r.placement_level}/5. Adaptive practice is ready next.`)}catch(e:any){setMessage(e?.message||"Diagnostic finished, but placement could not be saved.")}}else setMessage(`${mode[0].toUpperCase()+mode.slice(1)} session complete.`);setQuestions([]);setFeedback(null);await refresh()}
- function next(){setFeedback(null);if(index<questions.length-1)setIndex(index+1);else void finish()} const q=questions[index]; const daily=progress?.daily||[]; const momentum=progress?.momentum||{}; const today=daily[0]; const langs=choice==="both"?["english","french"]:[choice];
- return <main className="mx-auto max-w-6xl px-4 py-8 space-y-6"><section className="rounded-3xl border bg-white p-6 shadow-sm"><p className="text-sm font-semibold text-blue-700">QUALIFY · LANGUAGE & EXAM COACH</p><h1 className="mt-2 text-3xl font-bold">Build the language score your mobility plan needs.</h1><p className="mt-2 text-slate-600">Diagnostic → adaptive daily practice → Mistakes Bank → progress. English, French, or both remain your choice.</p></section>
- <section className="grid gap-4 md:grid-cols-2"><div className="rounded-2xl border bg-white p-5"><h2 className="font-bold text-xl">Your learning plan</h2><div className="mt-4 flex flex-wrap gap-2">{(["english","french","both"] as Choice[]).map(x=><button key={x} onClick={()=>setChoice(x)} className={`rounded-full border px-4 py-2 ${choice===x?"bg-slate-900 text-white":""}`}>{x==="both"?"English + French":x}</button>)}</div>{choice==="both"&&<div className="mt-4"><b>English {english}% · French {french}%</b><input className="w-full" type="range" min="30" max="70" step="20" value={english} onChange={e=>setEnglish(+e.target.value)}/></div>}<div className="mt-4"><b>{minutes} minutes/day</b><input className="w-full" type="range" min="5" max="60" step="5" value={minutes} onChange={e=>setMinutes(+e.target.value)}/></div><div className="mt-4 grid grid-cols-2 gap-3">{langs.map(l=><label className="text-sm capitalize" key={l}>{l} target level<input type="number" min="0" max="12" className="mt-1 w-full rounded-lg border p-2" value={(targets as any)[l]} onChange={e=>setTargets({...targets,[l]:Math.max(0,Math.min(12,+e.target.value))})}/></label>)}</div><button onClick={save} className="mt-4 rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white">Save plan</button></div>
- <div className="rounded-2xl bg-slate-950 p-5 text-white"><h2 className="text-xl font-bold">Practice readiness</h2>{langs.map(l=>{const p=progress?.languages?.[l];return <div key={l} className="mt-4"><div className="flex justify-between"><b>{l==="english"?"IELTS General":"TEF Canada"}</b><span>{p?.accuracy_percent||0}%</span></div><div className="mt-2 h-2 rounded bg-slate-700"><div className="h-2 rounded bg-white" style={{width:`${p?.accuracy_percent||0}%`}}/></div><p className="mt-1 text-sm text-slate-300">Internal placement {(levels as any)[l]}/5 · {p?.attempted||0} attempts · {p?.readiness||"building"}</p></div>})}<p className="mt-5 text-xs text-slate-400">Internal placement and practice readiness are not official IELTS, TEF, CLB or NCLC results.</p></div></section>
- <section className="rounded-2xl border bg-white p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Daily momentum</p><h2 className="mt-1 text-xl font-bold">Keep moving without streak punishment</h2><p className="mt-1 text-sm text-slate-600">Momentum rewards activity across the last 14 days. Missing one day does not erase what you already built.</p></div><span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">{momentum.points_last_14||0} points</span></div><div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4"><div className="rounded-xl bg-slate-50 p-4"><b className="text-2xl">{momentum.active_days_last_14||0}</b><p className="text-sm text-slate-500">active days / 14</p></div><div className="rounded-xl bg-slate-50 p-4"><b className="text-2xl">{today?.questions_attempted||0}</b><p className="text-sm text-slate-500">questions today</p></div><div className="rounded-xl bg-slate-50 p-4"><b className="text-2xl">{today?.english_minutes||0}m</b><p className="text-sm text-slate-500">English today</p></div><div className="rounded-xl bg-slate-50 p-4"><b className="text-2xl">{today?.french_minutes||0}m</b><p className="text-sm text-slate-500">French today</p></div></div></section>
- {qualification?.actions?.length>0&&<section className="rounded-2xl border bg-white p-5"><p className="text-xs font-bold uppercase tracking-wide text-blue-700">Qualification action plan</p><h2 className="mt-1 text-xl font-bold">What to work on next</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{qualification.actions.map((a:any)=><div key={a.language} className="rounded-xl border p-4"><div className="flex justify-between gap-3"><b>{a.exam}</b><span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold">{a.priority} priority</span></div><p className="mt-2 font-semibold">{String(a.action||"").replaceAll("_"," ")}</p><p className="mt-2 text-sm text-slate-500">Placement {a.profile_level} · target {a.current_target_level} · accuracy {a.practice?.accuracy_percent||0}%</p></div>)}</div></section>}
- <section className="rounded-2xl border bg-white p-5"><h2 className="text-xl font-bold">Today's learning</h2><p className="mt-1 text-sm text-slate-600">Use the diagnostic once for placement, then let adaptive practice select an appropriate difficulty. Daily Challenge is designed for a short 1–5 minute session.</p><div className="mt-4 flex flex-wrap gap-2">{langs.map(l=><span className="contents" key={l}><button onClick={()=>start(l,true)} className="rounded-xl border px-4 py-2">{l==="english"?"English":"French"} diagnostic</button><button onClick={()=>adaptive(l)} className="rounded-xl bg-blue-50 px-4 py-2 font-semibold">Adaptive {l==="english"?"IELTS":"TEF"}</button><button onClick={()=>dailyChallenge(l)} className="rounded-xl bg-emerald-50 px-4 py-2 font-semibold">{l==="english"?"English":"French"} Daily Challenge</button></span>)}<button onClick={review} className="rounded-xl bg-amber-100 px-4 py-2 font-semibold">Review due mistakes</button></div>{message&&<p className="mt-3 text-sm text-slate-600">{message}</p>}{q&&<div className="mt-6 rounded-2xl bg-slate-50 p-5"><p className="text-xs font-bold uppercase text-slate-500">{mode} · {q.exam} · {q.skill} · level {q.difficulty} · {index+1}/{questions.length}</p><p className="mt-3 text-lg font-semibold">{q.prompt}</p><div className="mt-4 grid gap-2">{q.choices.map(c=><button disabled={!!feedback||loading} key={c} onClick={()=>answer(c)} className="rounded-xl border bg-white p-3 text-left">{c}</button>)}</div>{feedback&&<div className={`mt-4 rounded-xl p-4 ${feedback.correct?"bg-emerald-50":"bg-amber-50"}`}><b>{feedback.correct?"Correct":"Review this one"}</b><p>{feedback.explanation}</p>{!feedback.correct&&<p className="mt-1">Correct answer: <b>{feedback.correct_answer}</b></p>}<button onClick={next} className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-white">{index<questions.length-1?"Next question":"Finish session"}</button></div>}</div>}</section>
- <section className="rounded-2xl border bg-white p-5"><div className="flex justify-between"><div><h2 className="text-xl font-bold">Mistakes Bank</h2><p className="text-sm text-slate-600">Spaced review without punitive streak loss.</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-sm">{mistakes.filter(m=>!m.mastered_at).length} active</span></div>{mistakes.length===0?<p className="mt-4 rounded-xl bg-slate-50 p-4">No mistakes recorded yet.</p>:<div className="mt-4 grid gap-3 md:grid-cols-2">{mistakes.map(m=><div className="rounded-xl border p-4" key={m.id}><div className="flex justify-between"><b>{m.mastered_at?"Mastered":"Learning"}</b><span>{m.mistake_count} mistake{m.mistake_count===1?"":"s"}</span></div><p className="mt-2 text-sm">Review streak {m.correct_streak}/3</p><p className="text-sm text-slate-500">Next review {new Date(m.next_review_at).toLocaleDateString()}</p></div>)}</div>}</section></main> }
+
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { ApiError, apiJson } from "@/lib/api";
+
+type Language = "english" | "french";
+type LanguageChoice = Language | "both";
+type ActivityMode = "diagnostic" | "adaptive" | "daily" | "review";
+type AccessState = "checking" | "ready" | "signed-out" | "unavailable";
+
+type CatalogResponse = {
+  ok: boolean;
+  contract_version: string;
+  language_choices: LanguageChoice[];
+  allocation_presets: Array<{ english: number; french: number }>;
+  answer_key_policy: string;
+  content_policy: string;
+  score_boundary: string;
+};
+
+type LanguageProfile = {
+  language_selection?: LanguageChoice;
+  english_allocation?: number;
+  french_allocation?: number;
+  daily_minutes?: number;
+  english_current_level?: number;
+  french_current_level?: number;
+  english_target_level?: number;
+  french_target_level?: number;
+};
+
+type LearningPlan = {
+  contract_version?: string;
+  allocation?: { english: number; french: number };
+  daily_minutes?: number;
+  daily_plan?: Array<{
+    language: Language;
+    minutes: number;
+    activities: Array<{ type: string; minutes: number }>;
+  }>;
+};
+
+type Question = {
+  id: string;
+  language: Language;
+  exam: string;
+  skill: string;
+  difficulty: number;
+  prompt: string;
+  choices: string[];
+  content_origin?: "moveready_original" | "official_released";
+  source_url?: string | null;
+};
+
+type AttemptFeedback = {
+  ok: boolean;
+  correct: boolean;
+  correct_answer: string;
+  explanation: string;
+  next_action?: string;
+};
+
+type Mistake = {
+  id: string;
+  question_id: string;
+  mistake_count: number;
+  correct_streak: number;
+  next_review_at: string;
+  mastered_at?: string | null;
+};
+
+type ProgressResponse = {
+  ok: boolean;
+  languages?: Partial<Record<Language, {
+    attempted: number;
+    correct: number;
+    accuracy_percent: number;
+    readiness: string;
+  }>>;
+  daily?: Array<{
+    activity_date: string;
+    english_minutes: number;
+    french_minutes: number;
+    questions_attempted: number;
+    questions_correct: number;
+    momentum_points: number;
+  }>;
+  momentum?: {
+    active_days_last_14: number;
+    points_last_14: number;
+    model: string;
+  };
+};
+
+type QualificationResponse = {
+  ok: boolean;
+  actions?: Array<{
+    language: Language;
+    exam: string;
+    current_target_level: number;
+    profile_level: number;
+    target_gap: number;
+    action: string;
+    priority: "high" | "medium" | "low";
+    practice?: {
+      attempted: number;
+      accuracy_percent: number;
+      readiness: string;
+    };
+  }>;
+};
+
+const fallbackAllocationPresets = [
+  { english: 50, french: 50 },
+  { english: 70, french: 30 },
+  { english: 30, french: 70 },
+];
+
+const languageMeta: Record<Language, { label: string; exam: string }> = {
+  english: { label: "English", exam: "IELTS General" },
+  french: { label: "French", exam: "TEF Canada" },
+};
+
+function boundedNumber(value: unknown, minimum: number, maximum: number, fallback: number) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(minimum, Math.min(maximum, Math.round(parsed)));
+}
+
+function readable(value: unknown) {
+  const text = String(value || "Not available").replaceAll("_", " ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return "Not scheduled";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
+}
+
+function apiMessage(error: unknown) {
+  const apiError = error as ApiError;
+  const code = String(apiError?.data?.error || apiError?.message || "");
+  if (apiError?.status === 401 || code === "verified_session_required") {
+    return "Sign in with your verified email before using your private Language Coach.";
+  }
+  if (code === "diagnostic_incomplete") {
+    const required = Number(apiError?.data?.required_attempts || 6);
+    return `Answer at least ${required} distinct diagnostic questions before an internal placement can be saved.`;
+  }
+  if (code === "unsupported_allocation") return "Choose one of the supported 50/50, 70/30, or 30/70 language allocations.";
+  if (code === "question_not_found") return "That practice question is no longer active. Start a new activity.";
+  if (code === "question_content_unavailable") return "That question is unavailable because its content source could not be verified.";
+  if (code === "invalid_answer" || code === "answer_required") return "Choose an answer before continuing.";
+  if (apiError?.name === "AbortError") return "The Language Coach request timed out. Please try again.";
+  return "MoveReady could not complete that Language Coach action. Please try again.";
+}
+
+function isSignedOutError(error: unknown) {
+  const apiError = error as ApiError;
+  return apiError?.status === 401 || apiError?.data?.error === "verified_session_required";
+}
+
+export default function LanguageCoachWorkspace() {
+  const [access, setAccess] = useState<AccessState>("checking");
+  const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
+  const [choice, setChoice] = useState<LanguageChoice>("english");
+  const [englishAllocation, setEnglishAllocation] = useState(50);
+  const [minutes, setMinutes] = useState(20);
+  const [targets, setTargets] = useState<Record<Language, number>>({ english: 7, french: 7 });
+  const [levels, setLevels] = useState<Record<Language, number>>({ english: 0, french: 0 });
+  const [plan, setPlan] = useState<LearningPlan | null>(null);
+  const [progress, setProgress] = useState<ProgressResponse | null>(null);
+  const [qualification, setQualification] = useState<QualificationResponse | null>(null);
+  const [mistakes, setMistakes] = useState<Mistake[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [mode, setMode] = useState<ActivityMode>("adaptive");
+  const [sessionLanguage, setSessionLanguage] = useState<Language>("english");
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [feedback, setFeedback] = useState<AttemptFeedback | null>(null);
+  const [busyAction, setBusyAction] = useState("");
+  const [message, setMessage] = useState("Checking the live Language Coach contract...");
+  const questionStartedAt = useRef(Date.now());
+
+  const selectedLanguages = useMemo<Language[]>(
+    () => choice === "both" ? ["english", "french"] : [choice],
+    [choice],
+  );
+
+  const allocation = useMemo(
+    () => choice === "english"
+      ? { english: 100, french: 0 }
+      : choice === "french"
+        ? { english: 0, french: 100 }
+        : { english: englishAllocation, french: 100 - englishAllocation },
+    [choice, englishAllocation],
+  );
+
+  const activeQuestion = questions[questionIndex];
+  const daily = progress?.daily || [];
+  const today = daily[0];
+  const momentum = progress?.momentum;
+  const activeMistakes = mistakes.filter((item) => !item.mastered_at);
+  const dueMistakes = activeMistakes.filter((item) => {
+    const dueAt = Date.parse(item.next_review_at);
+    return Number.isFinite(dueAt) && dueAt <= Date.now();
+  });
+
+  function applyProfile(profile?: LanguageProfile | null) {
+    if (!profile) return;
+    const nextChoice = profile.language_selection || "english";
+    setChoice(nextChoice);
+    setEnglishAllocation(
+      nextChoice === "both"
+        ? boundedNumber(profile.english_allocation, 30, 70, 50)
+        : 50,
+    );
+    setMinutes(boundedNumber(profile.daily_minutes, 5, 180, 20));
+    setTargets({
+      english: boundedNumber(profile.english_target_level, 0, 12, 7),
+      french: boundedNumber(profile.french_target_level, 0, 12, 7),
+    });
+    setLevels({
+      english: boundedNumber(profile.english_current_level, 0, 5, 0),
+      french: boundedNumber(profile.french_current_level, 0, 5, 0),
+    });
+  }
+
+  async function loadDashboard(options: { quiet?: boolean } = {}) {
+    const quiet = Boolean(options.quiet);
+    if (!quiet) {
+      setAccess("checking");
+      setMessage("Checking the live Language Coach contract...");
+    }
+
+    try {
+      const contract = await apiJson<CatalogResponse>("language-coach/options", {
+        timeoutMs: 15000,
+        useAuthToken: false,
+      });
+      if (contract.contract_version !== "b07-v1") {
+        throw new Error("language_coach_contract_mismatch");
+      }
+      setCatalog(contract);
+
+      const results = await Promise.allSettled([
+        apiJson<{ ok: boolean; profile: LanguageProfile | null }>("language-coach/profile"),
+        apiJson<ProgressResponse>("language-coach/progress"),
+        apiJson<QualificationResponse>("language-coach/qualification-actions"),
+        apiJson<{ ok: boolean; mistakes: Mistake[] }>("language-coach/mistakes"),
+      ]);
+
+      const profileResult = results[0];
+      if (profileResult.status === "rejected") {
+        if (isSignedOutError(profileResult.reason)) {
+          setAccess("signed-out");
+          setMessage("Sign in to load your private learning plan, attempts, progress, and Mistakes Bank.");
+          return;
+        }
+        throw profileResult.reason;
+      }
+
+      applyProfile(profileResult.value.profile);
+      if (results[1].status === "fulfilled") setProgress(results[1].value);
+      if (results[2].status === "fulfilled") setQualification(results[2].value);
+      if (results[3].status === "fulfilled") setMistakes(results[3].value.mistakes || []);
+
+      const partialFailures = results.slice(1).filter((result) => result.status === "rejected").length;
+      setAccess("ready");
+      if (!quiet) {
+        setMessage(partialFailures
+          ? `Your plan loaded, but ${partialFailures} progress section${partialFailures === 1 ? " is" : "s are"} temporarily unavailable.`
+          : profileResult.value.profile
+            ? "Your private learning plan and progress are ready."
+            : "Choose English, French, or both, then save your first learning plan.");
+      }
+    } catch (error) {
+      setAccess("unavailable");
+      setMessage(
+        error instanceof Error && error.message === "language_coach_contract_mismatch"
+          ? "The live backend is not yet serving the required B07 Language Coach contract."
+          : "The Language Coach is temporarily unavailable. Your existing private progress has not been changed.",
+      );
+    }
+  }
+
+  useEffect(() => {
+    void loadDashboard();
+  }, []);
+
+  function changeChoice(nextChoice: LanguageChoice) {
+    setChoice(nextChoice);
+    setQuestions([]);
+    setFeedback(null);
+    setSelectedAnswer("");
+    setMessage(
+      nextChoice === "both"
+        ? "Choose how to divide your daily time between English and French."
+        : `${languageMeta[nextChoice].label} will receive 100% of your selected daily practice time.`,
+    );
+  }
+
+  async function savePlan() {
+    setBusyAction("save-plan");
+    setMessage("Saving your private learning plan...");
+    try {
+      const response = await apiJson<{
+        ok: boolean;
+        profile: LanguageProfile;
+        plan: LearningPlan;
+      }>("language-coach/profile", {
+        method: "PUT",
+        body: {
+          language_selection: choice,
+          allocation,
+          daily_minutes: minutes,
+          targets,
+        },
+        timeoutMs: 20000,
+      });
+      applyProfile(response.profile);
+      setPlan(response.plan);
+      setMessage("Plan saved. Your diagnostic placement was preserved and was not self-awarded by this form.");
+      await loadOutcomeData();
+    } catch (error) {
+      if (isSignedOutError(error)) setAccess("signed-out");
+      setMessage(apiMessage(error));
+    } finally {
+      setBusyAction("");
+    }
+  }
+
+  async function loadOutcomeData() {
+    const results = await Promise.allSettled([
+      apiJson<ProgressResponse>("language-coach/progress"),
+      apiJson<QualificationResponse>("language-coach/qualification-actions"),
+      apiJson<{ ok: boolean; mistakes: Mistake[] }>("language-coach/mistakes"),
+    ]);
+    if (results[0].status === "fulfilled") setProgress(results[0].value);
+    if (results[1].status === "fulfilled") setQualification(results[1].value);
+    if (results[2].status === "fulfilled") setMistakes(results[2].value.mistakes || []);
+  }
+
+  async function loadActivity(language: Language, nextMode: ActivityMode) {
+    const path = nextMode === "diagnostic"
+      ? "language-coach/diagnostic"
+      : nextMode === "adaptive"
+        ? "language-coach/adaptive-practice"
+        : "language-coach/daily-challenge";
+    setBusyAction(`load-${nextMode}-${language}`);
+    setMessage(`Preparing ${languageMeta[language].label} ${readable(nextMode).toLowerCase()}...`);
+    try {
+      const response = await apiJson<{
+        ok: boolean;
+        questions: Question[];
+        difficulty?: number;
+        minimum_attempts?: number;
+      }>(path, { query: { language }, timeoutMs: 20000 });
+      const nextQuestions = Array.isArray(response.questions) ? response.questions : [];
+      const required = Number(response.minimum_attempts || 6);
+      if (nextMode === "diagnostic" && nextQuestions.length < required) {
+        setQuestions([]);
+        setMessage(`The diagnostic bank currently has ${nextQuestions.length} eligible questions; at least ${required} are required before placement can begin.`);
+        return;
+      }
+      setQuestions(nextQuestions);
+      setQuestionIndex(0);
+      setFeedback(null);
+      setSelectedAnswer("");
+      setMode(nextMode);
+      setSessionLanguage(language);
+      questionStartedAt.current = Date.now();
+      setMessage(nextQuestions.length
+        ? nextMode === "diagnostic"
+          ? `Answer all ${nextQuestions.length} questions. Placement is saved only after the minimum distinct attempts are recorded.`
+          : nextMode === "daily"
+            ? `Your short ${languageMeta[language].label} challenge is ready.`
+            : `Adaptive practice selected difficulty ${response.difficulty || nextQuestions[0]?.difficulty || 1}.`
+        : "No eligible questions are available for this activity yet.");
+    } catch (error) {
+      if (isSignedOutError(error)) setAccess("signed-out");
+      setQuestions([]);
+      setMessage(apiMessage(error));
+    } finally {
+      setBusyAction("");
+    }
+  }
+
+  async function loadReview() {
+    setBusyAction("load-review");
+    setMessage("Checking your due Mistakes Bank reviews...");
+    try {
+      const response = await apiJson<{
+        ok: boolean;
+        due: Array<Mistake & { question?: Question | null }>;
+      }>("language-coach/review", { timeoutMs: 20000 });
+      const dueQuestions = (response.due || [])
+        .map((item) => item.question)
+        .filter((item): item is Question => Boolean(item));
+      setQuestions(dueQuestions);
+      setQuestionIndex(0);
+      setFeedback(null);
+      setSelectedAnswer("");
+      setMode("review");
+      setSessionLanguage(dueQuestions[0]?.language || selectedLanguages[0]);
+      questionStartedAt.current = Date.now();
+      setMessage(dueQuestions.length
+        ? `${dueQuestions.length} due review question${dueQuestions.length === 1 ? " is" : "s are"} ready.`
+        : "Your due review queue is clear. Previous progress remains intact.");
+    } catch (error) {
+      if (isSignedOutError(error)) setAccess("signed-out");
+      setQuestions([]);
+      setMessage(apiMessage(error));
+    } finally {
+      setBusyAction("");
+    }
+  }
+
+  async function answerQuestion(answer: string) {
+    if (!activeQuestion || feedback || busyAction) return;
+    setSelectedAnswer(answer);
+    setBusyAction("answer");
+    const responseSeconds = boundedNumber(
+      (Date.now() - questionStartedAt.current) / 1000,
+      0,
+      7200,
+      0,
+    );
+    try {
+      const response = await apiJson<AttemptFeedback>("language-coach/attempts", {
+        method: "POST",
+        body: {
+          question_id: activeQuestion.id,
+          answer,
+          response_seconds: responseSeconds,
+        },
+        timeoutMs: 20000,
+      });
+      setFeedback(response);
+      setMessage(response.correct
+        ? "Correct. Review the explanation, then continue."
+        : "This answer was added to your Mistakes Bank for spaced review.");
+      await loadOutcomeData();
+    } catch (error) {
+      if (isSignedOutError(error)) setAccess("signed-out");
+      setSelectedAnswer("");
+      setMessage(apiMessage(error));
+    } finally {
+      setBusyAction("");
+    }
+  }
+
+  async function finishActivity() {
+    setBusyAction("finish");
+    try {
+      if (mode === "diagnostic") {
+        const response = await apiJson<{
+          ok: boolean;
+          placement_level: number;
+          attempted: number;
+          required_attempts: number;
+        }>("language-coach/diagnostic/complete", {
+          method: "POST",
+          body: {
+            language: sessionLanguage,
+            question_ids: questions.map((question) => question.id),
+          },
+          timeoutMs: 20000,
+        });
+        setLevels((current) => ({
+          ...current,
+          [sessionLanguage]: boundedNumber(response.placement_level, 0, 5, current[sessionLanguage]),
+        }));
+        setMessage(`Diagnostic complete. Your internal ${languageMeta[sessionLanguage].label} placement is ${response.placement_level}/5. It is not an official exam score.`);
+      } else {
+        setMessage(`${readable(mode)} complete. Your progress and review queue have been updated.`);
+      }
+      setQuestions([]);
+      setQuestionIndex(0);
+      setFeedback(null);
+      setSelectedAnswer("");
+      await loadDashboard({ quiet: true });
+    } catch (error) {
+      setMessage(apiMessage(error));
+    } finally {
+      setBusyAction("");
+    }
+  }
+
+  function nextQuestion() {
+    if (questionIndex < questions.length - 1) {
+      setQuestionIndex((current) => current + 1);
+      setFeedback(null);
+      setSelectedAnswer("");
+      questionStartedAt.current = Date.now();
+      setMessage("Continue with the next question.");
+      return;
+    }
+    void finishActivity();
+  }
+
+  if (access === "checking") {
+    return (
+      <main className="language-shell">
+        <section className="language-state-card" aria-live="polite">
+          <span className="eyebrow">Language Coach</span>
+          <h1>Preparing your private learning workspace...</h1>
+          <p>{message}</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (access === "signed-out") {
+    return (
+      <main className="language-shell">
+        <section className="language-state-card language-sign-in-card">
+          <span className="eyebrow">Private Language Coach</span>
+          <h1>Sign in to continue your English or French preparation.</h1>
+          <p>Your selected language, placement, answers, mistakes, and daily progress belong only to your verified MoveReady account.</p>
+          <div className="language-feature-grid">
+            <div><strong>Diagnostic</strong><span>Internal placement after enough distinct answers</span></div>
+            <div><strong>Adaptive practice</strong><span>Difficulty responds to recent practice</span></div>
+            <div><strong>Mistakes Bank</strong><span>Due review without punitive streak loss</span></div>
+          </div>
+          <div className="actions">
+            <a className="btn primary" href="/login?next=/language-coach">Sign in with email</a>
+            <a className="btn" href="/qualify">Back to Qualify</a>
+          </div>
+          <p className="language-boundary">MoveReady practice indicators are not official IELTS, TEF, CLB, or NCLC results.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (access === "unavailable") {
+    return (
+      <main className="language-shell">
+        <section className="language-state-card" aria-live="polite">
+          <span className="eyebrow">Language Coach unavailable</span>
+          <h1>Your private progress has not been changed.</h1>
+          <p>{message}</p>
+          <div className="actions">
+            <button className="btn primary" type="button" onClick={() => void loadDashboard()}>Try again</button>
+            <a className="btn" href="/deployment-status">Check deployment status</a>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const allocationPresets = catalog?.allocation_presets?.length
+    ? catalog.allocation_presets
+    : fallbackAllocationPresets;
+
+  return (
+    <main className="language-shell">
+      <section className="language-hero">
+        <div>
+          <span className="eyebrow">QUALIFY · LANGUAGE &amp; EXAM COACH</span>
+          <h1>Build practical English, French, or both—one short session at a time.</h1>
+          <p>Choose your plan, complete an internal diagnostic, practise at an adaptive level, and review mistakes when they are due.</p>
+        </div>
+        <aside className="language-hero-status">
+          <span className="status-dot complete">Verified account</span>
+          <strong>{catalog?.contract_version || "B07 contract"}</strong>
+          <p>Answers and explanations remain hidden until your answer is recorded.</p>
+        </aside>
+      </section>
+
+      <p className="language-message" aria-live="polite">{message}</p>
+
+      <section className="language-plan-grid">
+        <article className="language-card language-plan-card">
+          <div className="panel-heading">
+            <div><p className="overline">Step 1</p><h2>Choose your learning plan</h2></div>
+            <span className="status-dot">Private</span>
+          </div>
+
+          <fieldset className="language-choice-grid">
+            <legend>Which language do you want to practise?</legend>
+            {(["english", "french", "both"] as LanguageChoice[]).map((item) => (
+              <label className={choice === item ? "selected" : ""} key={item}>
+                <input
+                  type="radio"
+                  name="language_selection"
+                  value={item}
+                  checked={choice === item}
+                  onChange={() => changeChoice(item)}
+                />
+                <span>
+                  <strong>{item === "both" ? "English + French" : languageMeta[item].label}</strong>
+                  <small>{item === "english" ? "IELTS General foundation" : item === "french" ? "TEF Canada foundation" : "Divide daily time between both"}</small>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+
+          {choice === "both" ? (
+            <fieldset className="language-allocation-grid">
+              <legend>How should daily time be divided?</legend>
+              {allocationPresets.map((preset) => (
+                <label className={englishAllocation === preset.english ? "selected" : ""} key={`${preset.english}-${preset.french}`}>
+                  <input
+                    type="radio"
+                    name="language_allocation"
+                    value={preset.english}
+                    checked={englishAllocation === preset.english}
+                    onChange={() => setEnglishAllocation(preset.english)}
+                  />
+                  <span><strong>{preset.english}% English</strong><small>{preset.french}% French</small></span>
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
+
+          <div className="form-grid two-col language-plan-fields">
+            <div className="field">
+              <label htmlFor="language_daily_minutes">Daily practice time</label>
+              <input
+                id="language_daily_minutes"
+                type="number"
+                inputMode="numeric"
+                min="5"
+                max="180"
+                step="5"
+                value={minutes}
+                onChange={(event) => setMinutes(boundedNumber(event.target.value, 5, 180, 20))}
+              />
+              <small>Choose 5–180 minutes. Short, consistent practice is acceptable.</small>
+            </div>
+            {selectedLanguages.map((language) => (
+              <div className="field" key={language}>
+                <label htmlFor={`${language}_target_level`}>{languageMeta[language].label} planning target</label>
+                <input
+                  id={`${language}_target_level`}
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="12"
+                  value={targets[language]}
+                  onChange={(event) => setTargets((current) => ({
+                    ...current,
+                    [language]: boundedNumber(event.target.value, 0, 12, current[language]),
+                  }))}
+                />
+                <small>Planning level only; not a self-awarded official CLB/NCLC result.</small>
+              </div>
+            ))}
+          </div>
+
+          <button className="btn primary" type="button" onClick={() => void savePlan()} disabled={Boolean(busyAction)}>
+            {busyAction === "save-plan" ? "Saving plan..." : "Save private plan"}
+          </button>
+
+          {plan?.daily_plan?.length ? (
+            <div className="language-plan-preview">
+              <strong>Saved daily split</strong>
+              {plan.daily_plan.map((item) => (
+                <span key={item.language}>{languageMeta[item.language].label}: {item.minutes} minute{item.minutes === 1 ? "" : "s"}</span>
+              ))}
+            </div>
+          ) : null}
+        </article>
+
+        <article className="language-card language-readiness-card">
+          <div className="panel-heading">
+            <div><p className="overline">Practice indicators</p><h2>Your current readiness</h2></div>
+            <span className="status-dot">Internal</span>
+          </div>
+          {selectedLanguages.map((language) => {
+            const item = progress?.languages?.[language];
+            const accuracy = boundedNumber(item?.accuracy_percent, 0, 100, 0);
+            return (
+              <div className="language-readiness-row" key={language}>
+                <div><strong>{languageMeta[language].exam}</strong><span>{accuracy}% practice accuracy</span></div>
+                <div className="language-progress-track" aria-label={`${accuracy}% practice accuracy`}>
+                  <span style={{ width: `${accuracy}%` }} />
+                </div>
+                <p>Internal placement {levels[language]}/5 · {item?.attempted || 0} recorded attempts · {readable(item?.readiness || "building")}</p>
+              </div>
+            );
+          })}
+          <div className="language-boundary">
+            <strong>Important score boundary</strong>
+            <p>Internal placement, accuracy, readiness, and planning targets are preparation signals. They are not official IELTS, TEF, CLB, or NCLC results.</p>
+          </div>
+        </article>
+      </section>
+
+      <section className="language-card language-momentum-card">
+        <div className="panel-heading">
+          <div><p className="overline">Daily momentum</p><h2>Keep moving without streak punishment</h2></div>
+          <span className="status-dot complete">{momentum?.points_last_14 || 0} points</span>
+        </div>
+        <p>Missing one day does not erase your accumulated practice.</p>
+        <div className="language-metric-grid">
+          <div><strong>{momentum?.active_days_last_14 || 0}</strong><span>active days / 14</span></div>
+          <div><strong>{today?.questions_attempted || 0}</strong><span>questions today</span></div>
+          <div><strong>{today?.english_minutes || 0}m</strong><span>English today</span></div>
+          <div><strong>{today?.french_minutes || 0}m</strong><span>French today</span></div>
+        </div>
+      </section>
+
+      <section className="language-card language-learning-card">
+        <div className="panel-heading">
+          <div><p className="overline">Step 2</p><h2>Choose today&apos;s activity</h2></div>
+          <span className="status-dot">{dueMistakes.length} due reviews</span>
+        </div>
+        <p>Use the diagnostic for internal placement, adaptive practice for your current difficulty, or a short daily challenge when time is limited.</p>
+        <div className="language-activity-grid">
+          {selectedLanguages.map((language) => (
+            <div className="language-activity-group" key={language}>
+              <strong>{languageMeta[language].label}</strong>
+              <button className="btn" type="button" onClick={() => void loadActivity(language, "diagnostic")} disabled={Boolean(busyAction)}>
+                {levels[language] > 0 ? "Retake diagnostic" : "Start diagnostic"}
+              </button>
+              <button className="btn primary" type="button" onClick={() => void loadActivity(language, "adaptive")} disabled={Boolean(busyAction)}>Adaptive practice</button>
+              <button className="btn" type="button" onClick={() => void loadActivity(language, "daily")} disabled={Boolean(busyAction)}>1–5 minute challenge</button>
+            </div>
+          ))}
+          <div className="language-activity-group review">
+            <strong>Mistakes Bank</strong>
+            <button className="btn" type="button" onClick={() => void loadReview()} disabled={Boolean(busyAction)}>Review due mistakes</button>
+            <span>{dueMistakes.length ? `${dueMistakes.length} ready now` : "No due review detected"}</span>
+          </div>
+        </div>
+
+        {activeQuestion ? (
+          <article className="language-question-card">
+            <div className="language-question-meta">
+              <span>{readable(mode)}</span>
+              <span>{activeQuestion.exam}</span>
+              <span>{readable(activeQuestion.skill)}</span>
+              <span>Difficulty {activeQuestion.difficulty}</span>
+              <span>{questionIndex + 1} of {questions.length}</span>
+            </div>
+            <div className="language-question-progress"><span style={{ width: `${((questionIndex + (feedback ? 1 : 0)) / questions.length) * 100}%` }} /></div>
+            <p className="language-question-source">
+              {activeQuestion.content_origin === "official_released" ? "Permitted official-release practice" : "MoveReady-original practice"}
+              {activeQuestion.content_origin === "official_released" && activeQuestion.source_url?.startsWith("https://") ? <a href={activeQuestion.source_url} target="_blank" rel="noreferrer">View source</a> : null}
+            </p>
+            <h3>{activeQuestion.prompt}</h3>
+            <div className="language-answer-grid">
+              {(activeQuestion.choices || []).map((answer) => {
+                const isSelected = selectedAnswer === answer;
+                const isCorrectAnswer = Boolean(feedback && feedback.correct_answer === answer);
+                return (
+                  <button
+                    className={`${isSelected ? "selected" : ""} ${isCorrectAnswer ? "correct" : ""}`.trim()}
+                    type="button"
+                    disabled={Boolean(feedback) || busyAction === "answer"}
+                    onClick={() => void answerQuestion(answer)}
+                    key={answer}
+                  >
+                    {answer}
+                  </button>
+                );
+              })}
+            </div>
+            {feedback ? (
+              <div className={`language-feedback ${feedback.correct ? "correct" : "review"}`} aria-live="polite">
+                <strong>{feedback.correct ? "Correct" : "Review this one"}</strong>
+                <p>{feedback.explanation}</p>
+                {!feedback.correct ? <p>Correct answer: <b>{feedback.correct_answer}</b></p> : null}
+                <button className="btn primary" type="button" onClick={nextQuestion} disabled={Boolean(busyAction)}>
+                  {questionIndex < questions.length - 1 ? "Next question" : mode === "diagnostic" ? "Complete diagnostic" : "Finish activity"}
+                </button>
+              </div>
+            ) : null}
+          </article>
+        ) : null}
+      </section>
+
+      {qualification?.actions?.length ? (
+        <section className="language-card">
+          <div className="panel-heading">
+            <div><p className="overline">Qualification plan</p><h2>What to work on next</h2></div>
+            <span className="status-dot">Choice preserved</span>
+          </div>
+          <div className="language-action-grid">
+            {qualification.actions.map((action) => (
+              <article key={action.language}>
+                <div><strong>{action.exam}</strong><span className={`language-priority ${action.priority}`}>{action.priority} priority</span></div>
+                <h3>{readable(action.action)}</h3>
+                <p>Internal placement {action.profile_level}/5 · planning target {action.current_target_level} · practice accuracy {action.practice?.accuracy_percent || 0}%</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="language-card language-mistakes-card">
+        <div className="panel-heading">
+          <div><p className="overline">Spaced review</p><h2>Mistakes Bank</h2></div>
+          <span className="status-dot">{activeMistakes.length} active</span>
+        </div>
+        <p>A wrong answer adds a review item. Three later correct reviews can mark it mastered; missing a day does not delete progress.</p>
+        {!mistakes.length ? (
+          <div className="language-empty-state">No mistakes are recorded yet. Start a diagnostic or practice activity when you are ready.</div>
+        ) : (
+          <div className="language-mistake-grid">
+            {mistakes.map((mistake) => (
+              <article className={mistake.mastered_at ? "mastered" : ""} key={mistake.id}>
+                <div><strong>{mistake.mastered_at ? "Mastered" : "Learning"}</strong><span>{mistake.mistake_count} mistake{mistake.mistake_count === 1 ? "" : "s"}</span></div>
+                <p>Correct review streak: {mistake.correct_streak}/3</p>
+                <p>{mistake.mastered_at ? `Mastered ${formatDate(mistake.mastered_at)}` : `Next review ${formatDate(mistake.next_review_at)}`}</p>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="language-safety-strip">
+        <strong>Content and score boundary</strong>
+        <span>MoveReady uses original practice or permitted official-release material with provenance. It does not use leaked, recalled, or reconstructed live exam content, and it does not issue official test scores.</span>
+      </section>
+    </main>
+  );
+}

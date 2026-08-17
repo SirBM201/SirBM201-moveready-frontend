@@ -58,5 +58,8 @@ jobs:
       - name: Test B06 general-user Jobs contract
         run: npm run test:b06
 
+      - name: Test B08 Language Coach contract
+        run: npm run test:b08
+
       - name: Build Next.js application
         run: npm run build
