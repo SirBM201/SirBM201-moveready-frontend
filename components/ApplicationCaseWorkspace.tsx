@@ -7,6 +7,7 @@ import { ApiError, apiJson } from "@/lib/api";
 
 type ApplicationOptions = {
   ok: boolean;
+  contract_version?: string;
   route_categories?: string[];
   application_stages?: string[];
   case_statuses?: string[];
@@ -139,24 +140,37 @@ export default function ApplicationCaseWorkspace() {
   const [selected, setSelected] = useState<ApplicationCase | null>(null);
   const [events, setEvents] = useState<ApplicationEvent[]>([]);
   const [accountEmail, setAccountEmail] = useState("");
-  const [message, setMessage] = useState("Sign in to load private application cases.");
+  const [workspaceState, setWorkspaceState] = useState<"loading" | "ready" | "signed_out" | "error">("loading");
+  const [message, setMessage] = useState("Loading private application cases...");
   const [loading, setLoading] = useState(false);
   const [updatingRef, setUpdatingRef] = useState("");
 
   const terminalStages = useMemo(() => new Set(options.terminal_stages || []), [options.terminal_stages]);
 
   async function loadCases(silent = false) {
+    setWorkspaceState("loading");
     if (!silent) {
       setLoading(true);
       setMessage("Loading private application cases...");
     }
     try {
       const optionData = await apiJson<ApplicationOptions>("applications/options", { timeoutMs: 12000, useAuthToken: false });
+      if (optionData.contract_version !== "b12-v1") {
+        setWorkspaceState("error");
+        setMessage("The deployed application contract is older than B12. Retry after the backend deployment completes.");
+        return;
+      }
       setOptions({ ...fallbackOptions, ...optionData });
-      const data = await apiJson<{ account_email?: string; application_cases?: ApplicationCase[] }>("applications", { timeoutMs: 25000 });
+      const data = await apiJson<{ contract_version?: string; account_email?: string; application_cases?: ApplicationCase[] }>("applications", { timeoutMs: 25000 });
+      if (data.contract_version !== "b12-v1") {
+        setWorkspaceState("error");
+        setMessage("Application cases returned an older contract. Retry after the backend deployment completes.");
+        return;
+      }
       const rows = data.application_cases || [];
       setCases(rows);
       setAccountEmail(data.account_email || "");
+      setWorkspaceState("ready");
       setMessage("Application cases loaded.");
       if (selectedRef && rows.some((row) => row.case_ref === selectedRef)) {
         await loadDetail(selectedRef, true);
@@ -167,6 +181,7 @@ export default function ApplicationCaseWorkspace() {
       setSelected(null);
       setEvents([]);
       setAccountEmail("");
+      setWorkspaceState(apiError?.status === 401 ? "signed_out" : "error");
       setMessage(apiError?.status === 401 ? "Sign in with email to use the private Application Center." : apiError?.data?.hint || apiError?.message || "Unable to load application cases. Migration 028 may be pending.");
     } finally {
       if (!silent) setLoading(false);
@@ -378,10 +393,10 @@ export default function ApplicationCaseWorkspace() {
 
   return (
     <div className="result-stack">
-      <article className="result-block featured">
+      <article className="result-block featured" aria-busy={workspaceState === "loading" || loading}>
         <div className="panel-heading">
           <div><p className="overline">Private Application Center</p><h2>{accountEmail ? `Applications for ${accountEmail}` : "Connect a verified account"}</h2></div>
-          <span className="status-dot">Metadata only</span>
+          <span className="status-dot">{workspaceState === "loading" ? "Loading" : workspaceState === "ready" ? "Metadata only" : workspaceState === "signed_out" ? "Sign in" : "Needs retry"}</span>
         </div>
         <p>{options.storage_boundary || fallbackOptions.storage_boundary}</p>
         <div className="actions">
@@ -390,7 +405,7 @@ export default function ApplicationCaseWorkspace() {
           <a className="btn" href="/evidence-pack">Evidence Center</a>
           <a className="btn" href="/timeline">Timeline</a>
         </div>
-        <p className="form-status">{message}</p>
+        <p className="form-status" aria-live="polite" role={workspaceState === "error" ? "alert" : undefined}>{message}</p>
       </article>
 
       <section className="live-workspace">
@@ -414,13 +429,13 @@ export default function ApplicationCaseWorkspace() {
             <div className="field"><label htmlFor="case_fee_amount">Application fee</label><input id="case_fee_amount" name="fee_amount" type="number" min="0" step="0.01" /></div>
             <div className="field"><label htmlFor="case_fee_currency">Currency</label><input id="case_fee_currency" name="fee_currency" placeholder="EUR" /></div>
             <div className="field"><label htmlFor="case_payment_status">Payment status</label><select id="case_payment_status" name="payment_status" defaultValue="not_recorded">{paymentStatuses.map((item) => <option key={item} value={item}>{readable(item)}</option>)}</select></div>
-            <div className="field"><label htmlFor="case_evidence_pack">Evidence pack ID</label><input id="case_evidence_pack" name="evidence_pack_id" placeholder="Optional private pack UUID" /></div>
+            <div className="field b12-pack-field"><label htmlFor="case_evidence_pack">Linked evidence pack</label><input id="case_evidence_pack" name="evidence_pack_id" placeholder="Choose a pack above" readOnly /><small>Use the account-owned pack picker above; you do not need to copy a private UUID.</small></div>
           </div>
           <div className="field"><label htmlFor="case_source_url">Official source or tracking URL</label><input id="case_source_url" name="official_source_url" type="url" placeholder="https://official-authority.example/..." /></div>
           <div className="field"><label htmlFor="case_source_note">Official source note</label><textarea id="case_source_note" name="official_source_note" rows={3} placeholder="What was checked, when, and which authority controls the next action." /></div>
           <div className="field"><label htmlFor="case_notes">Private planning note</label><textarea id="case_notes" name="notes" rows={3} placeholder="Do not paste raw correspondence or sensitive identifiers." /></div>
           <label className="checkbox-field"><input type="checkbox" name="consent_to_store" /><span>I consent to storing this application metadata under my verified account. I understand that raw files and full sensitive references are not accepted.</span></label>
-          <button className="btn primary" type="submit" disabled={loading}>Create application case</button>
+          <button className="btn primary" type="submit" disabled={loading || workspaceState !== "ready"}>Create application case</button>
         </form>
 
         <section className="result-panel">
@@ -440,7 +455,7 @@ export default function ApplicationCaseWorkspace() {
                 <div className="actions"><button className="btn primary" type="button" disabled={updatingRef === item.case_ref} onClick={() => loadDetail(item.case_ref)}>{updatingRef === item.case_ref ? "Loading..." : selectedRef === item.case_ref ? "Selected" : "Open case"}</button></div>
               </article>
             ))}
-            {!cases.length ? <article className="result-block soft"><h3>No application case loaded</h3><p>Sign in and create the first case after migration 028 is applied.</p></article> : null}
+            {workspaceState === "ready" && !cases.length ? <article className="result-block soft"><h3>No application case yet</h3><p>Choose an account-owned route or evidence pack above, or enter the first case manually when real application work begins.</p></article> : null}
           </div>
         </section>
       </section>

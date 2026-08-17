@@ -18,6 +18,7 @@ type LinkOption = {
 
 type LinkResponse = {
   ok: boolean;
+  contract_version?: string;
   account_email?: string;
   profiles?: LinkOption[];
   saved_routes?: LinkOption[];
@@ -43,19 +44,30 @@ function setInputValue(id: string, value?: string | null) {
 
 export default function ApplicationLinkChoices() {
   const [data, setData] = useState<LinkResponse | null>(null);
-  const [message, setMessage] = useState("Sign in to load profiles, saved routes, and evidence packs you can link.");
+  const [state, setState] = useState<"loading" | "ready" | "signed_out" | "error">("loading");
+  const [message, setMessage] = useState("Loading account-owned application links...");
   const [loading, setLoading] = useState(false);
 
   async function load() {
     setLoading(true);
+    setState("loading");
     setMessage("Loading account-owned application links...");
     try {
       const response = await apiJson<LinkResponse>("applications/links", { timeoutMs: 20000 });
+      if (response.contract_version !== "b12-v1") {
+        setData(null);
+        setState("error");
+        setMessage("The deployed application-link contract is older than B12. Retry after the backend deployment completes.");
+        return;
+      }
       setData(response);
-      setMessage("Account-owned link choices loaded.");
+      setState("ready");
+      const unavailable = Object.keys(response.errors || {});
+      setMessage(unavailable.length ? `Link choices loaded with ${unavailable.length} unavailable source${unavailable.length === 1 ? "" : "s"}. You can still enter the case details manually.` : "Account-owned link choices loaded.");
     } catch (error) {
       const apiError = error as ApiError;
       setData(null);
+      setState(apiError?.status === 401 ? "signed_out" : "error");
       setMessage(apiError?.status === 401 ? "Sign in to load private link choices." : apiError?.message || "Unable to load application link choices.");
     } finally {
       setLoading(false);
@@ -87,14 +99,15 @@ export default function ApplicationLinkChoices() {
   const packs = data?.evidence_packs || [];
 
   return (
-    <section className="result-block soft">
+    <section className="result-block soft" id="application-links" aria-busy={loading}>
       <div className="panel-heading">
         <div><p className="overline">Account-owned links</p><h2>Use a saved route or evidence pack</h2></div>
-        <span className="status-dot">{data?.account_email ? "Verified" : "Sign in"}</span>
+        <span className="status-dot">{state === "loading" ? "Loading" : data?.account_email ? "Verified" : state === "signed_out" ? "Sign in" : "Needs retry"}</span>
       </div>
       <p>{data?.privacy_note || "Only private account-owned identifiers and short labels are loaded. Raw documents and sensitive references are not exposed."}</p>
       <div className="actions"><button className="btn primary" type="button" disabled={loading} onClick={load}>{loading ? "Loading..." : "Refresh link choices"}</button><a className="btn" href="/saved-routes">Saved routes</a><a className="btn" href="/evidence-pack">Evidence packs</a></div>
-      <p className="form-status">{message}</p>
+      <p className="form-status" aria-live="polite" role={state === "error" ? "alert" : undefined}>{message}</p>
+      {state === "signed_out" ? <div className="actions"><a className="btn primary" href="/login?next=/applications">Sign in to choose a pack</a></div> : null}
       <div className="live-workspace">
         <article className="workflow-panel live-form">
           <p className="overline">Saved routes</p>

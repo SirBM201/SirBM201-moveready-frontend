@@ -1,4 +1,5 @@
 import ApplicationCaseWorkspace from "@/components/ApplicationCaseWorkspace";
+import ApplicationLinkChoices from "@/components/ApplicationLinkChoices";
 import SiteHeader from "@/components/SiteHeader";
 
 const controls = [
@@ -27,7 +28,7 @@ export default function ApplicationsPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Verified account case manager</span>
+          <span className="eyebrow">B12 · PREPARE → APPLY</span>
           <h1>Track a real application from research to decision in one private workspace.</h1>
           <p className="lede">
             Link route, evidence, appointment, submission, deadlines, fees, source status, additional-document requests, communications, and the final decision without uploading raw authority correspondence.
@@ -42,6 +43,7 @@ export default function ApplicationsPage() {
       </section>
 
       <section className="section no-top-pad" id="application-workspace">
+        <ApplicationLinkChoices />
         <ApplicationCaseWorkspace />
       </section>
 
