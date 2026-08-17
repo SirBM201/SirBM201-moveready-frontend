@@ -23,7 +23,7 @@ export default function EvidencePackPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Verified account workspace</span>
+          <span className="eyebrow">B12 · DOCUMENTS → EVIDENCE</span>
           <h1>Organize evidence, expiry risk, and refusal repair without uploading raw documents.</h1>
           <p className="lede">
             Build a private document inventory, generate a route-based evidence pack, and prepare a structured response to a refusal or denied-admission event.

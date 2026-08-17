@@ -8,6 +8,7 @@ import { ApiError, apiJson } from "@/lib/api";
 type OptionRow = { key: string; label: string };
 type EvidenceOptions = {
   ok: boolean;
+  contract_version?: string;
   document_types?: string[];
   owner_scopes?: string[];
   document_statuses?: string[];
@@ -152,31 +153,45 @@ export default function EvidencePackWorkspace() {
   const [packs, setPacks] = useState<EvidencePack[]>([]);
   const [refusalResult, setRefusalResult] = useState<RefusalResult | null>(null);
   const [accountEmail, setAccountEmail] = useState("");
-  const [message, setMessage] = useState("Sign in to load your private evidence inventory.");
+  const [workspaceState, setWorkspaceState] = useState<"loading" | "ready" | "signed_out" | "error">("loading");
+  const [message, setMessage] = useState("Loading your private evidence inventory...");
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
 
   async function loadWorkspace(silent = false) {
+    setWorkspaceState("loading");
     if (!silent) {
       setLoading(true);
       setMessage("Loading private evidence records...");
     }
     try {
       const optionData = await apiJson<EvidenceOptions>("evidence/options", { timeoutMs: 12000, useAuthToken: false });
+      if (optionData.contract_version !== "b12-v1") {
+        setWorkspaceState("error");
+        setMessage("The deployed evidence contract is older than B12. Retry after the backend deployment completes.");
+        return;
+      }
       setOptions({ ...fallbackOptions, ...optionData });
       const [documentData, packData] = await Promise.all([
-        apiJson<{ account_email?: string; documents?: DocumentRow[] }>("evidence/documents", { timeoutMs: 20000 }),
-        apiJson<{ account_email?: string; evidence_packs?: EvidencePack[] }>("evidence/packs", { timeoutMs: 20000 }),
+        apiJson<{ contract_version?: string; account_email?: string; documents?: DocumentRow[] }>("evidence/documents", { timeoutMs: 20000 }),
+        apiJson<{ contract_version?: string; account_email?: string; evidence_packs?: EvidencePack[] }>("evidence/packs", { timeoutMs: 20000 }),
       ]);
+      if (documentData.contract_version !== "b12-v1" || packData.contract_version !== "b12-v1") {
+        setWorkspaceState("error");
+        setMessage("Evidence records returned an older contract. Retry after the backend deployment completes.");
+        return;
+      }
       setDocuments(documentData.documents || []);
       setPacks(packData.evidence_packs || []);
       setAccountEmail(documentData.account_email || packData.account_email || "");
+      setWorkspaceState("ready");
       setMessage("Private evidence inventory and packs loaded.");
     } catch (error) {
       const apiError = error as ApiError;
       setDocuments([]);
       setPacks([]);
       setAccountEmail("");
+      setWorkspaceState(apiError?.status === 401 ? "signed_out" : "error");
       setMessage(apiError?.status === 401 ? "Sign in with email to use the private Evidence Center." : apiError?.data?.hint || "Unable to load evidence records. Migration 027 may still be pending.");
     } finally {
       if (!silent) setLoading(false);
@@ -319,10 +334,10 @@ export default function EvidencePackWorkspace() {
 
   return (
     <div className="result-stack">
-      <article className="result-block featured">
+      <article className="result-block featured" aria-busy={workspaceState === "loading" || loading}>
         <div className="panel-heading">
           <div><p className="overline">Private evidence workspace</p><h2>{accountEmail ? `Evidence for ${accountEmail}` : "Connect a verified account"}</h2></div>
-          <span className="status-dot">Metadata only</span>
+          <span className="status-dot">{workspaceState === "loading" ? "Loading" : workspaceState === "ready" ? "Metadata only" : workspaceState === "signed_out" ? "Sign in" : "Needs retry"}</span>
         </div>
         <p>{options.storage_boundary || fallbackOptions.storage_boundary}</p>
         <div className="actions">
@@ -330,7 +345,7 @@ export default function EvidencePackWorkspace() {
           <a className="btn" href="/login?next=/evidence-pack">Sign in</a>
           <a className="btn" href="/source-health">Source health</a>
         </div>
-        <p className="form-status">{message}</p>
+        <p className="form-status" aria-live="polite" role={workspaceState === "error" ? "alert" : undefined}>{message}</p>
       </article>
 
       <section className="live-workspace">
@@ -354,7 +369,7 @@ export default function EvidencePackWorkspace() {
             <div className="field"><label htmlFor="evidence_legalization_status">Legalization</label><select id="evidence_legalization_status" name="legalization_status" defaultValue="unknown">{processStatuses.map((item) => <option key={item} value={item}>{readable(item)}</option>)}</select></div>
           </div>
           <div className="field"><label htmlFor="evidence_notes">Notes</label><textarea id="evidence_notes" name="notes" rows={3} placeholder="Metadata only. Do not paste private numbers or raw document text." /></div>
-          <button className="btn primary" type="submit" disabled={loading}>Save document metadata</button>
+          <button className="btn primary" type="submit" disabled={loading || workspaceState !== "ready"}>Save document metadata</button>
         </form>
 
         <section className="result-panel">
@@ -378,7 +393,7 @@ export default function EvidencePackWorkspace() {
                 <div className="actions"><button className="btn" type="button" disabled={updatingId === item.id} onClick={() => archiveDocument(item)}>{updatingId === item.id ? "Archiving..." : "Archive metadata"}</button></div>
               </article>
             ))}
-            {!documents.length ? <article className="result-block soft"><h3>No document metadata loaded</h3><p>Sign in and add your first document inventory record. Migration 027 must be applied before records can be stored.</p></article> : null}
+            {workspaceState === "ready" && !documents.length ? <article className="result-block soft"><h3>No document metadata yet</h3><p>Add the first metadata record when you know which document exists. No file upload is needed.</p></article> : null}
           </div>
         </section>
       </section>
@@ -392,7 +407,7 @@ export default function EvidencePackWorkspace() {
             <div className="field"><label htmlFor="pack_application_stage">Application stage</label><select id="pack_application_stage" name="application_stage" defaultValue="preparation">{(options.application_stages || []).map((item) => <option key={item} value={item}>{readable(item)}</option>)}</select></div>
           </div>
           <div className="field"><label htmlFor="pack_source_notes">Official checklist or source note</label><textarea id="pack_source_notes" name="official_source_notes" rows={5} placeholder="Record the official authority, checklist date, URL title, or exact current instruction you checked. Do not paste private application data." /></div>
-          <button className="btn primary" type="submit" disabled={loading}>Generate and save evidence pack</button>
+          <button className="btn primary" type="submit" disabled={loading || workspaceState !== "ready"}>Generate and save evidence pack</button>
         </form>
 
         <section className="result-panel">
@@ -409,9 +424,10 @@ export default function EvidencePackWorkspace() {
                   <div><strong>Official source note</strong><span>{pack.official_source_notes || "Not recorded"}</span></div>
                 </div>
                 <p className="form-status">{pack.safety_note}</p>
+                <div className="actions"><a className="btn primary" href="/applications#application-links">Use this pack in an application case</a></div>
               </article>
             ))}
-            {!packs.length ? <article className="result-block soft"><h3>No evidence pack generated</h3><p>Add document metadata, record the official checklist you checked, and generate a pack for the intended route.</p></article> : null}
+            {workspaceState === "ready" && !packs.length ? <article className="result-block soft"><h3>No evidence pack yet</h3><p>Add document metadata, record the official checklist you checked, and generate a pack for the intended route.</p></article> : null}
           </div>
         </section>
       </section>
@@ -432,7 +448,7 @@ export default function EvidencePackWorkspace() {
           <div className="field"><label htmlFor="refusal_corrected_evidence">Corrected or new evidence</label><textarea id="refusal_corrected_evidence" name="corrected_evidence" rows={5} placeholder="One item per line: official decision obtained; employer letter corrected; six-month savings history; revised market validation..." /></div>
           <div className="field"><label htmlFor="refusal_excerpt">Optional redacted decision excerpt</label><textarea id="refusal_excerpt" name="decision_excerpt" rows={5} placeholder="Remove names, passport numbers, addresses, account details, file numbers, barcodes, signatures, and third-party data." /></div>
           <label className="checkbox-field"><input type="checkbox" name="decision_excerpt_redacted" /><span>I removed direct identifiers and sensitive personal data from any excerpt entered above.</span></label>
-          <button className="btn primary" type="submit" disabled={loading}>Generate refusal-repair plan</button>
+          <button className="btn primary" type="submit" disabled={loading || workspaceState !== "ready"}>Generate refusal-repair plan</button>
         </form>
 
         <section className="result-panel">

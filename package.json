@@ -10,7 +10,8 @@
     "test:b06": "node scripts/test-b06-general-user-jobs.mjs",
     "test:b08": "node scripts/test-b08-language-coach.mjs",
     "test:b10": "node scripts/test-b10-financial-readiness.mjs",
-    "test:b11": "node scripts/test-b11-opportunity-route-finder.mjs"
+    "test:b11": "node scripts/test-b11-opportunity-route-finder.mjs",
+    "test:b12": "node scripts/test-b12-documents-evidence-applications.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
