@@ -8,6 +8,7 @@ on:
       - "components/**"
       - "lib/**"
       - "public/**"
+      - "scripts/**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -19,6 +20,7 @@ on:
       - "components/**"
       - "lib/**"
       - "public/**"
+      - "scripts/**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -52,6 +54,9 @@ jobs:
         # NODE_ENV=production is required for the build, but npm would otherwise
         # omit declared build-time devDependencies such as @tailwindcss/postcss.
         run: npm ci --include=dev
+
+      - name: Test B06 general-user Jobs contract
+        run: npm run test:b06
 
       - name: Build Next.js application
         run: npm run build

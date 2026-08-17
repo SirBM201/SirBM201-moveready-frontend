@@ -10,6 +10,7 @@ import {
   JobDocumentDraft,
   JobLead,
   JobProfile,
+  JobSearchContract,
   JobWatch,
   ResumeDocument,
   formatJobDate,
@@ -19,6 +20,7 @@ import {
 type AutomationOverview = {
   ok: boolean;
   profile: JobProfile | null;
+  search_contract: JobSearchContract;
   watches: JobWatch[];
   jobs: JobLead[];
   alerts: JobAutomationAlert[];
@@ -66,6 +68,20 @@ function statusTone(status?: string) {
   if (["completed", "approved", "ready", "submission_confirmed", "open"].includes(status || "")) return "complete";
   if (["failed", "closed", "not_submitted"].includes(status || "")) return "warning";
   return "active";
+}
+
+function priorityExplanation(job: JobLead) {
+  if (job.application_priority === "out_of_scope") return "Outside selected scope";
+  if (job.application_priority === "not_recommended") return "Do not prioritize";
+  if (job.application_priority === "verify_authorization") return "Verify work rights first";
+  if (job.application_priority === "profile_incomplete") return "Complete search setup";
+  if (job.application_priority === "recommended") return "Recommended to review";
+  return "Consider after review";
+}
+
+function scopeExplanation(job: JobLead) {
+  if (job.search_scope_classification === "local" || job.search_scope_classification === "international") return jobLabel(job.search_scope_classification);
+  return "Location not classified";
 }
 
 export default function JobAutomationWorkspace() {
@@ -371,16 +387,24 @@ export default function JobAutomationWorkspace() {
     { label: "Truth approval", complete: selectedDrafts.length >= 2 && selectedDrafts.every((draft) => ["approved", "exported"].includes(draft.status)) },
     { label: "Employer handoff", complete: selectedAssistance?.status === "submission_confirmed" },
   ];
+  const searchContract = overview.search_contract;
+  const scopeReady = Boolean(overview.profile && searchContract?.ready);
 
   return (
     <>
       <section className="jobs-page-heading">
         <div><span className="eyebrow">Controlled job automation</span><h1>Discover, prepare, approve, and apply—one safe step at a time.</h1><p className="lede">MoveReady checks official employer sources, alerts you to relevant changes, prepares editable drafts from your own evidence, and opens the employer page only when you approve the pack.</p></div>
-        <div className="actions"><button className="btn primary" type="button" onClick={scanAll} disabled={busy !== "" || !overview.counts.active_watches}>{busy === "scan-all" ? "Scanning..." : "Scan official sources now"}</button><a className="btn" href="/jobs/profile">Career facts</a><button className="btn" type="button" onClick={() => load()} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button></div>
+        <div className="actions"><button className="btn primary" type="button" onClick={scanAll} disabled={busy !== "" || !overview.counts.active_watches || !scopeReady}>{busy === "scan-all" ? "Scanning..." : "Scan official sources now"}</button><a className="btn" href="/jobs/profile">Search profile</a><button className="btn" type="button" onClick={() => load()} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button></div>
       </section>
 
       <div className="jobs-safety-strip"><strong>No automatic submission:</strong><span>MoveReady never fills declarations, accepts legal terms, sends an application, or claims success without your explicit confirmation.</span></div>
       <p className="jobs-inline-status" aria-live="polite">{message}</p>
+
+      <section className={`section jobs-section jobs-scope-contract ${scopeReady ? "ready" : "attention"}`}>
+        <div><p className="overline">Intentional search area</p><h2>{scopeReady ? `${jobLabel(searchContract.search_scope)} search is active` : "Complete your search area before scanning"}</h2><p>{searchContract?.truth_note || "Work rights are user-reported and employer support requires source evidence."}</p></div>
+        <div className="jobs-contract-facts"><span><small>Current country</small><strong>{searchContract?.current_country || "Not recorded"}</strong></span><span><small>Countries in scope</small><strong>{searchContract?.target_countries.join(", ") || "Not ready"}</strong></span><span><small>Work rights reported</small><strong>{searchContract?.work_authorized_countries.join(", ") || "None confirmed"}</strong></span></div>
+        {!scopeReady ? <a className="btn primary" href="/jobs/setup">Complete search setup</a> : <a className="btn" href="/jobs/profile">Edit search area</a>}
+      </section>
 
       <section className="section jobs-section jobs-automation-progress">
         <div className="panel-heading"><div><p className="overline">Your assisted flow</p><h2>Five controlled stages</h2></div><span className="status-dot">{steps.filter((step) => step.complete).length} of 5 ready</span></div>
@@ -389,10 +413,10 @@ export default function JobAutomationWorkspace() {
       </section>
 
       <section className="section jobs-section">
-        <div className="section-heading-row"><div><p className="overline">1. Vacancy monitoring</p><h2>Official employer sources only</h2><p>Build monitors from the companies already in your target list. Supported public ATS pages are allowed; arbitrary job-board or social-media scraping is not.</p></div><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={busy !== ""}>{busy === "bootstrap" ? "Creating..." : overview.watches.length ? "Refresh target monitors" : "Create target monitors"}</button><a className="btn" href="/jobs/companies">Target companies</a></div></div>
+        <div className="section-heading-row"><div><p className="overline">1. Vacancy monitoring</p><h2>Official employer sources only</h2><p>Build monitors from target companies inside your selected countries. Supported public ATS pages are allowed; arbitrary job-board or social-media scraping is not.</p></div><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={busy !== "" || !scopeReady}>{busy === "bootstrap" ? "Creating..." : overview.watches.length ? "Refresh target monitors" : "Create target monitors"}</button><a className="btn" href="/jobs/companies">Target companies</a></div></div>
         <div className="jobs-monitor-grid">
-          {overview.watches.map((watch) => <article className="jobs-monitor-card" key={watch.id}><div className="panel-heading"><div><p className="overline">{watch.company_name || "Target employer"}</p><h3>{watch.watch_name}</h3></div><span className={`status-dot ${statusTone(watch.last_scan_status)}`}>{jobLabel(watch.last_scan_status)}</span></div><p>{watch.keywords?.slice(0, 4).join(" · ") || "Profile roles and skills"}</p><div className="jobs-record-facts"><span><small>Last scan</small><strong>{formatJobDate(watch.last_scan_at, true)}</strong></span><span><small>Listings</small><strong>{watch.last_result_count || 0}</strong></span><span><small>Cadence</small><strong>{jobLabel(watch.cadence)}</strong></span></div>{watch.last_error ? <p className="jobs-warning-copy">Latest check failed safely: {watch.last_error}</p> : null}<div className="actions"><button className="btn primary" type="button" onClick={() => scanWatch(watch)} disabled={busy !== "" || !watch.is_active}>{busy === `scan-${watch.id}` ? "Checking..." : "Check now"}</button><button className="btn" type="button" onClick={() => toggleWatch(watch)} disabled={busy !== ""}>{watch.is_active ? "Pause" : "Activate"}</button><a className="btn" href={watch.source_url} target="_blank" rel="noreferrer">Official source</a></div></article>)}
-          {!overview.watches.length ? <article className="jobs-empty"><h3>No vacancy monitor exists yet</h3><p>Choose target employers first, then create monitors from their recorded official career pages.</p><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches}>Create target monitors</button><a className="btn" href="/jobs/companies">Choose employers</a></div></article> : null}
+          {overview.watches.map((watch) => <article className="jobs-monitor-card" key={watch.id}><div className="panel-heading"><div><p className="overline">{watch.company_name || "Target employer"}</p><h3>{watch.watch_name}</h3></div><span className={`status-dot ${statusTone(watch.last_scan_status)}`}>{jobLabel(watch.last_scan_status)}</span></div><p>{watch.keywords?.slice(0, 4).join(" · ") || "Profile roles and skills"}</p><div className="jobs-record-facts"><span><small>Last scan</small><strong>{formatJobDate(watch.last_scan_at, true)}</strong></span><span><small>Listings</small><strong>{watch.last_result_count || 0}</strong></span><span><small>Cadence</small><strong>{jobLabel(watch.cadence)}</strong></span></div>{watch.last_error ? <p className="jobs-warning-copy">Latest check failed safely: {watch.last_error}</p> : null}<div className="actions"><button className="btn primary" type="button" onClick={() => scanWatch(watch)} disabled={busy !== "" || !watch.is_active || !scopeReady}>{busy === `scan-${watch.id}` ? "Checking..." : "Check now"}</button><button className="btn" type="button" onClick={() => toggleWatch(watch)} disabled={busy !== ""}>{watch.is_active ? "Pause" : "Activate"}</button><a className="btn" href={watch.source_url} target="_blank" rel="noreferrer">Official source</a></div></article>)}
+          {!overview.watches.length ? <article className="jobs-empty"><h3>No vacancy monitor exists yet</h3><p>{scopeReady ? "Choose target employers first, then create monitors from their recorded official career pages." : "Complete your intentional country scope before creating target monitors."}</p><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={!scopeReady}>Create target monitors</button>{scopeReady ? <a className="btn" href="/jobs/companies">Choose employers</a> : <a className="btn" href="/jobs/setup">Complete search setup</a>}</div></article> : null}
         </div>
       </section>
 
@@ -406,7 +430,7 @@ export default function JobAutomationWorkspace() {
 
       <section className="section jobs-section">
         <div className="section-heading-row"><div><p className="overline">3. Discovered vacancies</p><h2>Choose a genuine opportunity</h2><p>Scores are transparent planning aids, not employment predictions. Always confirm requirements, closing dates, location, and sponsorship wording on the official page.</p></div><span className="status-dot">{overview.counts.open_jobs} open</span></div>
-        <div className="jobs-card-grid jobs-automation-job-grid">{overview.jobs.map((job) => <article className={`jobs-card${selectedJobId === job.id ? " selected" : ""}`} key={job.id}><div className="panel-heading"><div><p className="overline">{job.company_name || "Employer"}</p><h3>{job.job_title}</h3></div><span className="jobs-score">{job.match_score || 0}%</span></div><p>{[job.city, job.province, job.country].filter(Boolean).join(", ") || "Location not recorded"}</p><ul className="jobs-reasons">{(job.match_reasons || []).slice(0, 3).map((reason) => <li key={reason}>{reason}</li>)}</ul><div className="jobs-record-facts"><span><small>First seen</small><strong>{formatJobDate(job.first_seen_at)}</strong></span><span><small>Status</small><strong>{jobLabel(job.status)}</strong></span></div><div className="actions"><button className="btn primary" type="button" onClick={() => prepareJob(job)} disabled={busy !== ""}>{busy === `prepare-${job.id}` ? "Preparing..." : "Prepare application"}</button>{job.job_url ? <a className="btn" href={job.job_url} target="_blank" rel="noreferrer">Review vacancy</a> : null}</div></article>)}{!overview.jobs.length ? <article className="jobs-empty"><h3>No matching vacancy has been discovered yet</h3><p>Create monitors and scan the recorded official employer sources. You can continue using manual vacancies in Applications while monitors run.</p></article> : null}</div>
+        <div className="jobs-card-grid jobs-automation-job-grid">{overview.jobs.map((job) => <article className={`jobs-card${selectedJobId === job.id ? " selected" : ""}`} key={job.id}><div className="panel-heading"><div><p className="overline">{job.company_name || "Employer"}</p><h3>{job.job_title}</h3></div><span className="jobs-score">{job.match_score || 0}% match</span></div><p>{[job.city, job.province, job.country].filter(Boolean).join(", ") || "Location not recorded"}</p><div className="badge-row"><span className="badge">{scopeExplanation(job)}</span><span className="badge">Viability {job.application_viability_score ?? job.application_priority_score ?? 0}%</span><span className="badge">{priorityExplanation(job)}</span></div><ul className="jobs-reasons">{(job.application_priority_reasons || job.viability_reasons || []).slice(0, 2).map((reason) => <li key={reason}><strong>{reason}</strong></li>)}{(job.match_reasons || []).slice(0, 2).map((reason) => <li key={reason}>{reason}</li>)}</ul><div className="jobs-record-facts"><span><small>First seen</small><strong>{formatJobDate(job.first_seen_at)}</strong></span><span><small>Source status</small><strong>{jobLabel(job.status)}</strong></span></div><div className="actions"><button className="btn primary" type="button" onClick={() => prepareJob(job)} disabled={busy !== "" || job.application_priority === "out_of_scope" || job.application_priority === "profile_incomplete"}>{busy === `prepare-${job.id}` ? "Preparing..." : job.application_priority === "out_of_scope" ? "Outside selected scope" : job.application_priority === "verify_authorization" ? "Prepare for work-rights review" : "Prepare application"}</button>{job.job_url ? <a className="btn" href={job.job_url} target="_blank" rel="noreferrer">Review vacancy</a> : null}</div></article>)}{!overview.jobs.length ? <article className="jobs-empty"><h3>No matching vacancy has been discovered yet</h3><p>Create monitors and scan the recorded official employer sources. You can continue using manual vacancies in Applications while monitors run.</p></article> : null}</div>
       </section>
 
       <section className="section jobs-section" id="application-pack">

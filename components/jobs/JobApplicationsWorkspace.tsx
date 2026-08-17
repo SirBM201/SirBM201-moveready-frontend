@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { ApiError, apiJson } from "@/lib/api";
+import { profileSearchContract } from "@/lib/jobProfile";
 import {
   JobApplication,
   JobCompany,
@@ -48,6 +49,13 @@ function draftFor(application?: JobApplication): ApplicationDraft {
   };
 }
 
+function defaultApplicationCountry(profile: JobProfile | null) {
+  const contract = profileSearchContract(profile);
+  return contract.search_scope === "international"
+    ? contract.international_target_countries[0] || ""
+    : contract.current_country || "";
+}
+
 export default function JobApplicationsWorkspace() {
   const [profile, setProfile] = useState<JobProfile | null>(null);
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -86,7 +94,7 @@ export default function JobApplicationsWorkspace() {
       setJobs(jobResponse.jobs || []);
       setDocuments(documentResponse.documents || []);
       setDrafts(Object.fromEntries(rows.map((application) => [application.id, draftFor(application)])));
-      setNewCountry((current) => current || profileResponse.profile?.primary_country || "");
+      setNewCountry((current) => current || defaultApplicationCountry(profileResponse.profile));
       setSignedOut(false);
       setMessage(successMessage || (rows.length
         ? `${rows.length} application record${rows.length === 1 ? " is" : "s are"} in your private pipeline.`
@@ -141,7 +149,7 @@ export default function JobApplicationsWorkspace() {
     const job = jobs.find((item) => item.id === jobId);
     setSelectedJobId(jobId);
     setSelectedCompanyId("");
-    setNewCountry(job?.country || profile?.primary_country || "");
+    setNewCountry(job?.country || defaultApplicationCountry(profile));
   }
 
   async function createApplication(event: FormEvent<HTMLFormElement>) {
@@ -173,7 +181,7 @@ export default function JobApplicationsWorkspace() {
       form.reset();
       setSelectedJobId("");
       setSelectedCompanyId("");
-      setNewCountry(profile?.primary_country || "");
+      setNewCountry(defaultApplicationCountry(profile));
       setStatusFilter(response.application.status || "");
       await load(response.created === false
         ? response.message || `${response.application.job_title} is already in your pipeline.`
@@ -272,7 +280,7 @@ export default function JobApplicationsWorkspace() {
           <div className="panel-heading"><div><p className="overline">New opportunity</p><h2>Add a vacancy or application</h2></div><span className="status-dot">Private to your account</span></div>
           <p className="jobs-form-intro">Choose a vacancy already saved in MoveReady, or enter the role and employer yourself. Use “Saved, not applied” until you actually submit.</p>
           <div className="form-grid two-col">
-            <div className="field"><label htmlFor="application_job_id">Saved vacancy <span>(optional)</span></label><select id="application_job_id" name="job_id" value={selectedJobId} onChange={(event) => chooseSavedJob(event.target.value)}><option value="">Enter a vacancy manually</option>{jobs.map((job) => <option value={job.id} key={job.id}>{job.job_title} · {job.company_name || "Employer not linked"}</option>)}</select></div>
+            <div className="field"><label htmlFor="application_job_id">Saved vacancy <span>(optional)</span></label><select id="application_job_id" name="job_id" value={selectedJobId} onChange={(event) => chooseSavedJob(event.target.value)}><option value="">Enter a vacancy manually</option>{jobs.map((job) => <option value={job.id} key={job.id}>{job.job_title} · {job.company_name || "Employer not linked"} · {jobLabel(job.application_priority, "Review")}</option>)}</select><small>Outside-scope vacancies remain trackable, but MoveReady will not treat them as recommended.</small></div>
             <div className="field"><label htmlFor="application_status">Current stage</label><select id="application_status" name="status" defaultValue="saved">{applicationStatuses.map((item) => <option value={item} key={item}>{applicationStage(item)}</option>)}</select><small>Select Applied only after the application has been submitted.</small></div>
             {!selectedJobId ? <div className="field"><label htmlFor="application_job_title">Job title</label><input id="application_job_title" name="job_title" required /></div> : null}
             {!selectedJob?.company_id ? <><div className="field"><label htmlFor="application_company_id">Target company <span>(optional)</span></label><select id="application_company_id" name="company_id" value={selectedCompanyId} onChange={(event) => setSelectedCompanyId(event.target.value)}><option value="">Enter another employer</option>{companies.map((company) => <option value={company.id} key={company.id}>{company.company_name}</option>)}</select></div>{!selectedCompanyId ? <div className="field"><label htmlFor="application_company_name">Employer name</label><input id="application_company_name" name="company_name" required /></div> : null}</> : null}

@@ -1,4 +1,4 @@
-import type { JobProfile } from "@/lib/jobs";
+import type { JobProfile, JobSearchContract, JobSearchScope } from "@/lib/jobs";
 
 export type JobProfileDraft = {
   display_name: string;
@@ -14,15 +14,15 @@ export type JobProfileDraft = {
   later_countries: string;
   preferred_provinces: string;
   work_authorization_status: string;
-  search_scope: "local" | "international" | "both";
+  search_scope: JobSearchScope;
   current_country: string;
   work_authorized_countries: string;
 };
 
 export const searchScopeChoices = [
-  { value: "local", label: "Local", help: "Show jobs in my current country. Immigration or sponsorship analysis stays out of the way unless it is actually relevant." },
-  { value: "international", label: "International", help: "Show jobs outside my current country and assess work authorization, sponsorship and relocation viability." },
-  { value: "both", label: "Both", help: "Search locally and internationally, while applying immigration checks only to the international opportunities that need them." },
+  { value: "local", label: "Local", help: "Search only in the country where I currently live or work." },
+  { value: "international", label: "International", help: "Search only in the foreign countries I intentionally select." },
+  { value: "both", label: "Local + international", help: "Search my current country and my selected foreign countries." },
 ] as const;
 
 export const workAuthorizationChoices = [
@@ -91,7 +91,7 @@ export function founderJobProfileDraft(): JobProfileDraft {
     work_authorization_status: "requires_sponsorship",
     search_scope: "both",
     current_country: "Kuwait",
-    work_authorized_countries: ["Kuwait"].join("\n"),
+    work_authorized_countries: "",
   };
 }
 
@@ -104,6 +104,63 @@ export function parseJobProfileList(value: string) {
     .split(/[\n,]+/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function countryKey(value?: string | null) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function uniqueCountries(values: Array<string | undefined | null>) {
+  const seen = new Set<string>();
+  return values
+    .map((country) => String(country || "").trim())
+    .filter((country) => {
+      const key = countryKey(country);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+export function usesInternationalSearch(scope: JobSearchScope) {
+  return scope === "international" || scope === "both";
+}
+
+export function internationalTargetsFromDraft(draft: JobProfileDraft) {
+  const currentCountry = countryKey(draft.current_country);
+  return uniqueCountries(parseJobProfileList([draft.primary_country, draft.later_countries].filter(Boolean).join("\n")))
+    .filter((country) => countryKey(country) !== currentCountry);
+}
+
+export function profileSearchContract(profile: JobProfile | null): JobSearchContract {
+  const scope = profile?.search_scope === "local" || profile?.search_scope === "international" || profile?.search_scope === "both"
+    ? profile.search_scope
+    : "international";
+  const currentCountry = profile?.current_country?.trim() || null;
+  const internationalTargets = uniqueCountries([profile?.primary_country, ...(profile?.later_countries || [])])
+    .filter((country) => countryKey(country) !== countryKey(currentCountry));
+  const localTargets = currentCountry ? [currentCountry] : [];
+  const targetCountries = scope === "local"
+    ? localTargets
+    : scope === "international"
+      ? internationalTargets
+      : uniqueCountries([...localTargets, ...internationalTargets]);
+  const missingFields = [
+    ...(!currentCountry ? ["current_country"] : []),
+    ...(usesInternationalSearch(scope) && !internationalTargets.length ? ["international_target_country"] : []),
+  ];
+  return {
+    version: "b05-v1",
+    ready: missingFields.length === 0,
+    search_scope: scope,
+    current_country: currentCountry,
+    local_target_countries: localTargets,
+    international_target_countries: internationalTargets,
+    target_countries: targetCountries,
+    work_authorized_countries: profile?.work_authorized_countries || [],
+    missing_fields: missingFields,
+    truth_note: "Work authorization is user-reported and vacancy sponsorship is source-derived; neither guarantees employment or immigration approval.",
+  };
 }
 
 export function jobProfileToDraft(profile: JobProfile | null): JobProfileDraft {
