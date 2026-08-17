@@ -75,31 +75,45 @@ $Passport.passport_index.passport_strength_band
 $Passport.passport_index.summary
 ```
 
-## Readiness tools check
+## B10 Financial Readiness check
 
 ```powershell
 $FundsPayload = @{
-  available_funds_amount = 12000
-  required_funds_amount = 15000
-  target_timeline_months = 6
-  family_members_count = 3
+  country_code = "FI"
+  route_code = "d-visa"
   currency = "EUR"
-  recent_large_deposits = $false
+  savings = 12000
+  expected_funding = 0
+  family_size = 1
+  proof_of_funds = @{
+    amount = $null
+    currency = "EUR"
+  }
+  costs = @{
+    flight = 600
+    accommodation = 1500
+    settlement_reserve = 2000
+  }
 }
 
 $Funds = Invoke-RestMethod `
   -Method Post `
-  -Uri "$Api/api/readiness/funds-plan" `
+  -Uri "$Api/api/financial-readiness/check" `
   -ContentType "application/json" `
   -Body ($FundsPayload | ConvertTo-Json -Depth 10)
 
-$Funds | ConvertTo-Json -Depth 10
+$Funds.contract_version
+$Funds.financial_plan.contract_version
+$Funds.financial_plan.assessment.status
+$Funds.financial_plan.warnings
 ```
+
+This unresolved-source scenario must remain fail-closed. It must not treat a missing official requirement as zero. Add a real current requirement and HTTPS authority reference only when testing a route-specific source you have reviewed.
 
 ## Launch acceptance rule
 
 The MVP is launch-ready only when a normal user can understand this order without help:
 
-**Start → Account/Profile → Check Route → Report → Passport → Visa Power → Saved Routes/Alerts → Support only if needed.**
+**Start → Account/Profile → Check Route → Financial Readiness → Report → Passport → Visa Power → Saved Routes/Alerts → Support only if needed.**
 
 MoveReady must remain advisory. It must not promise visa approval, travel entry, admission, job offers, lottery selection, ballot success, or provider acceptance.

@@ -6,7 +6,7 @@ import SiteHeader from "@/components/SiteHeader";
 const familyAreas = [
   "Spouse eligibility and relationship evidence",
   "Child documents, birth certificates, custody, and school records",
-  "Extra proof-of-funds pressure by family size",
+  "Route-specific proof-of-funds review for the exact family size",
   "Family health or travel insurance requirements",
   "Accommodation size and arrival planning",
   "School, childcare, local registration, and settlement tasks",
