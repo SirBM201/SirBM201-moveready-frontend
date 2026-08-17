@@ -61,5 +61,8 @@ jobs:
       - name: Test B08 Language Coach contract
         run: npm run test:b08
 
+      - name: Test B10 Financial Readiness contract
+        run: npm run test:b10
+
       - name: Build Next.js application
         run: npm run build

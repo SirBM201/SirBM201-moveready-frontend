@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { apiJson } from "@/lib/api";
 
 type Result = Record<string, any> | null;
-type ResultKind = "name" | "document" | "funds" | "refusal";
+type ResultKind = "name" | "document" | "refusal";
 
 function sourcePage() {
   try {
@@ -73,17 +73,6 @@ function ResultPanel({ title, result, kind }: { title: string; result: Result; k
         </div>
       ) : null}
 
-      {kind === "funds" ? (
-        <div className="mini-list two-col-list">
-          <div><strong>Available funds</strong><span>{result.currency} {Number(result.available_funds || 0).toLocaleString()}</span></div>
-          <div><strong>Planning requirement</strong><span>{result.currency} {Number(result.required_funds_adjusted || 0).toLocaleString()}</span></div>
-          <div><strong>Shortfall</strong><span>{result.currency} {Number(result.shortfall || 0).toLocaleString()}</span></div>
-          <div><strong>Monthly savings target</strong><span>{result.currency} {Number(result.monthly_savings_target || 0).toLocaleString()}</span></div>
-          <div><strong>Warnings</strong><span>{(result.warnings || []).length ? result.warnings.join(" ") : "No major funds warning from the entered values."}</span></div>
-          <div><strong>Important</strong><span>{result.note || "Use official proof-of-funds rules before applying."}</span></div>
-        </div>
-      ) : null}
-
       {kind === "refusal" ? (
         <div className="mini-list">
           {(result.findings || []).length ? (
@@ -106,7 +95,6 @@ function ResultPanel({ title, result, kind }: { title: string; result: Result; k
 export default function ReadinessTools() {
   const [nameResult, setNameResult] = useState<Result>(null);
   const [documentResult, setDocumentResult] = useState<Result>(null);
-  const [fundsResult, setFundsResult] = useState<Result>(null);
   const [refusalResult, setRefusalResult] = useState<Result>(null);
   const [status, setStatus] = useState("Ready. Choose one tool and click the green button.");
 
@@ -131,23 +119,6 @@ export default function ReadinessTools() {
       useAuthToken: false,
     });
     setDocumentResult(data as Result);
-  }
-
-  async function runFundsPlan(formData: FormData) {
-    const data = await apiJson("readiness/funds-plan", {
-      method: "POST",
-      body: {
-        available_funds_amount: Number(formData.get("available_funds_amount") || 0),
-        required_funds_amount: Number(formData.get("required_funds_amount") || 0),
-        target_timeline_months: Number(formData.get("target_timeline_months") || 1),
-        family_members_count: Number(formData.get("family_members_count") || 0),
-        currency: String(formData.get("currency") || "EUR"),
-        recent_large_deposits: formData.get("recent_large_deposits") === "on",
-        source_page: sourcePage(),
-      },
-      useAuthToken: false,
-    });
-    setFundsResult(data as Result);
   }
 
   async function runRefusalRisk(formData: FormData) {
@@ -200,7 +171,7 @@ export default function ReadinessTools() {
         <div className="badge-row">
           <span className="badge">Names</span>
           <span className="badge">Documents</span>
-          <span className="badge">Funds</span>
+          <span className="badge">Financial readiness</span>
           <span className="badge">Refusal risk</span>
         </div>
       </article>
@@ -238,20 +209,24 @@ export default function ReadinessTools() {
 
       <article className="tool-card">
         <div>
-          <h3>Proof-of-funds and budget planner</h3>
-          <p>Estimate shortfall, monthly savings target, family adjustment, and large-deposit risk.</p>
+          <h3>Financial readiness planner</h3>
+          <p>Build a sourced B09 funding scenario without invented family multipliers, exchange rates or approval signals.</p>
         </div>
         <div className="tool-layout">
-          <form className="form-grid two-col" onSubmit={(event) => handleSubmit(event, runFundsPlan)}>
-            <div className="field"><label>Available funds</label><input name="available_funds_amount" type="number" defaultValue="12000" /></div>
-            <div className="field"><label>Required funds</label><input name="required_funds_amount" type="number" defaultValue="15000" /></div>
-            <div className="field"><label>Timeline months</label><input name="target_timeline_months" type="number" defaultValue="6" /></div>
-            <div className="field"><label>Family members</label><input name="family_members_count" type="number" defaultValue="0" /></div>
-            <div className="field"><label>Currency</label><input name="currency" defaultValue="EUR" /></div>
-            <label className="checkbox-field"><input name="recent_large_deposits" type="checkbox" />Recent large deposits</label>
-            <button className="btn primary full" type="submit">Plan funds</button>
-          </form>
-          <ResultPanel title="Funds result" result={fundsResult} kind="funds" />
+          <div className="mini-list">
+            <div><strong>Source the requirement</strong><span>Record the current amount, title, checked date and HTTPS authority link for the exact route and household.</span></div>
+            <div><strong>Model the scenario</strong><span>Combine savings, expected funding and six cost categories while keeping route estimates separate from your overrides.</span></div>
+            <div><strong>Understand the result</strong><span>See the unresolved requirement, source review, currency mismatch, funding gap and monthly target states clearly.</span></div>
+          </div>
+          <article className="result-block soft">
+            <p className="overline">B10 workspace</p>
+            <h3>Use the complete financial plan</h3>
+            <p>Family size is recorded as context only. MoveReady applies no automatic multiplier and accepts no bank documents here.</p>
+            <div className="actions">
+              <a className="btn primary" href="/budget-calculator">Open financial readiness</a>
+              <a className="btn" href="/proof-of-funds">Evidence checklist</a>
+            </div>
+          </article>
         </div>
       </article>
 
