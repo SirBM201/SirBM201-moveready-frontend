@@ -1,9 +1,9 @@
 export default function NotFound() {
   return (
-    <main className="global-not-found-shell">
+    <main className="global-not-found-shell" aria-labelledby="global-not-found-title">
       <section className="global-not-found-card">
         <p className="overline">Page not found</p>
-        <h1>This MoveReady route does not exist or has moved.</h1>
+        <h1 id="global-not-found-title" tabIndex={-1}>This MoveReady route does not exist or has moved.</h1>
         <p>Use the guided setup or Account Center instead of guessing another URL. Private records are available only through their verified-account workspaces.</p>
         <div className="actions">
           <a className="btn primary" href="/onboarding">Guided setup</a>

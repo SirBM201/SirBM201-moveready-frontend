@@ -13,7 +13,8 @@
     "test:b11": "node scripts/test-b11-opportunity-route-finder.mjs",
     "test:b12": "node scripts/test-b12-documents-evidence-applications.mjs",
     "test:b13": "node scripts/test-b13-dashboard-orchestration.mjs",
-    "test:b14": "node scripts/test-b14-smart-alerts.mjs"
+    "test:b14": "node scripts/test-b14-smart-alerts.mjs",
+    "test:b15": "node scripts/test-b15-mobile-accessibility.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",

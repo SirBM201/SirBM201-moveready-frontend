@@ -246,7 +246,7 @@ export default function AccountLogin() {
   }
 
   return (
-    <div className="live-workspace">
+    <div className="live-workspace" aria-busy={loading || readinessLoading}>
       <section className="workflow-panel live-form">
         <div className="panel-heading">
           <div>
@@ -282,7 +282,7 @@ export default function AccountLogin() {
           <button className="btn full" type="submit" disabled={loading || code.length !== 6}>{loading ? "Verifying..." : "Verify and sign in"}</button>
         </form>
 
-        <p className="form-status">{message}</p>
+        <p className="form-status" aria-live="polite">{message}</p>
       </section>
 
       <section className="result-panel">

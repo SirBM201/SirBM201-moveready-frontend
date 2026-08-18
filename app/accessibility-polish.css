@@ -147,3 +147,87 @@
     text-overflow: ellipsis;
   }
 }
+
+/* B15: consistent focus, current-location and assistive-technology support. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.main-content:focus,
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+:where(.nav, .jobs-nav, .mobile-quick-nav) a[aria-current="page"] {
+  background: #dff3f0;
+  color: #123f3b;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.mobile-quick-nav a[aria-current="page"] > span {
+  background: #123f3b;
+  color: #ffffff;
+}
+
+:target {
+  scroll-margin-top: 96px;
+}
+
+[aria-busy="true"] {
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :where(.card, .result-block, .workflow-panel, .result-panel, input, select, textarea, button, .btn) {
+    border-width: 2px !important;
+  }
+
+  :where(.muted, .lede, .footer-brand p, .footer-links a) {
+    color: #334155;
+  }
+}
+
+@media (forced-colors: active) {
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .mobile-quick-nav {
+    background: Canvas;
+    border-color: CanvasText;
+    backdrop-filter: none;
+  }
+
+  .mobile-quick-nav a[aria-current="page"] > span {
+    forced-color-adjust: auto;
+  }
+}

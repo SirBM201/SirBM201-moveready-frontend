@@ -329,7 +329,7 @@ export default function AccountSettingsWorkspace() {
   ];
 
   return (
-    <div className="result-stack">
+    <div className="result-stack" aria-busy={loading}>
       <article className="result-block featured">
         <div className="panel-heading">
           <div>
@@ -338,7 +338,7 @@ export default function AccountSettingsWorkspace() {
           </div>
           <span className="status-dot">Private</span>
         </div>
-        <p>{message}</p>
+        <p aria-live="polite">{message}</p>
         <div className="actions">
           <button className="btn" type="button" onClick={loadAll} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
           <a className="btn" href="/activity">Open activity history</a>
@@ -430,7 +430,7 @@ export default function AccountSettingsWorkspace() {
         </div>
       </article>
 
-      <article className="result-block">
+      <article className="result-block" id="accessibility">
         <p className="overline">Accessibility</p>
         <h2>Adjust reading and motion</h2>
         <div className="mini-list">

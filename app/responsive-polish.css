@@ -217,3 +217,230 @@ h1 {
     align-items: center;
   }
 }
+
+/* B15: phone-width resilience and clear touch actions across all engines. */
+.main-content,
+.main-content > *,
+.card,
+.result-block,
+.workflow-panel,
+.result-panel,
+.panel-heading > *,
+.mini-list > div,
+.footer-links,
+.footer-links nav {
+  min-width: 0;
+}
+
+:where(.card, .result-block, .workflow-panel, .result-panel, .mini-list, .form-status, .lede, .site-footer) {
+  overflow-wrap: anywhere;
+}
+
+:where(button, .btn, summary, input, select, textarea) {
+  min-height: 44px;
+}
+
+:where(.nav a, .jobs-nav a, .footer-links a) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.form-grid > label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.form-grid > label > :where(input, select, textarea),
+.form-grid > :where(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+:where(pre, table, .json-result) {
+  max-width: 100%;
+}
+
+:where(pre, .json-result) {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.route-option-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.route-option-fieldset legend {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: clamp(21px, 3vw, 28px);
+  font-weight: 800;
+}
+
+.route-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  cursor: pointer;
+}
+
+.route-option input {
+  width: 22px;
+  height: 22px;
+}
+
+.route-comparison-result,
+.route-comparison-help {
+  margin-top: 24px;
+}
+
+@media (max-width: 760px) {
+  .nav {
+    overflow: visible;
+    align-items: center;
+  }
+
+  .nav > a:nth-of-type(n + 4) {
+    display: none;
+  }
+
+  .nav > a,
+  .nav-more summary {
+    min-height: 44px;
+  }
+
+  .nav-more {
+    margin-left: auto;
+  }
+
+  .panel-heading,
+  .section-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .panel-heading .status-dot,
+  .section-heading-row .status-dot {
+    align-self: flex-start;
+  }
+
+  :where(input, select, textarea) {
+    font-size: 16px;
+  }
+
+  .form-grid,
+  .form-grid.two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-grid > label:has(input[type="checkbox"]),
+  .form-grid > label:has(input[type="radio"]) {
+    min-height: 44px;
+    align-content: center;
+  }
+
+  .jobs-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .jobs-nav > a,
+  .jobs-nav-more summary {
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .site-footer {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar,
+  .section,
+  .hero-band,
+  .compact-hero,
+  .jobs-nav-wrap {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .nav {
+    gap: 0;
+    font-size: 12px;
+  }
+
+  .nav a,
+  .nav-more summary {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  h1 {
+    font-size: clamp(29px, 9vw, 36px);
+  }
+
+  .workflow-panel,
+  .result-panel,
+  .result-block,
+  .card {
+    padding: 15px;
+  }
+
+  .jobs-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-quick-nav {
+    left: 6px;
+    right: 6px;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .mobile-quick-nav a {
+    min-height: 56px;
+    padding: 6px 1px;
+    font-size: 10px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 920px) {
+  body {
+    padding-bottom: 0;
+  }
+
+  .mobile-quick-nav {
+    position: static;
+    margin: 12px;
+  }
+
+  .nav-more-menu,
+  .jobs-nav-more > div {
+    max-height: calc(100vh - 120px);
+  }
+}

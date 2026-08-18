@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
   useEffect(() => {
     console.error("MoveReady page error", error);
+    headingRef.current?.focus();
   }, [error]);
 
   return (
-    <main className="global-error-shell">
+    <main className="global-error-shell" aria-labelledby="global-error-title">
       <section className="global-error-card" role="alert">
         <p className="overline">This page could not finish loading</p>
-        <h1>Your saved account data has not been changed by this screen error.</h1>
+        <h1 id="global-error-title" ref={headingRef} tabIndex={-1}>Your saved account data has not been changed by this screen error.</h1>
         <p>Retry the page first. When a protected feature depends on a migration, deployment, account session, or external provider, it will remain unavailable rather than inventing a successful result.</p>
         {error.digest && <p><strong>Reference:</strong> {error.digest}</p>}
         <div className="actions">

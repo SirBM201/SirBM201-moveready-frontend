@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>
         <AccessibilityPreferenceLoader />
-        <div id="main-content">{children}</div>
+        <div className="main-content" id="main-content" tabIndex={-1}>{children}</div>
         <SiteFooter />
         <MobileQuickNav />
       </body>
