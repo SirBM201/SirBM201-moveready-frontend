@@ -36,8 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      NEXT_PUBLIC_API_BASE_URL: https://example.invalid
-      NEXT_PUBLIC_MOVERREADY_API_BASE_URL: https://example.invalid
+      NEXT_PUBLIC_API_BASE: ""
+      NEXT_PUBLIC_BACKEND_URL: https://example.invalid
+      MOVEREADY_BACKEND_URL: https://example.invalid
       NODE_ENV: production
 
     steps:
@@ -78,6 +79,9 @@ jobs:
 
       - name: Test B15 Mobile and Accessibility contract
         run: npm run test:b15
+
+      - name: Test B16 Deployment and Operations contract
+        run: npm run test:b16
 
       - name: Build Next.js application
         run: npm run build

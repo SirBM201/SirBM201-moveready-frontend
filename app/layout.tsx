@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import AccessibilityPreferenceLoader from "@/components/AccessibilityPreferenceLoader";
+import AdminKeyStorageGuard from "@/components/AdminKeyStorageGuard";
 import MobileQuickNav from "@/components/MobileQuickNav";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>
         <AccessibilityPreferenceLoader />
+        <AdminKeyStorageGuard />
         <div className="main-content" id="main-content" tabIndex={-1}>{children}</div>
         <SiteFooter />
         <MobileQuickNav />

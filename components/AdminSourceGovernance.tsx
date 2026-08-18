@@ -68,7 +68,7 @@ export default function AdminSourceGovernance() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failures.
     }
@@ -86,7 +86,7 @@ export default function AdminSourceGovernance() {
     setLoading(true);
     setMessage("Loading due sources and route versions...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const response = await apiJson<GovernanceResponse>("admin/source-governance/queue", {
         headers: headers(),
         query: { limit: 250 },
@@ -184,7 +184,7 @@ export default function AdminSourceGovernance() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="source_admin_key">Admin key</label><input id="source_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="source_admin_key">Admin key</label><input id="source_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={loadQueue}>{loading ? "Loading..." : "Load source queue"}</button>
         <button className="btn" type="button" disabled={loading} onClick={scanDue}>Create due alerts</button>
         <a className="btn" href="/source-health">Public source health</a>

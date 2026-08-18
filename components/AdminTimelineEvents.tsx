@@ -56,7 +56,7 @@ export default function AdminTimelineEvents() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -78,7 +78,7 @@ export default function AdminTimelineEvents() {
     setLoading(true);
     setMessage("Loading timeline events...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/timeline-events", {
         query: {
           status: statusFilter || undefined,
@@ -159,7 +159,7 @@ export default function AdminTimelineEvents() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="timeline_admin_key">Admin key</label>
-          <input id="timeline_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" />
+          <input id="timeline_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="timeline_status">Status</label>

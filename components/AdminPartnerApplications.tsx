@@ -61,7 +61,7 @@ export default function AdminPartnerApplications() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -83,7 +83,7 @@ export default function AdminPartnerApplications() {
     setLoading(true);
     setMessage("Loading partner applications...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/partner-applications", {
         query: {
           status: statusFilter || undefined,
@@ -142,7 +142,7 @@ export default function AdminPartnerApplications() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="partner_admin_key">Admin key</label>
-          <input id="partner_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" />
+          <input id="partner_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="partner_status">Status</label>

@@ -56,7 +56,7 @@ export default function AdminEvidenceReview() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failures.
     }
@@ -74,7 +74,7 @@ export default function AdminEvidenceReview() {
     setLoading(true);
     setMessage("Loading evidence packs and expiring document metadata...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const [packData, documentData] = await Promise.all([
         apiJson<{ evidence_packs?: Pack[] }>("admin/evidence-packs", { headers: headers(), query: { limit: 150 }, timeoutMs: 30000, useAuthToken: false }),
         apiJson<{ documents?: ExpiringDocument[] }>("admin/document-inventory/expiring", { headers: headers(), query: { days: 180, limit: 200 }, timeoutMs: 30000, useAuthToken: false }),
@@ -130,7 +130,7 @@ export default function AdminEvidenceReview() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="evidence_admin_key">Admin key</label><input id="evidence_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="evidence_admin_key">Admin key</label><input id="evidence_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={load}>{loading ? "Loading..." : "Load evidence review"}</button>
         <a className="btn" href="/evidence-pack">Open Evidence Center</a>
       </div>

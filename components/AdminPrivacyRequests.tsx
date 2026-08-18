@@ -62,7 +62,7 @@ export default function AdminPrivacyRequests() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failures.
     }
@@ -85,7 +85,7 @@ export default function AdminPrivacyRequests() {
     setLoading(true);
     setMessage("Loading protected privacy-request queue...");
     try {
-      localStorage.setItem("moveready_admin_key", key);
+      sessionStorage.setItem("moveready_admin_key", key);
       const response = await apiJson<QueueResponse>("admin/privacy-requests", {
         headers: { "X-MoveReady-Admin-Key": key },
         query: { limit: 300 },

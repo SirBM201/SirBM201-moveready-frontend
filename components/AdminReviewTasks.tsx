@@ -46,7 +46,7 @@ export default function AdminReviewTasks() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -66,7 +66,7 @@ export default function AdminReviewTasks() {
 
   function persistAdminKey() {
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
     } catch {
       // ignore storage failure
     }
@@ -244,7 +244,7 @@ export default function AdminReviewTasks() {
         <div className="form-grid two-col">
           <div className="field">
             <label>Admin key</label>
-            <input value={adminKey} onChange={(event) => setAdminKey(event.target.value)} type="password" placeholder="X-MoveReady-Admin-Key" />
+            <input value={adminKey} onChange={(event) => setAdminKey(event.target.value)} type="password" autoComplete="off" placeholder="X-MoveReady-Admin-Key" />
           </div>
           <button className="btn primary" type="button" onClick={() => { loadTasks(); loadSources(); }}>Load review workspace</button>
         </div>

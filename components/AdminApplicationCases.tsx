@@ -78,7 +78,7 @@ export default function AdminApplicationCases() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -96,7 +96,7 @@ export default function AdminApplicationCases() {
     setLoading(true);
     setMessage("Loading application cases and due deadlines...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const [caseData, dueData] = await Promise.all([
         apiJson<{ application_cases?: ApplicationCase[]; attention_count?: number }>("admin/application-cases", { headers: headers(), query: { limit: 250 }, timeoutMs: 30000, useAuthToken: false }),
         apiJson<{ application_cases?: ApplicationCase[] }>("admin/application-cases/deadlines/due", { headers: headers(), query: { hours: 336, limit: 250 }, timeoutMs: 30000, useAuthToken: false }),
@@ -232,7 +232,7 @@ export default function AdminApplicationCases() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="application_admin_key">Admin key</label><input id="application_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="application_admin_key">Admin key</label><input id="application_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={load}>{loading ? "Loading..." : "Load application cases"}</button>
         <a className="btn" href="/applications">User Application Center</a>
       </div>

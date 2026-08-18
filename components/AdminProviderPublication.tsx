@@ -60,7 +60,7 @@ export default function AdminProviderPublication() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -78,7 +78,7 @@ export default function AdminProviderPublication() {
     setLoading(true);
     setMessage("Loading providers and publication controls...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<{ partner_applications?: Provider[] }>("admin/partner-applications", {
         query: { limit: 75 },
         headers: headers(),
@@ -151,7 +151,7 @@ export default function AdminProviderPublication() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="publication_admin_key">Admin key</label><input id="publication_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="publication_admin_key">Admin key</label><input id="publication_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={loadProviders}>{loading ? "Loading..." : "Load publication controls"}</button>
       </div>
       <p className="form-status">{message}</p>

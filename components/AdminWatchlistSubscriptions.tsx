@@ -52,7 +52,7 @@ export default function AdminWatchlistSubscriptions() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -74,7 +74,7 @@ export default function AdminWatchlistSubscriptions() {
     setLoading(true);
     setMessage("Loading watchlist subscriptions...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/watchlist-subscriptions", {
         query: {
           status: statusFilter || undefined,
@@ -133,7 +133,7 @@ export default function AdminWatchlistSubscriptions() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="watchlist_admin_key">Admin key</label>
-          <input id="watchlist_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" />
+          <input id="watchlist_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="watchlist_status">Status</label>

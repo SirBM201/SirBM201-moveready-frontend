@@ -121,7 +121,7 @@ export default function AdminReviewConsole() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
+      const stored = sessionStorage.getItem(ADMIN_KEY_STORAGE) || "";
       if (stored) {
         setAdminKey(stored);
         void loadQueue(stored, true);
@@ -153,7 +153,7 @@ export default function AdminReviewConsole() {
       setQueue(data);
       setMessage(`Review queue loaded. Open items: ${data.total_open_items || 0}.`);
       try {
-        localStorage.setItem(ADMIN_KEY_STORAGE, key);
+        sessionStorage.setItem(ADMIN_KEY_STORAGE, key);
       } catch {
         // Ignore storage failures.
       }
@@ -201,9 +201,9 @@ export default function AdminReviewConsole() {
   function clearKey() {
     setAdminKey("");
     setQueue(null);
-    setMessage("Admin key cleared from this browser.");
+    setMessage("Admin key cleared from this tab.");
     try {
-      localStorage.removeItem(ADMIN_KEY_STORAGE);
+      sessionStorage.removeItem(ADMIN_KEY_STORAGE);
     } catch {
       // Ignore storage failures.
     }
@@ -231,7 +231,7 @@ export default function AdminReviewConsole() {
         </p>
         <div className="field">
           <label htmlFor="admin_queue_key">Admin key</label>
-          <input id="admin_queue_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="Paste X-MoveReady-Admin-Key" />
+          <input id="admin_queue_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="Paste X-MoveReady-Admin-Key" />
         </div>
         <div className="actions">
           <button className="btn primary" type="button" onClick={() => loadQueue()} disabled={loading}>{loading ? "Loading..." : "Load queue"}</button>

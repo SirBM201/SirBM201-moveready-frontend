@@ -8,10 +8,10 @@ export default function DeploymentStatusPage() {
 
       <section className="hero-band compact-hero">
         <div className="hero-copy">
-          <span className="eyebrow">Production verification</span>
-          <h1>See which MoveReady backend revision is actually running.</h1>
+          <span className="eyebrow">B16 · Deployment and operations hardening</span>
+          <h1>Verify the Vercel, Railway, Supabase, schedule, and admin-boundary contracts.</h1>
           <p className="lede">
-            This page checks the live backend build fingerprint, public capability contract, Passport Index schedule, and expected routes. A repository commit is not treated as a successful deployment until production reports the matching revision.
+            This page compares the live frontend and backend fingerprints, expected routes, four scheduled jobs, protected administrator boundary, environment summary, and migration frontier. A repository commit is not treated as a successful deployment until production reports the matching revision.
           </p>
         </div>
       </section>

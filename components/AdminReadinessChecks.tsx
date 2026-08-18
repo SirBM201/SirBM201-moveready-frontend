@@ -43,7 +43,7 @@ export default function AdminReadinessChecks() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -66,7 +66,7 @@ export default function AdminReadinessChecks() {
     setLoading(true);
     setMessage("Loading readiness checks...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/readiness-checks", {
         query: { tool_slug: toolFilter || undefined, risk_level: riskFilter || undefined, limit: 75 },
         headers: { "X-MoveReady-Admin-Key": adminKey.trim() },
@@ -100,7 +100,7 @@ export default function AdminReadinessChecks() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="readiness_admin_key">Admin key</label>
-          <input id="readiness_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" />
+          <input id="readiness_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="tool_filter">Tool</label>
