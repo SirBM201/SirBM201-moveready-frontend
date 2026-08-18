@@ -24,11 +24,15 @@ function backendOrigin() {
       process.env.NODE_ENV === "production" &&
       (url.protocol !== "https:" || isPrivateHostname)
     ) {
-      return PRODUCTION_BACKEND;
+      throw new Error("Production backend must use a public HTTPS origin.");
     }
 
     return url.origin;
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV === "production") {
+      const detail = error instanceof Error ? error.message : "invalid URL";
+      throw new Error(`MoveReady backend configuration is invalid: ${detail}`);
+    }
     return fallback;
   }
 }

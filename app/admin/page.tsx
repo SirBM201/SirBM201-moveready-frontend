@@ -15,7 +15,7 @@ import AdminUserProfiles from "@/components/AdminUserProfiles";
 import AdminWatchlistSubscriptions from "@/components/AdminWatchlistSubscriptions";
 
 const adminModules = [
-  ["Operations status", "Check configuration, account login, schemas through migration 030, evidence, applications, alerts, account preferences, privacy requests, providers, quotes, payments, handoffs, and controlled integrations.", "#operations-status"],
+  ["Operations status", "Check configuration, account login, the controlled migration ledger through 039, evidence, applications, alerts, account preferences, privacy requests, providers, quotes, payments, handoffs, scheduled jobs, and controlled integrations.", "#operations-status"],
   ["Source governance", "Review overdue official sources and route versions, record snapshots, and create review-due alerts without silently changing route facts.", "#source-governance"],
   ["Evidence review", "Review high-risk evidence packs, missing categories, official-source notes, and expired or expiring document metadata without accessing raw files.", "#evidence-review"],
   ["Application cases", "Review real application stages, deadlines, sources, fees, evidence links, additional-document requests, refusals, decisions, and event history.", "/admin#application-cases"],
@@ -70,7 +70,7 @@ export default function AdminPage() {
       </header>
       <section className="section">
         <h2>Admin workspace</h2>
-        <p className="section-intro">Admin tools protect the trust system: production diagnostics, account login, source freshness, evidence metadata, application cases and alerts, account privacy, profiles, opportunities, saved routes, timelines, partner screening, publication, service requests, quotes, payments, consent-based handoffs, support cases, watchlists, route versions, readiness checks, and report freshness.</p>
+        <p className="section-intro">Admin tools protect the trust system: production diagnostics, account login, source freshness, evidence metadata, application cases and alerts, account privacy, profiles, opportunities, saved routes, timelines, partner screening, publication, service requests, quotes, payments, consent-based handoffs, support cases, watchlists, route versions, readiness checks, and report freshness. The administrator key is retained only in the current browser tab and is cleared when that tab closes.</p>
         <div className="grid">
           {adminModules.map(([title, text, href]) => (
             <article className="card" key={title}>

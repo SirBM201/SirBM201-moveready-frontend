@@ -79,7 +79,7 @@ export default function AdminServiceHandoffs() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -97,7 +97,7 @@ export default function AdminServiceHandoffs() {
     setLoading(true);
     setMessage("Loading provider handoffs and support cases...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const [handoffData, caseData] = await Promise.all([
         apiJson<{ service_handoffs?: Handoff[] }>("admin/service-handoffs", { headers: headers(), query: { limit: 100 }, timeoutMs: 20000, useAuthToken: false }),
         apiJson<{ support_cases?: SupportCase[] }>("admin/support-cases", { headers: headers(), query: { limit: 125 }, timeoutMs: 20000, useAuthToken: false }),
@@ -242,7 +242,7 @@ export default function AdminServiceHandoffs() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="handoff_admin_key">Admin key</label><input id="handoff_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="handoff_admin_key">Admin key</label><input id="handoff_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={loadWorkspace}>{loading ? "Loading..." : "Load handoffs and cases"}</button>
       </div>
       <p className="form-status">{message}</p>

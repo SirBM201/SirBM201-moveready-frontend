@@ -52,7 +52,7 @@ export default function AdminApplicationAlerts() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -70,7 +70,7 @@ export default function AdminApplicationAlerts() {
     setLoading(true);
     setMessage("Loading private application alerts...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<{ application_alerts?: ApplicationAlert[] }>("admin/application-case-alerts", {
         headers: headers(),
         query: { limit: 500 },
@@ -150,7 +150,7 @@ export default function AdminApplicationAlerts() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="application_alert_admin_key">Admin key</label><input id="application_alert_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="application_alert_admin_key">Admin key</label><input id="application_alert_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <button className="btn primary" type="button" disabled={loading} onClick={load}>{loading ? "Working..." : "Load alerts"}</button>
         <button className="btn" type="button" disabled={loading} onClick={runScan}>Run protected scan</button>
         <a className="btn" href="/admin#application-cases">Application cases</a>

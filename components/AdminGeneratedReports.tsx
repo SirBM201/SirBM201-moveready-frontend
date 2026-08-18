@@ -69,7 +69,7 @@ export default function AdminGeneratedReports() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -91,7 +91,7 @@ export default function AdminGeneratedReports() {
     setLoading(true);
     setMessage("Loading generated reports...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/generated-reports", {
         query: {
           status: statusFilter || undefined,
@@ -148,7 +148,7 @@ export default function AdminGeneratedReports() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="report_admin_key">Admin key</label><input id="report_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" /></div>
+        <div className="field"><label htmlFor="report_admin_key">Admin key</label><input id="report_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" /></div>
         <div className="field"><label htmlFor="report_status">Status</label><select id="report_status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}</select></div>
         <div className="field"><label htmlFor="report_risk">Risk</label><select id="report_risk" value={riskFilter} onChange={(event) => setRiskFilter(event.target.value)}><option value="">All risk levels</option>{riskOptions.map((risk) => <option key={risk} value={risk}>{risk}</option>)}</select></div>
         <div className="field"><label htmlFor="report_ref">Report ref</label><input id="report_ref" value={refFilter} onChange={(event) => setRefFilter(event.target.value)} placeholder="MRR-..." /></div>

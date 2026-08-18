@@ -70,7 +70,7 @@ export default function AdminOperationsStatus() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -85,7 +85,7 @@ export default function AdminOperationsStatus() {
     setLoading(true);
     setMessage("Checking account login, configuration, and required database schemas...");
     try {
-      localStorage.setItem("moveready_admin_key", key);
+      sessionStorage.setItem("moveready_admin_key", key);
       const data = await apiJson<OperationsStatus>("admin/operations/status", {
         headers: { "X-MoveReady-Admin-Key": key },
         timeoutMs: 30000,
@@ -119,7 +119,7 @@ export default function AdminOperationsStatus() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="operations_admin_key">Admin key</label>
-          <input id="operations_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" />
+          <input id="operations_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" />
         </div>
         <button className="btn primary" type="button" disabled={loading} onClick={loadStatus}>{loading ? "Checking..." : "Run operations check"}</button>
         <a className="btn" href="/launch-readiness">Open launch readiness</a>

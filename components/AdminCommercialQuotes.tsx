@@ -66,7 +66,7 @@ export default function AdminCommercialQuotes() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // Ignore storage failure.
     }
@@ -89,7 +89,7 @@ export default function AdminCommercialQuotes() {
     setLoading(true);
     setMessage("Loading commercial quotes...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<QuoteList>("admin/commercial-quotes", {
         query: { status: statusFilter || undefined, limit: 75 },
         headers: headers(),
@@ -226,7 +226,7 @@ export default function AdminCommercialQuotes() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="quote_admin_key">Admin key</label><input id="quote_admin_key" type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
+        <div className="field"><label htmlFor="quote_admin_key">Admin key</label><input id="quote_admin_key" type="password" autoComplete="off" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" /></div>
         <div className="field"><label htmlFor="quote_status_filter">Status</label><select id="quote_status_filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}</select></div>
         <button className="btn primary" type="button" disabled={loading} onClick={loadQuotes}>{loading ? "Loading..." : "Load quotes"}</button>
       </div>

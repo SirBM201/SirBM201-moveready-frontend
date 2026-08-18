@@ -54,7 +54,7 @@ export default function AdminUserProfiles() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -76,7 +76,7 @@ export default function AdminUserProfiles() {
     setLoading(true);
     setMessage("Loading user profiles...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/user-profiles", {
         query: {
           status: statusFilter || undefined,
@@ -133,7 +133,7 @@ export default function AdminUserProfiles() {
       </div>
 
       <div className="admin-toolbar">
-        <div className="field"><label htmlFor="profile_admin_key">Admin key</label><input id="profile_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" /></div>
+        <div className="field"><label htmlFor="profile_admin_key">Admin key</label><input id="profile_admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" /></div>
         <div className="field"><label htmlFor="profile_status">Status</label><select id="profile_status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}</select></div>
         <div className="field"><label htmlFor="profile_goal">Goal</label><select id="profile_goal" value={goalFilter} onChange={(event) => setGoalFilter(event.target.value)}><option value="">All goals</option>{goalOptions.map((goal) => <option key={goal} value={goal}>{goal}</option>)}</select></div>
         <div className="field"><label htmlFor="profile_target">Target country</label><input id="profile_target" value={targetFilter} onChange={(event) => setTargetFilter(event.target.value)} placeholder="Example: Estonia" /></div>

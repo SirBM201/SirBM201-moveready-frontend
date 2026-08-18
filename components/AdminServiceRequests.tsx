@@ -46,7 +46,7 @@ export default function AdminServiceRequests() {
 
   useEffect(() => {
     try {
-      setAdminKey(localStorage.getItem("moveready_admin_key") || "");
+      setAdminKey(sessionStorage.getItem("moveready_admin_key") || "");
     } catch {
       // ignore storage failure
     }
@@ -68,7 +68,7 @@ export default function AdminServiceRequests() {
     setLoading(true);
     setMessage("Loading service requests...");
     try {
-      localStorage.setItem("moveready_admin_key", adminKey.trim());
+      sessionStorage.setItem("moveready_admin_key", adminKey.trim());
       const data = await apiJson<ApiList>("admin/service-requests", {
         query: { status: nextStatus || undefined, limit: 75 },
         headers: { "X-MoveReady-Admin-Key": adminKey.trim() },
@@ -124,7 +124,7 @@ export default function AdminServiceRequests() {
       <div className="admin-toolbar">
         <div className="field">
           <label htmlFor="admin_key">Admin key</label>
-          <input id="admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" />
+          <input id="admin_key" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="X-MoveReady-Admin-Key" type="password" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="status_filter">Status</label>
