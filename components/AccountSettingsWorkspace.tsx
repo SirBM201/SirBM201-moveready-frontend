@@ -4,6 +4,17 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { ApiError, apiJson, clearStoredAuthToken } from "@/lib/api";
 
+type SmartAlertPreferences = {
+  jobs_enabled: boolean;
+  application_followups_enabled: boolean;
+  language_reminders_enabled: boolean;
+  evidence_refresh_enabled: boolean;
+  critical_only: boolean;
+  document_expiry_lead_days: number;
+  language_inactive_days: number;
+  evidence_refresh_days: number;
+};
+
 type Preferences = {
   email: string;
   preferred_language: string;
@@ -25,6 +36,7 @@ type Preferences = {
   larger_text: boolean;
   onboarding_status: string;
   onboarding_step: string;
+  smart_alert_preferences: SmartAlertPreferences;
   delivery_status?: Record<string, string>;
 };
 
@@ -51,6 +63,17 @@ type PrivacyRequest = {
   completed_at?: string;
 };
 
+const defaultSmartAlertPreferences: SmartAlertPreferences = {
+  jobs_enabled: true,
+  application_followups_enabled: true,
+  language_reminders_enabled: false,
+  evidence_refresh_enabled: true,
+  critical_only: false,
+  document_expiry_lead_days: 180,
+  language_inactive_days: 7,
+  evidence_refresh_days: 30,
+};
+
 const defaultPreferences: Preferences = {
   email: "",
   preferred_language: "en",
@@ -72,7 +95,19 @@ const defaultPreferences: Preferences = {
   larger_text: false,
   onboarding_status: "not_started",
   onboarding_step: "profile",
+  smart_alert_preferences: defaultSmartAlertPreferences,
 };
+
+function withPreferenceDefaults(value?: Partial<Preferences>): Preferences {
+  return {
+    ...defaultPreferences,
+    ...(value || {}),
+    smart_alert_preferences: {
+      ...defaultSmartAlertPreferences,
+      ...(value?.smart_alert_preferences || {}),
+    },
+  };
+}
 
 function formatDate(value?: string) {
   if (!value) return "Not recorded";
@@ -114,7 +149,7 @@ export default function AccountSettingsWorkspace() {
         apiJson<{ ok: boolean; sessions: SessionRow[] }>("account/sessions", { timeoutMs: 20000 }),
         apiJson<{ ok: boolean; requests: PrivacyRequest[] }>("account/privacy-requests", { timeoutMs: 20000 }),
       ]);
-      const next = { ...defaultPreferences, ...(preferenceResponse.preferences || {}) };
+      const next = withPreferenceDefaults(preferenceResponse.preferences);
       setPreferences(next);
       setSessions(sessionResponse.sessions || []);
       setPrivacyRequests(requestResponse.requests || []);
@@ -142,8 +177,15 @@ export default function AccountSettingsWorkspace() {
     }
   }
 
-  async function savePreferences(event: FormEvent) {
-    event.preventDefault();
+  function setSmartAlertField<K extends keyof SmartAlertPreferences>(field: K, value: SmartAlertPreferences[K]) {
+    setPreferences((current) => ({
+      ...current,
+      smart_alert_preferences: { ...current.smart_alert_preferences, [field]: value },
+    }));
+  }
+
+  async function savePreferences(event?: FormEvent) {
+    event?.preventDefault();
     setSaving(true);
     setMessage("Saving account preferences...");
     try {
@@ -152,7 +194,7 @@ export default function AccountSettingsWorkspace() {
         body: preferences,
         timeoutMs: 20000,
       });
-      const next = { ...defaultPreferences, ...(response.preferences || {}) };
+      const next = withPreferenceDefaults(response.preferences);
       setPreferences(next);
       applyAccessibility(next);
       setMessage("Preferences saved. External delivery remains controlled until its provider is activated and tested.");
@@ -361,6 +403,31 @@ export default function AccountSettingsWorkspace() {
             </label>
           ))}
         </div>
+        <h3 style={{ marginTop: 20 }}>B14 smart-alert controls</h3>
+        <p>Language reminders are opt-in. Critical-only mode suppresses lower-priority items without deleting their underlying records.</p>
+        <div className="mini-list">
+          {([
+            ["jobs_enabled", "Jobs", "Include monitored job changes and private follow-ups."],
+            ["application_followups_enabled", "Application follow-ups", "Include stored application deadlines and follow-ups."],
+            ["evidence_refresh_enabled", "Evidence refresh", "Include stale metadata-only evidence packs."],
+            ["language_reminders_enabled", "Language reminders", "Optionally include due review and practice reminders."],
+            ["critical_only", "Critical only", "Hide high, medium and low items from the consolidated inbox."],
+          ] as Array<[keyof SmartAlertPreferences, string, string]>).map(([field, title, detail]) => (
+            <label key={field} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <input type="checkbox" checked={Boolean(preferences.smart_alert_preferences[field])} onChange={(event) => setSmartAlertField(field, event.target.checked as never)} />
+              <span><strong>{title}</strong><br />{detail}</span>
+            </label>
+          ))}
+        </div>
+        <div className="form-grid" style={{ marginTop: 16 }}>
+          <label>Document expiry lead days<input type="number" min={30} max={365} value={preferences.smart_alert_preferences.document_expiry_lead_days} onChange={(event) => setSmartAlertField("document_expiry_lead_days", Number(event.target.value))} /></label>
+          <label>Language inactive days<input type="number" min={1} max={30} value={preferences.smart_alert_preferences.language_inactive_days} onChange={(event) => setSmartAlertField("language_inactive_days", Number(event.target.value))} /></label>
+          <label>Evidence refresh days<input type="number" min={7} max={180} value={preferences.smart_alert_preferences.evidence_refresh_days} onChange={(event) => setSmartAlertField("evidence_refresh_days", Number(event.target.value))} /></label>
+        </div>
+        <div className="actions">
+          <button className="btn primary" type="button" onClick={() => void savePreferences()} disabled={saving}>{saving ? "Saving..." : "Save notification choices"}</button>
+          <a className="btn" href="/alerts">Open smart alerts</a>
+        </div>
       </article>
 
       <article className="result-block">
@@ -375,7 +442,7 @@ export default function AccountSettingsWorkspace() {
           ))}
         </div>
         <div className="actions">
-          <button className="btn primary" type="button" onClick={(event) => void savePreferences(event as unknown as FormEvent)} disabled={saving}>Save accessibility choices</button>
+          <button className="btn primary" type="button" onClick={() => void savePreferences()} disabled={saving}>Save accessibility choices</button>
         </div>
       </article>
 

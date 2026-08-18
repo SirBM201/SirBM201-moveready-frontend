@@ -40,6 +40,7 @@ export default function WatchlistPage() {
           </div>
           <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#alert-inbox">Open alert inbox</a>
+            <a className="btn" href="/alerts">Consolidated smart alerts</a>
             <a className="btn" href="#create-alert">Create alert</a>
             <a className="btn" href="/opportunities">Browse opportunities</a>
             <a className="btn" href="/saved-routes">Saved routes</a>
