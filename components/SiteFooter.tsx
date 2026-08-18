@@ -53,6 +53,7 @@ const footerGroups = [
       { label: "Source Health", href: "/source-health" },
       { label: "Sources", href: "/sources" },
       { label: "Safety", href: "/safety" },
+      { label: "Accessibility", href: "/accessibility" },
       { label: "Privacy", href: "/privacy" },
       { label: "Data Deletion", href: "/data-deletion" },
       { label: "Provider Application", href: "/partners/apply" },

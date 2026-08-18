@@ -231,7 +231,7 @@ export default function SmartAlertsCenter() {
   const categories = Object.keys(data?.counts_by_category || {});
 
   return (
-    <div className="result-stack" aria-live="polite">
+    <div className="result-stack" aria-busy={state === "loading" || saving}>
       <article className="result-block featured">
         <div className="panel-heading">
           <div>
@@ -240,7 +240,7 @@ export default function SmartAlertsCenter() {
           </div>
           <span className="status-dot">{state === "ready" ? "B14 connected" : readable(state)}</span>
         </div>
-        <p>{message}</p>
+        <p aria-live="polite" role={state === "error" ? "alert" : undefined}>{message}</p>
         <div className="badge-row">
           {(["critical", "high", "medium", "low"] as Priority[]).map((item) => (
             <span className="badge" key={item}>{readable(item)}: {data?.counts_by_priority?.[item] || 0}</span>

@@ -94,7 +94,7 @@ export default function DashboardCommandCenter() {
   const primary = data?.primary_action;
 
   return (
-    <section className="section no-top-pad" id="command-center" aria-live="polite">
+    <section className="section no-top-pad" id="command-center" aria-busy={state === "loading"}>
       <article className="result-block featured">
         <div className="panel-heading">
           <div>
@@ -107,7 +107,7 @@ export default function DashboardCommandCenter() {
         {state !== "ready" || !primary ? (
           <div className="result-block soft">
             <h3>{state === "loading" ? "Loading your private account" : "Command center not ready"}</h3>
-            <p>{message}</p>
+            <p aria-live="polite">{message}</p>
             <div className="actions">
               {state === "signed_out" && <a className="btn primary" href="/login">Sign in</a>}
               {state !== "loading" && <button className="btn" type="button" onClick={load}>Try again</button>}
@@ -126,7 +126,7 @@ export default function DashboardCommandCenter() {
                 <button className="btn" type="button" onClick={load}>Refresh</button>
               </div>
             </div>
-            <p>{message}</p>
+            <p aria-live="polite">{message}</p>
 
             <div className="grid">
               {phases.map((phase) => (
