@@ -3,7 +3,7 @@ import SiteHeader from "@/components/SiteHeader";
 
 const controls = [
   ["Preferences", "Language, currency, time zone, date format, reminder timing, and onboarding progress."],
-  ["Notification consent", "In-app, email, WhatsApp, source, deadline, document-expiry, opportunity, and marketing choices remain separate."],
+  ["Notification consent", "In-app categories, B14 smart-alert thresholds, external channel preferences, and marketing choices remain separate."],
   ["Accessibility", "Reduced motion, higher contrast, larger text, and simpler-language preferences."],
   ["Security", "Review active sessions, revoke another device, or sign out the current session."],
   ["Privacy", "Download a safe JSON export or open a reviewed access, correction, restriction, consent-withdrawal, or deletion request."],
@@ -23,6 +23,7 @@ export default function SettingsPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="#settings-workspace">Open settings</a>
+            <a className="btn" href="/alerts">Smart alerts</a>
             <a className="btn" href="/activity">Activity history</a>
             <a className="btn" href="/onboarding">Guided setup</a>
             <a className="btn" href="/dashboard">Account Center</a>

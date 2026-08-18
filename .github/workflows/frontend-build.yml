@@ -73,5 +73,8 @@ jobs:
       - name: Test B13 Dashboard Orchestration contract
         run: npm run test:b13
 
+      - name: Test B14 Smart Alerts contract
+        run: npm run test:b14
+
       - name: Build Next.js application
         run: npm run build

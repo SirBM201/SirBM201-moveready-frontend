@@ -5,6 +5,7 @@ import ProfileDashboard from "@/components/ProfileDashboard";
 import SiteHeader from "@/components/SiteHeader";
 
 const secondaryWorkspaces = [
+  ["Smart alerts", "/alerts", "Review critical changes across jobs, applications, documents, sources, language, and evidence."],
   ["Guided setup", "/onboarding", "Complete profile and route foundations in order."],
   ["My Journey", "/my-journey", "Review every recorded stage from profile through settlement."],
   ["Route Checker", "/route-checker", "Verify source status, requirements, funds, and risks."],
@@ -47,6 +48,7 @@ export default function DashboardPage() {
           </div>
           <div className="actions" style={{ marginTop: 14 }}>
             <a className="btn primary" href="#command-center">Show my next action</a>
+            <a className="btn" href="/alerts">Open smart alerts</a>
             <a className="btn" href="/my-journey">Open My Journey</a>
             <a className="btn" href="/login">Sign in</a>
           </div>

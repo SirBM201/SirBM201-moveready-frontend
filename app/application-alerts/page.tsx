@@ -34,6 +34,7 @@ export default function ApplicationAlertsPage() {
           </p>
           <div className="actions">
             <a className="btn primary" href="#alert-inbox">Open alert inbox</a>
+            <a className="btn" href="/alerts">Consolidated smart alerts</a>
             <a className="btn" href="/applications">Application Center</a>
             <a className="btn" href="/timeline">Timeline</a>
             <a className="btn" href="/dashboard">Account Center</a>
