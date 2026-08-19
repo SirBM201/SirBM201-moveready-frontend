@@ -135,6 +135,64 @@ function buildUrl(path: string, query?: ApiInit["query"]) {
   return qs ? `${url}?${qs}` : url;
 }
 
+function countryList(value: any): string[] {
+  const values = Array.isArray(value) ? value : String(value || "").split(",");
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const item of values) {
+    const cleaned = String(item || "").trim();
+    const key = cleaned.toLocaleLowerCase();
+    if (cleaned && !seen.has(key)) {
+      seen.add(key);
+      result.push(cleaned);
+    }
+    if (result.length >= 30) break;
+  }
+  return result;
+}
+
+function searchContractFromProfile(profile: any) {
+  const rawScope = String(profile?.search_scope || "international").trim().toLowerCase();
+  const searchScope = ["local", "international", "both"].includes(rawScope) ? rawScope : "international";
+  const currentCountry = String(profile?.current_country || "").trim() || null;
+  const primaryCountry = String(profile?.primary_country || "").trim() || null;
+  const currentKey = String(currentCountry || "").toLowerCase();
+  const internationalTargets = countryList([primaryCountry, ...countryList(profile?.later_countries)])
+    .filter((country) => country.toLowerCase() !== currentKey);
+  const localTargets = countryList([currentCountry]);
+  const targetCountries = searchScope === "local"
+    ? localTargets
+    : searchScope === "international"
+      ? internationalTargets
+      : countryList([currentCountry, ...internationalTargets]);
+  const missingFields: string[] = [];
+  if (!currentCountry) missingFields.push("current_country");
+  if (["international", "both"].includes(searchScope) && !internationalTargets.length) {
+    missingFields.push("international_target_country");
+  }
+  return {
+    version: "b05-v1",
+    ready: missingFields.length === 0,
+    search_scope: searchScope,
+    current_country: currentCountry,
+    local_target_countries: localTargets,
+    international_target_countries: internationalTargets,
+    target_countries: targetCountries,
+    work_authorized_countries: countryList(profile?.work_authorized_countries),
+    missing_fields: missingFields,
+    truth_note: "Work authorization is user-reported and vacancy sponsorship is source-derived; neither is a guarantee of employment or immigration approval.",
+  };
+}
+
+function normalizeApiResponse(path: string, data: any) {
+  const cleanPath = cleanApiPath(path).replace(/\/$/, "");
+  if (cleanPath === "jobs/automation/overview" && isPlainObject(data) && data.profile) {
+    const contract = isPlainObject(data.search_contract) ? data.search_contract : searchContractFromProfile(data.profile);
+    return { ...data, search_contract: contract };
+  }
+  return data;
+}
+
 export async function apiJson<T = any>(path: string, init: ApiInit = {}, token?: string | null): Promise<T> {
   const method = (init.method || "GET").toUpperCase();
   const headers: Record<string, string> = {
@@ -187,7 +245,7 @@ export async function apiJson<T = any>(path: string, init: ApiInit = {}, token?:
       throw new ApiError(response.status, message, data);
     }
 
-    return data as T;
+    return normalizeApiResponse(path, data) as T;
   } finally {
     clearTimeout(timeout);
   }
