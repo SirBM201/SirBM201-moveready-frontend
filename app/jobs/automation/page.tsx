@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import JobAutomationAlertCounterBridge from "@/components/jobs/JobAutomationAlertCounterBridge";
 import JobAutomationWorkspace from "@/components/jobs/JobAutomationWorkspace";
 
 export const metadata: Metadata = {
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function JobAutomationPage() {
-  return <JobAutomationWorkspace />;
+  return (
+    <>
+      <JobAutomationWorkspace />
+      <JobAutomationAlertCounterBridge />
+    </>
+  );
 }
