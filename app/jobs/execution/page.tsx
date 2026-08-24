@@ -1,0 +1,1 @@
+import ApplicationExecutionWorkspace from "@/components/jobs/ApplicationExecutionWorkspace";export default function ExecutionPage(){return <ApplicationExecutionWorkspace/>;}
