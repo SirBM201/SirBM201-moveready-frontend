@@ -5,11 +5,11 @@ const links=[
  {label:"Discover",href:"/jobs"},
  {label:"Readiness",href:"/jobs#vacancies"},
  {label:"Applications",href:"/jobs/applications"},
- {label:"Career documents",href:"/jobs/resume-vault"},
+ {label:"Career Studio",href:"/jobs/career-studio"},
 ];
 const supportingLinks=[
  {label:"Guided setup",href:"/jobs/setup"},{label:"Matching profile",href:"/jobs/profile"},
- {label:"Full workspace",href:"/jobs/workspace"},{label:"Automatic search",href:"/jobs/automation"},
+ {label:"Résumé vault",href:"/jobs/resume-vault"},{label:"Full workspace",href:"/jobs/workspace"},{label:"Automatic search",href:"/jobs/automation"},
  {label:"Companies",href:"/jobs/companies"},{label:"Recruiters",href:"/jobs/recruiters"},
  {label:"Interview preparation",href:"/jobs/interview-preparation"},
 ];
