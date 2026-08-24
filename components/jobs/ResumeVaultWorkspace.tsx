@@ -205,7 +205,7 @@ export default function ResumeVaultWorkspace() {
     <>
       <section className="jobs-page-heading">
         <div><span className="eyebrow">Application documents</span><h1>Keep the right resume ready for each application.</h1><p className="lede">Store private resume, cover-letter, and portfolio versions in one place. MoveReady records which version is active so you can select it when tracking an application.</p></div>
-        <div className="actions"><button className="btn primary" type="button" onClick={() => startUpload(recommendedType || "ats_resume")}>Upload a document</button><a className="btn" href="/jobs">Jobs Dashboard</a><button className="btn" type="button" onClick={() => load()} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button></div>
+        <div className="actions"><a className="btn primary" href="/jobs/career-studio">Open Career Studio</a><button className="btn" type="button" onClick={() => startUpload(recommendedType || "ats_resume")}>Upload an existing document</button><a className="btn" href="/jobs">Jobs Dashboard</a><button className="btn" type="button" onClick={() => load()} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button></div>
       </section>
 
       <div className="jobs-safety-strip">
