@@ -3,7 +3,7 @@ import { useEffect,useRef } from "react";
 import { usePathname } from "next/navigation";
 const links=[
  {label:"Discover",href:"/jobs"},
- {label:"Readiness",href:"/jobs/applications"},
+ {label:"Readiness",href:"/jobs#vacancies"},
  {label:"Applications",href:"/jobs/applications"},
  {label:"Career documents",href:"/jobs/resume-vault"},
 ];
