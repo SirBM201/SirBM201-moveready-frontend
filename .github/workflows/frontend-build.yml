@@ -9,6 +9,8 @@ on:
       - "lib/**"
       - "public/**"
       - "scripts/**"
+      - "tests/**"
+      - "docs/LQ02_**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -21,6 +23,8 @@ on:
       - "lib/**"
       - "public/**"
       - "scripts/**"
+      - "tests/**"
+      - "docs/LQ02_**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -44,44 +48,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
-
       - name: Install dependencies
-        # NODE_ENV=production is required for the build, but npm would otherwise
-        # omit declared build-time devDependencies such as @tailwindcss/postcss.
         run: npm ci --include=dev
-
+      - name: Test LQ02 integration foundation
+        run: npm run test:lq02
+      - name: Test deployed-journey harness configuration
+        run: npm run test:e2e
       - name: Test B06 general-user Jobs contract
         run: npm run test:b06
-
       - name: Test B08 Language Coach contract
         run: npm run test:b08
-
       - name: Test B10 Financial Readiness contract
         run: npm run test:b10
-
       - name: Test B11 Opportunity / Route Finder contract
         run: npm run test:b11
-
       - name: Test B12 Documents, Evidence and Applications contract
         run: npm run test:b12
-
       - name: Test B13 Dashboard Orchestration contract
         run: npm run test:b13
-
       - name: Test B14 Smart Alerts contract
         run: npm run test:b14
-
       - name: Test B15 Mobile and Accessibility contract
         run: npm run test:b15
-
       - name: Test B16 Deployment and Operations contract
         run: npm run test:b16
-
       - name: Build Next.js application
         run: npm run build
