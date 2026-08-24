@@ -13,7 +13,7 @@ assert.match(guide,/Create your matching profile/);
 assert.match(guide,/Find your first evidence-backed vacancy/);
 assert.match(guide,/Review one vacancy before applying/);
 assert.match(style,/@media\(max-width:560px\)/);
-for(const label of ["Find","Qualify","Move","Settle","Grow","Dashboard"])assert.match(header,new RegExp(`label: "${label}"`));
+for(const label of ["Find","Qualify","Move","Settle","Grow","Dashboard"])assert.match(header,new RegExp(`label:\\s*"${label}"`));
 assert.match(mobile,/Jobs/);assert.match(mobile,/Account/);
 assert.match(jobs,/Discover/);assert.match(jobs,/Applications/);assert.match(jobs,/Readiness/);
 assert.match(onboarding,/LaunchJourneyGuide/);assert.match(relocation,/GuidedOnboarding/);
