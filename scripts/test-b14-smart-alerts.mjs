@@ -41,7 +41,7 @@ assert.match(center, /Verify official source/);
 assert.match(center, /email, WhatsApp, SMS, Telegram and push delivery remain disabled/i);
 assert.match(page, /Smart alerts and critical monitoring/);
 assert.match(page, /alert noise/i);
-assert.match(header, /href:\\s*"\\/alerts"/);
+assert.match(header, /href:\s*"\/alerts"/);
 assert.match(dashboard, /Open smart alerts/);
 assert.match(workflow, /npm run test:b14/);
 assert.match(packageJson, /"test:b14"/);
