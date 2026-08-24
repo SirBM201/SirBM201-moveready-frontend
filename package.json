@@ -19,7 +19,8 @@
     "test:b15": "node scripts/test-b15-mobile-accessibility.mjs",
     "test:b16": "node scripts/test-b16-deployment-operations.mjs",
     "test:lq03": "node scripts/test-lq03-vacancy-journey.mjs",
-    "test:lq04": "node scripts/test-lq04-guided-shell.mjs"
+    "test:lq04": "node scripts/test-lq04-guided-shell.mjs",
+    "test:lq05": "node scripts/test-lq05-career-studio.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
