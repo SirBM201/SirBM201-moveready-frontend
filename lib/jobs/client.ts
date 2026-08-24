@@ -9,7 +9,7 @@ import type { JsonObject } from "./domain";
 
 export type JobsTransport = <T = unknown>(
   path: string,
-  init?: RequestInit & { body?: unknown; query?: Record<string, string | number | boolean | null | undefined>; useAuthToken?: boolean },
+  init?: Omit<RequestInit, "body"> & { body?: unknown; query?: Record<string, string | number | boolean | null | undefined>; useAuthToken?: boolean },
 ) => Promise<T>;
 const defaultTransport: JobsTransport = apiJson;
 const call = async (transport: JobsTransport, key: string, params: Record<string,string> = {}, body?: unknown, query?: JsonObject) => {
