@@ -16,7 +16,8 @@ const recordNumbers = (value: unknown): Record<string, number> => Object.fromEnt
 const first = (raw: JsonObject, ...keys: string[]): unknown => keys.map(key => raw[key]).find(value => value !== undefined);
 const payload = (value: unknown): JsonObject => {
   const raw = object(value);
-  const nested = first(raw, "data", "result");\n  return nested && typeof nested === "object" && !Array.isArray(nested) ? object(nested) : raw;
+  const nested = first(raw, "data", "result");
+  return nested && typeof nested === "object" && !Array.isArray(nested) ? object(nested) : raw;
 };
 const items = (value: unknown, ...keys: string[]): unknown[] => {
   const raw = object(value);
