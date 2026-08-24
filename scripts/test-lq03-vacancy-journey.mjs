@@ -17,5 +17,5 @@ assert.match(css,/@media\(max-width:850px\)/);
 assert.match(css,/min-height:44px/);
 assert.match(page,/VacancyDiscovery/);
 assert.match(workspace,/JobsDashboard/);
-assert.doesNotMatch(discovery,/guarantee|guaranteed/i);
+assert.match(discovery,/Neither score guarantees selection, sponsorship or immigration approval/);
 console.log("LQ03 vacancy discovery/detail journey contract: PASS");
