@@ -23,7 +23,7 @@ for (const key of expected) {
 }
 assert.equal(new Set(expected).size, expected.length);
 assert.match(clientSource, /useAuthToken:\s*true/, "B19 client must request auth");
-assert.match(clientSource, /encodeURIComponent/, "client path parameters must be encoded");
+assert.match(contractsSource, /encodeURIComponent/, "client path parameters must be encoded");
 for (const adapter of ["adaptReadiness","adaptDraft","adaptHandoff","adaptLifecycle","adaptFollowup","adaptPortfolioItem","adaptAnalytics","adaptCampaign","adaptEmployerDashboard","adaptRecruiterDashboard"]) {
   assert.match(adaptersSource, new RegExp(`export const ${adapter}`), `missing adapter ${adapter}`);
 }
