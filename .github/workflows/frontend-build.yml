@@ -63,6 +63,8 @@ jobs:
         run: npm run test:lq04
       - name: Test LQ05 Career Studio
         run: npm run test:lq05
+      - name: Test LQ06 Vacancy Alignment Report
+        run: npm run test:lq06
       - name: Test deployed-journey harness configuration
         run: npm run test:e2e
       - name: Test B06 general-user Jobs contract
