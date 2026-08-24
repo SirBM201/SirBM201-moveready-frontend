@@ -1,5 +1,5 @@
-import JobsDashboard from "@/components/jobs/JobsDashboard";
+import VacancyDiscovery from "@/components/jobs/VacancyDiscovery";
 
 export default function JobsPage() {
-  return <JobsDashboard />;
+  return <VacancyDiscovery />;
 }
