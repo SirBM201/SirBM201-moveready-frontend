@@ -10,7 +10,7 @@ on:
       - "public/**"
       - "scripts/**"
       - "tests/**"
-      - "docs/LQ02_**"
+      - "docs/LQ**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -24,7 +24,7 @@ on:
       - "public/**"
       - "scripts/**"
       - "tests/**"
-      - "docs/LQ02_**"
+      - "docs/LQ**"
       - "package.json"
       - "package-lock.json"
       - "next.config.*"
@@ -65,6 +65,8 @@ jobs:
         run: npm run test:lq05
       - name: Test LQ06 Vacancy Alignment Report
         run: npm run test:lq06
+      - name: Test LQ07 application execution and portfolio
+        run: npm run test:lq07
       - name: Test deployed-journey harness configuration
         run: npm run test:e2e
       - name: Test B06 general-user Jobs contract
