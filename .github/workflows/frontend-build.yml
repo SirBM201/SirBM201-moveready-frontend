@@ -59,6 +59,8 @@ jobs:
         run: npm run test:lq02
       - name: Test LQ03 vacancy discovery and detail journey
         run: npm run test:lq03
+      - name: Test LQ04 guided onboarding and product shell
+        run: npm run test:lq04
       - name: Test deployed-journey harness configuration
         run: npm run test:e2e
       - name: Test B06 general-user Jobs contract

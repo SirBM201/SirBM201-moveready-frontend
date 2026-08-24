@@ -57,8 +57,8 @@ for (const navigation of [header, mobileNav, jobsNav]) {
 assert.match(header, /event\.key === "Escape"/);
 assert.match(header, /querySelector\("summary"\)\?\.focus\(\)/);
 assert.match(jobsNav, /event\.key === "Escape"/);
-for (const label of ["Find", "Qualify", "Move", "Alerts", "Account"]) {
-  assert.match(mobileNav, new RegExp(`label: "${label}"`));
+for (const label of ["Start", "Jobs", "Actions", "Alerts", "Account"]) {
+  assert.match(mobileNav, new RegExp(`label:\\s*"${label}"`));
 }
 
 const css = accessibilityCss + responsiveCss;
