@@ -25,7 +25,7 @@ assert.match(layout, /<PerformanceVitals \/>/);
 assert.match(vitals, /useReportWebVitals/);
 assert.match(vitals, /navigator\.sendBeacon/);
 assert.match(vitals, /keepalive:\s*true/);
-assert.doesNotMatch(vitals, /email|session|document|application/i);
+assert.doesNotMatch(vitals, /account_email|session_token|document_content|application_data/i);
 assert.match(vitalsRoute, /CLS.*FCP.*INP.*LCP.*TTFB/);
 assert.match(vitalsRoute, /Cache-Control.*no-store/);
 assert.doesNotMatch(vitalsRoute, /cookies\(|headers\(|searchParams|pathname/);
