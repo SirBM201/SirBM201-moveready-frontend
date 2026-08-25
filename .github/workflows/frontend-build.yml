@@ -71,6 +71,8 @@ jobs:
         run: npm run test:lq08
       - name: Test LQ09 browser capture and safe assistant
         run: npm run test:lq09
+      - name: Test LQ10 LinkedIn optimizer and mock interview
+        run: npm run test:lq10
       - name: Build Chrome extension package
         run: npm run build:extension
       - name: Test deployed-journey harness configuration
