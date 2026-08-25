@@ -19,7 +19,7 @@ const launchChecks=[
 ];
 
 const deploymentChecks=[
- "Confirm the production migration frontier through 055 has been applied successfully and no later migration remains pending.",
+ "Confirm the historical Language Coach migrations through 039 remain applied, the production migration frontier through 055 is confirmed, and no later migration remains pending.",
  "Confirm Railway ENV_MODE and FLASK_ENV are production, AUTH_OTP_DEV_MODE is false, and no development OTP appears in an API response.",
  "Compare /api/build-info deployment.commit_sha with the current backend main commit and require route_contract.ok = true.",
  "Confirm the deployment contract contains financial-readiness/check with contract_versions.financial_readiness = b09-v1 and opportunity-finder/recommendations with contract_versions.opportunity_finder = b11-v1, plus route-comparison, account/outcomes and language-coach/profile.",
