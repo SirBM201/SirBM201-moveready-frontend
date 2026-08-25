@@ -67,6 +67,8 @@ jobs:
         run: npm run test:lq06
       - name: Test LQ07 application execution and portfolio
         run: npm run test:lq07
+      - name: Test LQ08 campaign employer recruiter intelligence
+        run: npm run test:lq08
       - name: Test deployed-journey harness configuration
         run: npm run test:e2e
       - name: Test B06 general-user Jobs contract
