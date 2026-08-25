@@ -25,6 +25,7 @@
     "test:lq07": "node scripts/test-lq07-execution.mjs",
     "test:lq08": "node scripts/test-lq08-intelligence.mjs",
     "test:lq09": "node scripts/test-lq09-browser-assistant.mjs",
+    "test:lq10": "node scripts/test-lq10-career-practice.mjs",
     "build:extension": "node scripts/build-lq09-extension.mjs"
   },
   "dependencies": {
