@@ -27,7 +27,8 @@
     "test:lq09": "node scripts/test-lq09-browser-assistant.mjs",
     "test:lq10": "node scripts/test-lq10-career-practice.mjs",
     "build:extension": "node scripts/build-lq09-extension.mjs",
-    "test:lq11": "node scripts/test-lq11-launch-hardening.mjs"
+    "test:lq11": "node scripts/test-lq11-launch-hardening.mjs",
+    "test:lq12": "node scripts/test-lq12-production-beta.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
