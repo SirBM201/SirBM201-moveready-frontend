@@ -22,7 +22,8 @@
     "test:lq04": "node scripts/test-lq04-guided-shell.mjs",
     "test:lq05": "node scripts/test-lq05-career-studio.mjs",
     "test:lq06": "node scripts/test-lq06-alignment-report.mjs",
-    "test:lq07": "node scripts/test-lq07-execution.mjs"
+    "test:lq07": "node scripts/test-lq07-execution.mjs",
+    "test:lq08": "node scripts/test-lq08-intelligence.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",

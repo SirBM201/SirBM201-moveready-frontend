@@ -5,6 +5,7 @@ const links=[
  {label:"Discover",href:"/jobs"},
  {label:"Readiness",href:"/jobs#vacancies"},
  {label:"Execution",href:"/jobs/execution"},
+ {label:"Intelligence",href:"/jobs/intelligence"},
  {label:"Applications",href:"/jobs/applications"},
  {label:"Career Studio",href:"/jobs/career-studio"},
 ];
