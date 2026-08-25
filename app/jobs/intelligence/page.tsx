@@ -1,0 +1,1 @@
+import IntelligenceWorkspace from "@/components/jobs/IntelligenceWorkspace";export default function IntelligencePage(){return <IntelligenceWorkspace/>;}
