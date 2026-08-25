@@ -51,6 +51,15 @@ type SmartAlertsResponse = {
   primary_alert?: SmartAlert | null;
   alerts?: SmartAlert[];
   preferences?: AlertPreferences;
+  daily_digest?: {
+    mode: "private_in_app";
+    schedule_time: string;
+    timezone: string;
+    generated_at: string;
+    refresh_available: boolean;
+    external_delivery_enabled: boolean;
+    summary: { total: number; critical: number; high: number };
+  };
   delivery_status?: Record<string, string>;
   partial_errors?: Record<string, string>;
   empty_state?: string | null;
@@ -246,6 +255,11 @@ export default function SmartAlertsCenter() {
             <span className="badge" key={item}>{readable(item)}: {data?.counts_by_priority?.[item] || 0}</span>
           ))}
           <span className="badge">Suppressed by preferences: {data?.suppressed_count || 0}</span>
+        </div>
+        <div className="mini-list" aria-label="Daily alert delivery status">
+          <div><strong>Private in-app digest</strong><span>{data?.daily_digest ? `${data.daily_digest.schedule_time} ${data.daily_digest.timezone}` : "07:07 UTC"}</span></div>
+          <div><strong>Last consolidated</strong><span>{data?.daily_digest?.generated_at ? formatDate(data.daily_digest.generated_at) : "Refresh to consolidate now"}</span></div>
+          <div><strong>External delivery</strong><span>External delivery remains disabled until consent and audited delivery controls are active.</span></div>
         </div>
         <div className="actions">
           <button className="btn primary" type="button" onClick={() => void load()} disabled={state === "loading"}>Refresh alerts</button>
