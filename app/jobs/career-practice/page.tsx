@@ -1,0 +1,1 @@
+import CareerPracticeWorkspace from "@/components/jobs/CareerPracticeWorkspace";export default function CareerPracticePage(){return <CareerPracticeWorkspace/>;}
