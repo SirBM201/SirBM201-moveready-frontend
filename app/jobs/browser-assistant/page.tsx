@@ -1,0 +1,1 @@
+import BrowserAssistantWorkspace from "@/components/jobs/BrowserAssistantWorkspace";export default function BrowserAssistantPage(){return <BrowserAssistantWorkspace/>;}
