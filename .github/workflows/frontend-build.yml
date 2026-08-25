@@ -73,6 +73,8 @@ jobs:
         run: npm run test:lq09
       - name: Test LQ10 LinkedIn optimizer and mock interview
         run: npm run test:lq10
+      - name: Test LQ11 launch hardening
+        run: npm run test:lq11
       - name: Build Chrome extension package
         run: npm run build:extension
       - name: Test deployed-journey harness configuration
