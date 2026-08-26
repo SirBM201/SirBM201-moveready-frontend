@@ -4,6 +4,6 @@ const [studio,model,exports,css,page,vault,nav]=await Promise.all([read("compone
 for(const section of ["summary","skills","experiences","education","certifications"])assert.match(model,new RegExp(section));
 assert.match(model,/cover_letter/);assert.match(studio,/Live ATS-safe preview/);assert.match(studio,/truthConfirmed/);
 assert.match(exports,/pdfBlob/);assert.match(exports,/docxBlob/);assert.match(exports,/application\/vnd\.openxmlformats/);assert.match(exports,/PROFESSIONAL EXPERIENCE/);
-assert.match(studio,/jobs\/resume-vault/);assert.match(studio,/localStorage/);assert.match(studio,/application_priority_reasons|career_facts/);
+assert.match(studio,/jobs\/resume-vault/);assert.match(studio,/localStorage/);assert.match(studio,/careerDocumentFromProfile/);assert.match(model,/career_facts/);
 assert.match(css,/@media\(max-width:560px\)/);assert.match(page,/CareerStudio/);assert.match(vault,/Career Studio/);assert.match(nav,/Career Studio/);
 console.log("LQ05 Career Studio contract: PASS");

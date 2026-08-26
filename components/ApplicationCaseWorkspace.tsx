@@ -401,7 +401,7 @@ export default function ApplicationCaseWorkspace() {
         <p>{options.storage_boundary || fallbackOptions.storage_boundary}</p>
         <div className="actions">
           <button className="btn primary" type="button" disabled={loading} onClick={() => loadCases(false)}>{loading ? "Loading..." : "Refresh cases"}</button>
-          <a className="btn" href="/login?next=/applications">Sign in</a>
+          {workspaceState === "signed_out" ? <a className="btn" href="/login?next=/applications">Sign in</a> : null}
           <a className="btn" href="/evidence-pack">Evidence Center</a>
           <a className="btn" href="/timeline">Timeline</a>
         </div>

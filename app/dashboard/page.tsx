@@ -50,7 +50,7 @@ export default function DashboardPage() {
             <a className="btn primary" href="#command-center">Show my next action</a>
             <a className="btn" href="/alerts">Open smart alerts</a>
             <a className="btn" href="/my-journey">Open My Journey</a>
-            <a className="btn" href="/login">Sign in</a>
+            <a className="btn" href="#account-summary">View account summary</a>
           </div>
         </div>
       </section>
