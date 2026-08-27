@@ -154,15 +154,17 @@ export default function JobAutomationWorkspace() {
   const activeResumes = useMemo(() => overview?.documents.filter((document) => document.is_active && ["ats_resume", "executive_resume"].includes(document.document_type)) || [], [overview?.documents]);
 
   async function bootstrapWatches() {
+    if (busy) return;
     setBusy("bootstrap");
     setMessage("Creating monitors from the official career pages of your selected employers...");
     try {
-      const response = await apiJson<{ created: number; updated: number; skipped: number; message: string }>("jobs/automation/watches/bootstrap", {
+      const response = await apiJson<{ created: number; updated: number; skipped: number; message: string; skipped_targets?: Array<{ company_name: string; reason: string }>; deferred?: number }>("jobs/automation/watches/bootstrap", {
         method: "POST",
         body: {},
         timeoutMs: 30000,
       });
-      await load(`${response.message} ${response.created} created, ${response.updated} refreshed, ${response.skipped} skipped.`);
+      const reasons = (response.skipped_targets || []).map((item) => `${item.company_name}: ${item.reason}`).join(" ");
+      await load(`${response.message} ${response.created} created, ${response.updated} refreshed, ${response.skipped} skipped. ${reasons}${response.deferred ? ` ${response.deferred} targets exceed the 30-employer limit.` : ""}`);
     } catch (error) {
       setMessage(messageFrom(error, "Unable to create employer monitors."));
     } finally {
@@ -414,9 +416,10 @@ export default function JobAutomationWorkspace() {
 
       <section className="section jobs-section">
         <div className="section-heading-row"><div><p className="overline">1. Vacancy monitoring</p><h2>Official employer sources only</h2><p>Build monitors from target companies inside your selected countries. Supported public ATS pages are allowed; arbitrary job-board or social-media scraping is not.</p></div><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={busy !== "" || !scopeReady}>{busy === "bootstrap" ? "Creating..." : overview.watches.length ? "Refresh target monitors" : "Create target monitors"}</button><a className="btn" href="/jobs/companies">Target companies</a></div></div>
+        <p className="jobs-inline-status" role="status" aria-live="polite">{message}</p>
         <div className="jobs-monitor-grid">
           {overview.watches.map((watch) => <article className="jobs-monitor-card" key={watch.id}><div className="panel-heading"><div><p className="overline">{watch.company_name || "Target employer"}</p><h3>{watch.watch_name}</h3></div><span className={`status-dot ${statusTone(watch.last_scan_status)}`}>{jobLabel(watch.last_scan_status)}</span></div><p>{watch.keywords?.slice(0, 4).join(" · ") || "Profile roles and skills"}</p><div className="jobs-record-facts"><span><small>Last scan</small><strong>{formatJobDate(watch.last_scan_at, true)}</strong></span><span><small>Listings</small><strong>{watch.last_result_count || 0}</strong></span><span><small>Cadence</small><strong>{jobLabel(watch.cadence)}</strong></span></div>{watch.last_error ? <p className="jobs-warning-copy">Latest check failed safely: {watch.last_error}</p> : null}<div className="actions"><button className="btn primary" type="button" onClick={() => scanWatch(watch)} disabled={busy !== "" || !watch.is_active || !scopeReady}>{busy === `scan-${watch.id}` ? "Checking..." : "Check now"}</button><button className="btn" type="button" onClick={() => toggleWatch(watch)} disabled={busy !== ""}>{watch.is_active ? "Pause" : "Activate"}</button><a className="btn" href={watch.source_url} target="_blank" rel="noreferrer">Official source</a></div></article>)}
-          {!overview.watches.length ? <article className="jobs-empty"><h3>No vacancy monitor exists yet</h3><p>{scopeReady ? "Choose target employers first, then create monitors from their recorded official career pages." : "Complete your intentional country scope before creating target monitors."}</p><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={!scopeReady}>Create target monitors</button>{scopeReady ? <a className="btn" href="/jobs/companies">Choose employers</a> : <a className="btn" href="/jobs/setup">Complete search setup</a>}</div></article> : null}
+          {!overview.watches.length ? <article className="jobs-empty"><h3>No vacancy monitor exists yet</h3><p>{scopeReady ? "Choose target employers first, then create monitors from their recorded official career pages." : "Complete your intentional country scope before creating target monitors."}</p><div className="actions"><button className="btn primary" type="button" onClick={bootstrapWatches} disabled={busy !== "" || !scopeReady}>{busy === "bootstrap" ? "Creating..." : "Create target monitors"}</button>{scopeReady ? <a className="btn" href="/jobs/companies">Choose employers</a> : <a className="btn" href="/jobs/setup">Complete search setup</a>}</div></article> : null}
         </div>
       </section>
 
