@@ -15,6 +15,8 @@ export default function VacancyDiscovery() {
   const [jobs,setJobs]=useState<JobLead[]>([]), [loading,setLoading]=useState(true);
   const [error,setError]=useState<unknown>(null), [query,setQuery]=useState(""), [country,setCountry]=useState("all");
   const [freshness,setFreshness]=useState("all"), [sort,setSort]=useState<Sort>("recommended");
+  const [slow,setSlow]=useState(false);
+  useEffect(()=>{if(!loading){setSlow(false);return;}const timer=window.setTimeout(()=>setSlow(true),8000);return()=>window.clearTimeout(timer);},[loading]);
   async function load(){setLoading(true);setError(null);try{const response=await apiJson<JobsSummary>("jobs/summary",{timeoutMs:20000});setJobs(response.recommended_jobs||[]);}catch(e){setError(e);}finally{setLoading(false);}}
   useEffect(()=>{void load();},[]);
   const countries=useMemo(()=>Array.from(new Set(jobs.map(j=>j.country).filter(Boolean))).sort(),[jobs]);
@@ -28,7 +30,7 @@ export default function VacancyDiscovery() {
     if(sort==="viability")return (b.application_viability_score||b.application_priority_score||0)-(a.application_viability_score||a.application_priority_score||0);
     return ((b.application_viability_score||0)+(b.match_score||0))-((a.application_viability_score||0)+(a.match_score||0));
   }),[jobs,query,country,freshness,sort]);
-  if(loading)return <main className={styles.shell}><div className={styles.skeleton} role="status" aria-label="Loading current vacancies" /></main>;
+  if(loading)return <main className={styles.shell}><div className={styles.skeleton} role="status" aria-label="Loading current vacancies" /><p role="status">{slow?"This is taking longer than usual. The request will time out after 20 seconds; your saved vacancies are unchanged.":"Loading your vacancies and suitability information…"}</p><a className="btn" href="/dashboard">Back to dashboard</a></main>;
   if(error instanceof ApiError&&error.status===401)return <main className={styles.shell}><AuthExpiredState detail="Sign in to see vacancies matched against your private profile and work-rights information." /></main>;
   if(error)return <main className={styles.shell}><RecoverableErrorState detail={(error as Error)?.message||"Vacancies could not be loaded. Your saved data was not changed."} action={<button className="btn primary" onClick={load}>Try again</button>} /></main>;
   return <main className={styles.shell}>
