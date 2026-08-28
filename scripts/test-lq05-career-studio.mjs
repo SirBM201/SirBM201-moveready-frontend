@@ -7,3 +7,4 @@ assert.match(exports,/pdfBlob/);assert.match(exports,/docxBlob/);assert.match(ex
 assert.match(studio,/jobs\/resume-vault/);assert.match(studio,/localStorage/);assert.match(studio,/careerDocumentFromProfile/);assert.match(model,/career_facts/);
 assert.match(css,/@media\(max-width:560px\)/);assert.match(page,/CareerStudio/);assert.match(vault,/Career Studio/);assert.match(nav,/Career Studio/);
 console.log("LQ05 Career Studio contract: PASS");
+await import("./test-career-draft-storage.mjs");
