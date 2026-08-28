@@ -198,12 +198,17 @@ export default function JobAutomationWorkspace() {
     setBusy(`scan-${watch.id}`);
     setMessage(`Checking ${watch.watch_name}...`);
     try {
-      const response = await apiJson<{ scan: { discovered_count: number; new_count: number; changed_count: number; alert_count: number } }>(`jobs/automation/watches/${watch.id}/scan`, {
+      const response = await apiJson<{ scan: { skipped?: boolean; skip_reason?: string; diagnostics?: Record<string, number>; discovered_count?: number; new_count?: number; changed_count?: number; alert_count?: number } }>(`jobs/automation/watches/${watch.id}/scan`, {
         method: "POST",
         body: {},
         timeoutMs: 60000,
       });
-      await load(`${watch.watch_name}: ${response.scan.discovered_count} matching listings found, ${response.scan.new_count} new, ${response.scan.changed_count} changed, and ${response.scan.alert_count} alerts created.`);
+      const scan = response.scan;
+      const d = scan.diagnostics;
+      const detail = d ? ` Scan breakdown: ${d.extracted ?? "unknown"} extracted, ${d.after_relevance ?? 0} after relevance checks; ${d.source_host_excluded ?? 0} excluded by source, ${d.country_unknown ?? 0} with unconfirmed country, ${d.country_mismatch ?? 0} outside the monitor country.` : "";
+      await load(scan.skipped
+        ? `${watch.watch_name}: scan skipped (${scan.skip_reason || "search scope needs review"}). Review your search countries.`
+        : `${watch.watch_name}: ${scan.discovered_count ?? 0} matching listings found, ${scan.new_count ?? 0} new, ${scan.changed_count ?? 0} changed, and ${scan.alert_count ?? 0} alerts created.${detail}`);
     } catch (error) {
       await load(messageFrom(error, `Unable to check ${watch.watch_name}.`));
     } finally {
