@@ -79,6 +79,8 @@ jobs:
         run: npm run test:lq12
       - name: Test LQ20 V1 launch acceptance and failure boundaries
         run: npm run test:lq20
+      - name: Test LQ21 controlled V1 launch closure
+        run: npm run test:lq21
       - name: Build Chrome extension package
         run: npm run build:extension
       - name: Test deployed-journey harness configuration
