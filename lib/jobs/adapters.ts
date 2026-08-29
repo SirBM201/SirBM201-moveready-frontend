@@ -29,12 +29,24 @@ const items = (value: unknown, ...keys: string[]): unknown[] => {
 };
 
 export const adaptReadiness = (value: unknown): JobReadiness => {
-  const raw = payload(value);
+  const container = payload(value);
+  const nested = object(container.readiness);
+  const record = object(container.record);
+  const raw = Object.keys(nested).length ? { ...record, ...nested, job_id: first(container,"job_id","jobId") || nested.job_id, materials: container.materials } : container;
+  const gaps = list(first(raw,"gaps","issues")).map(item => {
+    const gap = object(item);
+    return {
+      code: text(gap.code), message: text(first(gap,"message","label")),
+      category: text(gap.category) || (gap.blocking ? "blocking" : "verification"),
+      severity: text(gap.severity) || (gap.blocking ? "critical" : "medium"),
+      blocking: Boolean(gap.blocking), action: text(gap.action) || "review",
+    };
+  });
   return {
     jobId: text(first(raw, "job_id", "jobId")),
     state: text(first(raw, "state", "status")) || "not_started",
     score: numberOrNull(first(raw, "score", "readiness_score")),
-    materials: list(raw.materials).map(item => {
+    materials: Array.isArray(raw.materials) ? list(raw.materials).map(item => {
       const material = object(item);
       return {
         kind: text(first(material, "kind", "type")),
@@ -42,8 +54,12 @@ export const adaptReadiness = (value: unknown): JobReadiness => {
         documentId: nullableText(first(material, "document_id", "documentId")),
         note: nullableText(material.note),
       };
-    }),
-    blockers: list(raw.blockers).map(text).filter(Boolean),
+    }) : Object.entries(object(raw.materials)).filter(([,value])=>value!==null&&value!==false&&value!==undefined).map(([kind,value])=>({kind,status:typeof value==="object"?"recorded":String(value)})),
+    blockers: gaps.filter(item=>item.blocking).map(item=>item.message),
+    gaps,
+    nextActions: list(first(raw,"next_actions","nextActions")).map(item=>{const action=object(item);return{code:text(action.code),priority:Number(action.priority)||0,label:text(first(action,"label","message")),action:text(action.action)||"review",blocking:Boolean(action.blocking)};}),
+    gapSummary: recordNumbers(first(raw,"gap_summary","gapSummary")),
+    evidenceCoverage: numberOrNull(first(raw,"evidence_coverage","evidenceCoverage")),
     updatedAt: nullableText(first(raw, "updated_at", "updatedAt")),
   };
 };
