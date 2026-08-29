@@ -9,16 +9,16 @@ export interface ApiContract {
   purpose: string;
 }
 export const B19_API_CONTRACTS: readonly ApiContract[] = [
-  ["readiness.get","B19.2","GET","jobs/:jobId/readiness","Read job readiness"],
-  ["readiness.materials","B19.2","PATCH","jobs/:jobId/readiness/materials","Update readiness materials"],
-  ["readiness.transition","B19.2","POST","jobs/:jobId/readiness/transition","Transition readiness"],
-  ["readiness.reconcile","B19.2","POST","jobs/:jobId/readiness/reconcile","Reconcile readiness"],
+  ["readiness.get","B19.2","GET","jobs/jobs/:jobId/readiness","Read job readiness"],
+  ["readiness.materials","B19.2","PATCH","jobs/jobs/:jobId/readiness/materials","Update readiness materials"],
+  ["readiness.transition","B19.2","POST","jobs/jobs/:jobId/readiness/transition","Transition readiness"],
+  ["readiness.reconcile","B19.2","POST","jobs/jobs/:jobId/readiness/reconcile","Reconcile readiness"],
   ["readiness.list","B19.2","GET","jobs/readiness","List readiness"],
-  ["drafts.create","B19.3","POST","jobs/:jobId/application-drafts","Create application draft"],
-  ["drafts.list","B19.3","GET","jobs/:jobId/application-drafts","List application drafts"],
+  ["drafts.create","B19.3","POST","jobs/jobs/:jobId/application-drafts","Create application draft"],
+  ["drafts.list","B19.3","GET","jobs/jobs/:jobId/application-drafts","List application drafts"],
   ["drafts.review","B19.3","POST","jobs/application-drafts/:draftId/review","Review application draft"],
   ["handoffs.create","B19.4","POST","jobs/application-drafts/:draftId/handoff","Create handoff"],
-  ["handoffs.list","B19.4","GET","jobs/:jobId/application-handoffs","List job handoffs"],
+  ["handoffs.list","B19.4","GET","jobs/jobs/:jobId/application-handoffs","List job handoffs"],
   ["handoffs.get","B19.4","GET","jobs/application-handoffs/:handoffId","Read handoff"],
   ["handoffs.status","B19.4","POST","jobs/application-handoffs/:handoffId/status","Update handoff status"],
   ["lifecycle.create","B19.5","POST","jobs/application-lifecycles","Create lifecycle"],
