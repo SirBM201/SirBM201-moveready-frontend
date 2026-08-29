@@ -29,7 +29,8 @@
     "build:extension": "node scripts/build-lq09-extension.mjs",
     "test:lq11": "node scripts/test-lq11-launch-hardening.mjs",
     "test:lq12": "node scripts/test-lq12-production-beta.mjs",
-    "test:lq13": "node scripts/test-lq13-career-studio-launch-quality.mjs"
+    "test:lq13": "node scripts/test-lq13-career-studio-launch-quality.mjs",
+    "test:lq14": "node scripts/test-lq14-opportunity-integrity.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
