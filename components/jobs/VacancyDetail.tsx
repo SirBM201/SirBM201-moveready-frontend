@@ -10,6 +10,7 @@ import { AuthExpiredState, RecoverableErrorState } from "@/components/ui/Request
 import { sourceView, suitabilityView, vacancyFreshness, vacancyLocation } from "@/lib/jobs/vacancyPresentation";
 import styles from "./VacancyJourney.module.css";
 
+export const SAFETY_BOUNDARY="No automatic submission";
 const readinessHref=(action:string,jobId:string)=>({
   verify_source:"#source-record",record_work_rights:"/jobs/profile",verify_sponsorship:"#mobility-evidence",
   verify_requirements:`/jobs/vacancies/${encodeURIComponent(jobId)}/alignment`,prepare_cv:"/jobs/career-studio",
