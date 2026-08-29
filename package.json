@@ -36,7 +36,8 @@
     "test:lq17": "node scripts/test-lq17-outcome-learning-loop.mjs",
     "test:lq18": "node scripts/test-lq18-offer-mobility-handoff.mjs",
     "test:lq19": "node scripts/test-lq19-v1-journey-closure.mjs",
-    "test:lq20": "node scripts/test-lq20-launch-acceptance.mjs"
+    "test:lq20": "node scripts/test-lq20-launch-acceptance.mjs",
+    "test:lq21": "node scripts/test-lq21-controlled-launch-closure.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
