@@ -15,7 +15,7 @@ const readinessHref=(action:string,jobId:string)=>({
   verify_source:"#source-record",record_work_rights:"/jobs/profile",verify_sponsorship:"#mobility-evidence",
   verify_requirements:`/jobs/vacancies/${encodeURIComponent(jobId)}/alignment`,prepare_cv:"/jobs/career-studio",
   prepare_cover_letter:`/jobs/career-studio?kind=cover_letter&jobId=${encodeURIComponent(jobId)}`,
-  answer_questions:"/jobs/applications",
+  answer_questions:`/jobs/execution?jobId=${encodeURIComponent(jobId)}`,
 }[action]||`/jobs/vacancies/${encodeURIComponent(jobId)}/alignment`);
 
 export default function VacancyDetail({jobId}:{jobId:string}) {
