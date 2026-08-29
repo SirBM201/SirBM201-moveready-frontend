@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { ApiError, apiJson } from "@/lib/api";
 import type { JobLead, JobsSummary, ResumeDocument } from "@/lib/jobs";
 import { AuthExpiredState, RecoverableErrorState } from "@/components/ui/RequestState";
-import { executionClient, type Draft, type Followup, type Handoff, type Lifecycle, type PortfolioItem, type PortfolioSummary, type ReadinessBundle } from "@/lib/jobs/executionClient";
+import { executionClient, type Draft, type Followup, type Handoff, type Lifecycle, type MobilityHandoff, type PortfolioItem, type PortfolioSummary, type ReadinessBundle } from "@/lib/jobs/executionClient";
 import styles from "./ApplicationExecution.module.css";
 
 const lifecycleStates=["submitted","screening","interview","offer","hired","rejected","withdrawn"];
@@ -16,6 +16,7 @@ export default function ApplicationExecutionWorkspace(){
  const[jobs,setJobs]=useState<JobLead[]>([]),[documents,setDocuments]=useState<ResumeDocument[]>([]),[portfolio,setPortfolio]=useState<PortfolioItem[]>([]);
  const[portfolioSummary,setPortfolioSummary]=useState<PortfolioSummary|null>(null);
  const[due,setDue]=useState<Followup[]>([]),[lifecycles,setLifecycles]=useState<Lifecycle[]>([]),[selectedId,setSelectedId]=useState("");
+ const[mobility,setMobility]=useState<MobilityHandoff|null>(null);
  const[readiness,setReadiness]=useState<ReadinessBundle|null>(null),[drafts,setDrafts]=useState<Draft[]>([]),[handoffs,setHandoffs]=useState<Handoff[]>([]);
  const[cvId,setCvId]=useState(""),[coverId,setCoverId]=useState(""),[requirements,setRequirements]=useState(false),[answers,setAnswers]=useState(false);
  const[manualConfirmed,setManualConfirmed]=useState(false),[evidence,setEvidence]=useState(""),[lifecycleState,setLifecycleState]=useState("screening");
@@ -23,9 +24,9 @@ export default function ApplicationExecutionWorkspace(){
  const[loading,setLoading]=useState(true),[busy,setBusy]=useState(""),[error,setError]=useState<unknown>(null),[message,setMessage]=useState("");
 
  const loadJob=useCallback(async(jobId:string)=>{
-  if(!jobId){setReadiness(null);setDrafts([]);setHandoffs([]);return;}
-  const[r,d,h]=await Promise.all([executionClient.readiness.get(jobId),executionClient.drafts.list(jobId),executionClient.handoffs.list(jobId)]);
-  setReadiness({...r,job_id:jobId});setDrafts(d);setHandoffs(h);
+  if(!jobId){setReadiness(null);setDrafts([]);setHandoffs([]);setMobility(null);return;}
+  const[r,d,h,m]=await Promise.all([executionClient.readiness.get(jobId),executionClient.drafts.list(jobId),executionClient.handoffs.list(jobId),executionClient.portfolio.mobility(jobId)]);
+  setReadiness({...r,job_id:jobId});setDrafts(d);setHandoffs(h);setMobility(m);
   setCvId(r.materials?.cv_id||"");setCoverId(r.materials?.cover_letter_id||"");
   setRequirements(Boolean((r.record as Record<string,unknown>)?.requirements_verified));setAnswers(Boolean(r.materials?.application_answers_ready));
  },[]);
@@ -90,6 +91,7 @@ export default function ApplicationExecutionWorkspace(){
     <article className={styles.step}><div className={styles.stepHead}><div><p className="overline">5 · follow-up</p><h2>Schedule follow-up</h2></div><span className={styles.state}>{due.filter(x=>x.job_id===selectedId).length} due</span></div><form className={styles.form} onSubmit={createFollow}><div className={styles.field}><label htmlFor="follow-type">Action</label><select id="follow-type" value={followType} onChange={e=>setFollowType(e.target.value)}><option value="check_in">Check in</option><option value="thank_you">Thank you</option><option value="interview_preparation">Interview preparation</option></select></div><div className={styles.field}><label htmlFor="follow-date">When</label><input id="follow-date" type="datetime-local" value={followDate} onChange={e=>setFollowDate(e.target.value)} required/></div><div className={styles.field}><label htmlFor="follow-note">Note</label><textarea id="follow-note" value={followNote} onChange={e=>setFollowNote(e.target.value)}/></div><div className={styles.actions}><button className="btn primary" disabled={!currentLifecycle||busy!==""}>Schedule follow-up</button></div></form>
      {due.filter(x=>x.job_id===selectedId).map(item=><div className={styles.draft} key={item.id}><strong>{label(item.action_type)}</strong><p>{new Date(item.scheduled_for).toLocaleString()} · {item.note||"No note"}</p><button className="btn" onClick={()=>void mutate("complete",()=>executionClient.followups.complete(item.id,"completed",{note:"Completed by user"}),"Follow-up completed with user confirmation.")}>Mark complete</button></div>)}
     </article>
+    <article className={styles.step}><div className={styles.stepHead}><div><p className="overline">6 · offer to mobility</p><h2>Open the MOVE pillar safely</h2></div><span className={`${styles.state} ${mobility?.ready_for_mobility_planning?styles.done:mobility?.available?styles.attention:styles.blocked}`}>{mobility?.ready_for_mobility_planning?"Planning ready":mobility?.available?"Evidence gaps":"Offer required"}</span></div><p>A confirmed offer can start mobility planning, but it is not immigration approval, work authorization or proof of sponsorship.</p>{mobility?.gaps.length?<ul className={styles.issues}>{mobility.gaps.map(gap=><li key={gap.code}>{gap.message}{gap.blocking?" — blocking":""} <a href={gap.href}>Resolve</a></li>)}</ul>:null}{mobility?.ready_for_mobility_planning?<div className={styles.actions}><a className="btn primary" href={mobility.planning_links.journey}>Build mobility plan</a><a className="btn" href={mobility.planning_links.route}>Verify work route</a><a className="btn" href={mobility.planning_links.evidence}>Prepare evidence</a><a className="btn" href={mobility.planning_links.finances}>Check finances</a></div>:null}<p className={styles.notice}><strong>No authority submission or travel booking.</strong> Confirm official immigration, embassy and employer instructions before relying on the plan.</p></article>
    </section>
   </div>
   <section className={styles.panel}><div className={styles.stepHead}><div><p className="overline">Application command center</p><h2>Prioritized actions across every role</h2></div><button className="btn" onClick={()=>void refreshGlobal()}>Refresh portfolio</button></div><div className={styles.portfolio}>{portfolio.map(item=><article className={`${styles.portfolioItem} ${item.due_followup_count?styles.due:""}`} key={item.job_id}><strong>{item.job_title||"Recorded vacancy"}</strong><p>{item.company_name||"Employer not linked"} · {label(item.pipeline_state)} · {item.progress?.percent??0}%</p>{item.next_action?<p><b>{item.next_action.title||label(item.next_action.type)}</b>{item.next_action.blocking?<><br/><strong>Blocking evidence gap</strong></>:null}</p>:<p>No action currently due.</p>}<div className={styles.actions}><button className="btn" onClick={()=>void chooseJob(item.job_id)}>Open execution</button>{item.next_action?.href?<a className="btn" href={item.next_action.href}>Resolve next gap</a>:null}{item.reconciliation?.requires_write_reconciliation?<button className="btn" onClick={()=>void mutate("portfolio",()=>executionClient.portfolio.reconcile(item.job_id),"Portfolio record reconciled.")}>Repair portfolio link</button>:null}</div></article>)}</div>{!portfolio.length?<p>No application records yet. Start a readiness check from a vacancy to add it here.</p>:null}</section>
