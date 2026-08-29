@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import JobsNav from "@/components/jobs/JobsNav";
+import V1LaunchJourney from "@/components/jobs/V1LaunchJourney";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function JobsLayout({ children }: { children: ReactNode }) {
     <main className="page-shell jobs-shell">
       <SiteHeader sectionLabel="Guided relocation and job-search platform" />
       <JobsNav />
+      <V1LaunchJourney />
       {children}
     </main>
   );
