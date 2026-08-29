@@ -13,7 +13,26 @@ export interface JobReadiness {
   score: number | null;
   materials: ReadinessMaterial[];
   blockers: string[];
+  gaps: ReadinessGap[];
+  nextActions: ReadinessAction[];
+  gapSummary: Record<string, number>;
+  evidenceCoverage: number | null;
   updatedAt: IsoDateTime | null;
+}
+export interface ReadinessGap {
+  code: string;
+  message: string;
+  category: string;
+  severity: string;
+  blocking: boolean;
+  action: string;
+}
+export interface ReadinessAction {
+  code: string;
+  priority: number;
+  label: string;
+  action: string;
+  blocking: boolean;
 }
 export interface ReadinessMaterial {
   kind: string;
