@@ -32,7 +32,8 @@
     "test:lq13": "node scripts/test-lq13-career-studio-launch-quality.mjs",
     "test:lq14": "node scripts/test-lq14-opportunity-integrity.mjs",
     "test:lq15": "node scripts/test-lq15-readiness-gap-engine.mjs",
-    "test:lq16": "node scripts/test-lq16-application-command-center.mjs"
+    "test:lq16": "node scripts/test-lq16-application-command-center.mjs",
+    "test:lq17": "node scripts/test-lq17-outcome-learning-loop.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",
