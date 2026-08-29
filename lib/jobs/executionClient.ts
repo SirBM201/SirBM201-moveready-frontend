@@ -8,6 +8,7 @@ export type Lifecycle={id:string;job_id:string;handoff_id:string;state:string;la
 export type Followup={id:string;lifecycle_id:string;job_id:string;action_type:string;status:string;scheduled_for:string;note?:string|null;outcome?:string|null};
 export type PortfolioItem={job_id:string;job_title?:string;company_name?:string;pipeline_state?:string;terminal?:boolean;priority_score?:number;due_followup_count?:number;progress?:{stage:string;percent:number;completed:boolean};next_action?:{type?:string;title?:string;summary?:string;href?:string;blocking?:boolean;gap_code?:string};reconciliation?:{requires_write_reconciliation?:boolean};[key:string]:unknown};
 export type PortfolioSummary={terminal:number;actionable:number;blocking:number;ready_to_apply:number;in_progress:number;due_followups:number;reconciliation_required:number};
+export type MobilityHandoff={contract_version:string;job_id:string;job_title?:string;company_name?:string;destination_country?:string|null;lifecycle_state:string;offer_evidence_recorded:boolean;work_authorized:boolean;sponsorship_status:string;relocation_support_status:string;available:boolean;ready_for_mobility_planning:boolean;blocking_gap_count:number;gaps:Array<{code:string;message:string;action:string;href:string;blocking:boolean}>;next_actions:Array<{code:string;message:string;action:string;href:string;blocking:boolean}>;planning_links:{route:string;evidence:string;finances:string;journey:string};safety:Record<string,boolean>};
 const get=<T>(path:string)=>apiJson<T>(path,{timeoutMs:25000,useAuthToken:true});
 const post=<T>(path:string,body:Record<string,unknown>={})=>apiJson<T>(path,{method:"POST",body,timeoutMs:30000,useAuthToken:true});
 export const executionClient={
@@ -42,6 +43,7 @@ export const executionClient={
   list:async()=>(await get<{items:PortfolioItem[]}>("jobs/application-portfolio")).items||[],
   actions:()=>get<{actions:Record<string,unknown>[];next?:Record<string,unknown>|null}>("jobs/application-portfolio/actions"),
   next:()=>get<{action:Record<string,unknown>;portfolio_count:number}>("jobs/application-portfolio/next-action"),
+  mobility:async(jobId:string)=>(await get<{handoff:MobilityHandoff}>(`jobs/application-portfolio/${encodeURIComponent(jobId)}/mobility-handoff`)).handoff,
   reconcile:(jobId:string)=>post<{changed:boolean;plan:Record<string,unknown>}>(`jobs/application-portfolio/${encodeURIComponent(jobId)}/reconcile`),
  },
 };
