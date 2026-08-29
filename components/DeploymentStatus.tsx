@@ -140,16 +140,22 @@ export default function DeploymentStatus() {
     setLoading(true);
     setMessage("Checking backend build information and operational controls...");
     try {
-      const [frontendResponse, buildInfo, operationsInfo] = await Promise.all([
-        fetch("/api/frontend-build-info", { cache: "no-store" }),
-        apiJson<BuildInfo>("build-info", { timeoutMs: 30000, useAuthToken: false }),
-        apiJson<OperationsStatus>("operations/status", { timeoutMs: 30000, useAuthToken: false }),
-      ]);
+      const frontendResponse = await fetch("/api/frontend-build-info", { cache: "no-store" });
       if (!frontendResponse.ok) throw new Error(`Frontend fingerprint returned HTTP ${frontendResponse.status}`);
       const frontendInfo = await frontendResponse.json() as FrontendBuildInfo;
       setFrontend(frontendInfo);
+      const [buildResult,operationsResult] = await Promise.allSettled([
+        apiJson<BuildInfo>("build-info", { timeoutMs: 30000, useAuthToken: false }),
+        apiJson<OperationsStatus>("operations/status", { timeoutMs: 30000, useAuthToken: false }),
+      ]);
+      const buildInfo=buildResult.status==="fulfilled"?buildResult.value:null;
+      const operationsInfo=operationsResult.status==="fulfilled"?operationsResult.value:null;
       setBuild(buildInfo);
       setOperations(operationsInfo);
+      if (!buildInfo || !operationsInfo) {
+        setMessage(`Vercel fingerprint verified. Railway ${!buildInfo&&!operationsInfo?"build and operations checks are":"check is"} unavailable; production is not accepted until connectivity recovers.`);
+        return;
+      }
       if (frontendInfo.contract_version !== "b16-v1") {
         setMessage("The frontend is responding, but it does not report the B16 deployment contract. Treat this deployment as incomplete.");
       } else if (buildInfo.contract_versions?.operations !== "b16-v1") {
@@ -165,7 +171,7 @@ export default function DeploymentStatus() {
       }
     } catch (error) {
       const apiError = error as ApiError;
-      setFrontend(null);
+      setFrontend((current) => current);
       setBuild(null);
       setOperations(null);
       setMessage(apiError?.message || "Unable to verify the deployed backend. It may be sleeping, unavailable, or serving an older route contract.");

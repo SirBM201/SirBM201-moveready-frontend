@@ -1,0 +1,5 @@
+import assert from "node:assert/strict";import{readFile}from"node:fs/promises";
+const[route,status,page,deployment,pkg,wf]=await Promise.all(["app/api/launch-acceptance/route.ts","components/LaunchAcceptanceStatus.tsx","app/deployment-status/page.tsx","components/DeploymentStatus.tsx","package.json",".github/workflows/frontend-build.yml"].map(x=>readFile(x,"utf8")));
+for(const value of ["/api/health","/api/build-info","/api/auth/health","/api/operations/status","/api/jobs/options"])assert.match(route,new RegExp(value.replaceAll("/","\\/")));
+assert.match(route,/expected:\s*401/);assert.match(route,/read_only:\s*true/);assert.match(route,/credentials_sent:\s*false/);assert.match(route,/external_action_performed:\s*false/);assert.match(route,/Promise\.all\(checks\.map/);
+assert.match(status,/no credentials, OTP request, record mutation, scan, application submission/);assert.match(page,/<LaunchAcceptanceStatus/);assert.match(deployment,/Promise\.allSettled/);assert.doesNotMatch(deployment,/setFrontend\(null\)/);assert.match(pkg,/"test:lq20"/);assert.match(wf,/npm run test:lq20/);console.log("LQ20 V1 launch acceptance contract: PASS");
